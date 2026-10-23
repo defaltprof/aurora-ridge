@@ -381,7 +381,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>The outcome is decided first.</strong> Each reel has a fixed strip of symbols. The game picks a random stop on every strip, reads 4 symbols from each, and only then plays the animation.</li>
           <li><strong>Two kinds of wild.</strong> The moon wild is a normal wild. It substitutes for everything except scatter, bonus and jackpot symbols and then is gone on the next spin. The yellow wilds, including the 2x and 3x ones, are <strong>growing wilds</strong>.</li>
           <li><strong>Growing wilds.</strong> A growing wild stays on screen while the other symbols spin around it. Each spin it adds one box, in the direction of the gold arrow, which is toward the nearest edge first and then the other way. When the reel is full of wilds it shows for one spin and clears. A multiplier wild multiplies any line it is on, and wilds on the same line multiply together.</li>
-          <li><strong>Free spins.</strong> Three or more bonus symbols anywhere award 20 free spins. Three more during the feature add 10. Locked wilds carry into the feature. The free spin strips carry more wilds, which is where most of the extra return comes from.</li>
+          <li><strong>Free spins.</strong> Three or more bonus symbols anywhere award 20 free spins. Two or more during the feature add 10 more. Locked wilds carry into the feature. The free spin strips carry more wilds, which is where most of the extra return comes from.</li>
           <li><strong>Scatters.</strong> A separate symbol. Three or more anywhere pay 5x, 10x or 25x your total bet. They do not start free spins.</li>
           <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Three or more of the same one on adjacent reels pay 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
           <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 95%. Change either and the return changes, so re-run the math lab after any edit.</li>
@@ -446,17 +446,18 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     jackpots: [12.5, 62.5, 125, 312.5, 1250],
     fsAward: 20,
     fsRetrig: 10,
+    fsRetrigMin: 2, // bonus symbols needed during free spins to add more spins
     base: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 3, BN: 5, JP1: 4, JP2: 2 },
       { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 3, W2: 2, SC: 3, BN: 5, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
       { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 5, BN: 11, JP1: 6, JP2: 3, JP3: 2, JP4: 2, JP5: 1 },
       { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 3, W3: 2, SC: 3, BN: 5, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
       { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, SC: 3, BN: 5, JP1: 4, JP2: 2 }
     ],
-    fs: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 4, SC: 3, BN: 3, JP1: 4, JP2: 2 },
-      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W2: 3, SC: 3, BN: 3, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
-      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W2: 3, SC: 5, BN: 3, JP1: 6, JP2: 3, JP3: 2, JP4: 2, JP5: 1 },
-      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W3: 3, SC: 3, BN: 3, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
-      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, SC: 3, BN: 3, JP1: 4, JP2: 2 }
+    fs: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 3, SC: 3, BN: 2, JP1: 4, JP2: 2 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W2: 3, SC: 3, BN: 2, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W2: 3, SC: 5, BN: 2, JP1: 6, JP2: 3, JP3: 2, JP4: 2, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W3: 3, SC: 3, BN: 2, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, SC: 3, BN: 2, JP1: 4, JP2: 2 }
     ]
   };
 
@@ -652,7 +653,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         res.trigger = true;
       } else if (res.mode === 'fs') {
         st.fsWin += res.win;
-        if (bn >= 3) { st.fsLeft += cfg.fsRetrig; res.retrigger = cfg.fsRetrig; }
+        if (bn >= (cfg.fsRetrigMin || 3)) { st.fsLeft += cfg.fsRetrig; res.retrigger = cfg.fsRetrig; }
         if (st.fsLeft <= 0) { st.mode = 'base'; st.exp = []; res.fsEnded = true; }
       }
       res.fsLeft = st.fsLeft;
@@ -916,9 +917,21 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       tone(f, t, 0.07, 'sine', vol, f * 0.85);
       noise(t, 0.025, vol * 0.5, f * 2.2, f * 1.6);
     }
+    // sweet chime: round, in-tune harmonics with a soft attack (friendlier than the raw plucked string)
+    function sweet(f, t, vol, dur) {
+      [[1, 1, 1], [2, 0.32, 0.55], [3, 0.1, 0.35], [4, 0.04, 0.25]].forEach(function (p) {
+        var o = ctx.createOscillator(), g = ctx.createGain(), dd = dur * p[2];
+        o.type = 'sine'; o.frequency.value = f * p[0];
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(vol * p[1], t + 0.008);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + dd);
+        o.connect(g); g.connect(sfxGain);
+        o.start(t); o.stop(t + dd + 0.05);
+      });
+    }
     function harp(list, step, vol, t0) {
       var t = t0 || ctx.currentTime;
-      list.forEach(function (f, i) { pluck(f, t + i * step, vol, 1.4); });
+      list.forEach(function (f, i) { sweet(f, t + i * step, vol * 0.75, 0.9); });
       return t + list.length * step;
     }
     var api = {
@@ -961,7 +974,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       win: function (x) {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime, end;
-        pluck(NOTES.C3, t, 0.16, 1.4);
+        tone(NOTES.C4, t, 0.35, 'sine', 0.06);
         if (x < 1) end = harp([NOTES.C5, NOTES.E5], 0.09, 0.16);
         else if (x < 5) end = harp([NOTES.C5, NOTES.E5, NOTES.G5], 0.09, 0.17);
         else end = harp([NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6, NOTES.E6], 0.08, 0.17);
@@ -972,7 +985,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         var t = ctx.currentTime;
         var run = retrigger ? [NOTES.G4, NOTES.C5, NOTES.E5, NOTES.G5] : [NOTES.C4, NOTES.D4, NOTES.E4, NOTES.G4, NOTES.A4, NOTES.C5, NOTES.D5, NOTES.E5, NOTES.G5, NOTES.A5, NOTES.C6];
         var end = harp(run, 0.065, 0.15);
-        pluck(NOTES.C3, t, 0.18, 1.8);
+        tone(NOTES.C4, t, 0.6, 'sine', 0.07);
         [NOTES.C5, NOTES.G5, NOTES.C6].forEach(function (f) { bell(f, end, 0.05, 2); });
       },
       jackpot: function (tier) {
@@ -980,7 +993,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         var t = ctx.currentTime, scale = [NOTES.C4, NOTES.D4, NOTES.E4, NOTES.G4, NOTES.A4, NOTES.C5, NOTES.D5, NOTES.E5, NOTES.G5, NOTES.A5, NOTES.C6, NOTES.E6];
         var run = scale.slice(0, Math.min(scale.length, 5 + tier * 2));
         var end = harp(run, 0.06, 0.16);
-        pluck(NOTES.C3, t, 0.2, 2);
+        tone(NOTES.C4, t, 0.8, 'sine', 0.08);
         [NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6].forEach(function (f, i) { bell(f, end + i * 0.05, 0.06, 2.6); });
         noise(end, 1.4, 0.05, 5000, 1500);
       },
@@ -1581,7 +1594,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td>' + p[0] + '</td><td>' + p[1] + '</td><td>' + p[2] + '</td></tr>';
     });
     ['G', 'W2', 'W3', 'SC', 'BN', 'JP1', 'JP2', 'JP3', 'JP4', 'JP5'].forEach(function (s) {
-      var note = s === 'SC' ? 'Pays anywhere: 3 = ' + cfg.scatter[3] + 'x, 4 = ' + cfg.scatter[4] + 'x, 5 = ' + cfg.scatter[5] + 'x your total bet' : s === 'BN' ? 'Pays nothing itself. 3 or more anywhere award ' + cfg.fsAward + ' free spins' : s.indexOf('JP') === 0 ? NAMES[s] + ': 3 or more on adjacent reels pays ' + cfg.jackpots[+s.charAt(2) - 1] + 'x your total bet' : (s === 'G' ? 'Growing wild: stays and grows a box each spin' : 'Growing wild that multiplies the wins it joins');
+      var note = s === 'SC' ? 'Pays anywhere: 3 = ' + cfg.scatter[3] + 'x, 4 = ' + cfg.scatter[4] + 'x, 5 = ' + cfg.scatter[5] + 'x your total bet' : s === 'BN' ? 'Pays nothing itself. 3 or more anywhere award ' + cfg.fsAward + ' free spins. 2 or more during free spins add ' + cfg.fsRetrig + ' more' : s.indexOf('JP') === 0 ? NAMES[s] + ': 3 or more on adjacent reels pays ' + cfg.jackpots[+s.charAt(2) - 1] + 'x your total bet' : (s === 'G' ? 'Growing wild: stays and grows a box each spin' : 'Growing wild that multiplies the wins it joins');
       html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">' + note + '</td></tr>';
     });
     $('ptable').innerHTML = html;
