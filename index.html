@@ -1122,6 +1122,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       var stopAt = [], t = base;
       for (c = 0; c < REELS; c++) { if (c > 0) t += step + (tease[c] ? teaseAdd : 0); stopAt[c] = t * 1000; }
       var done = [], ndone = 0, anims = [], timers = [], spinners = [], growEls = [], seen = 0, slammed = false;
+      var still = [];
+      for (c = 0; c < REELS; c++) {
+        var hk = (held[c] || []).slice();
+        if (hk.length) res.exp.forEach(function (e) { if (e.reel === c) for (var q = e.lo; q <= e.hi; q++) if (hk.indexOf(q) === -1) hk.push(q); });
+        still[c] = hk;
+      }
       res._grown = {};
       function land(c, quiet) {
         if (done[c]) return;
@@ -1137,7 +1143,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         for (var r = 0; r < ROWS; r++) {
           paint(r, c, res.grid[r][c]);
           cells[r][c].classList.remove('held', 'hide');
-          cells[r][c].classList.add('landed');
+          if (still[c].indexOf(r) === -1) cells[r][c].classList.add('landed');
         }
         var nx = c + 1;
         while (nx < REELS && done[nx]) nx++;
@@ -1173,7 +1179,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         var strip = document.createElement('div');
         strip.className = 'strip';
         var html = '';
-        for (i = 0; i < syms.length; i++) html += '<div class="scell" style="top:' + ((i - 1) * m.p) + 'px;height:' + m.h + 'px">' + tileHTML(syms[i]) + '</div>';
+        var tail = syms.length - ROWS;
+        for (i = 0; i < syms.length; i++) {
+          var blank = (i >= 1 && i <= ROWS && still[c].indexOf(i - 1) !== -1) || (i >= tail && h.indexOf(i - tail) !== -1);
+          html += '<div class="scell" style="top:' + ((i - 1) * m.p) + 'px;height:' + m.h + 'px">' + (blank ? '' : tileHTML(syms[i])) + '</div>';
+        }
         strip.innerHTML = html;
         spn.appendChild(strip);
         reelEls[c].appendChild(spn);
