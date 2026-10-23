@@ -145,7 +145,7 @@ h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); lette
 .cell.win .tile { box-shadow: inset 0 0 0 2px var(--amber), 0 0 20px color-mix(in srgb, var(--amber) 60%, transparent); animation: pulse 0.6s ease-in-out infinite alternate; }
 .cell.dim .tile { opacity: 0.3; filter: saturate(0.4); }
 .reel.spinning .cell:not(.held) .tile { animation: jitter 0.09s linear infinite; filter: blur(1.2px); }
-.cell.landed .tile { animation: land 0.22s ease-out; }
+.cell.landed .tile { animation: none; }
 .cell.grow .tile { animation: grow 0.35s ease-out; }
 @keyframes jitter { from { transform: translateY(-5%); } to { transform: translateY(5%); } }
 @keyframes land { 0% { transform: translateY(-12%); } 60% { transform: translateY(3%); } 100% { transform: none; } }
@@ -1190,11 +1190,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         spinners[c] = spn;
         for (r = 0; r < ROWS; r++) if (h.indexOf(r) === -1) cells[r][c].classList.add('hide');
         var S = (L + ROWS) * m.p, D = stopAt[c];
-        var wind = fastMode ? 70 : 150, settle = fastMode ? 150 : 260;
+        var wind = fastMode ? 70 : 150, settle = fastMode ? 180 : 380;
         var anim = strip.animate([
           { transform: 'translateY(' + (-S) + 'px)', offset: 0, easing: 'ease-out' },
-          { transform: 'translateY(' + (-S - 0.22 * m.p) + 'px)', offset: wind / D, easing: 'cubic-bezier(0.32, 0, 0.62, 1)' },
-          { transform: 'translateY(' + (0.17 * m.p) + 'px)', offset: (D - settle) / D, easing: 'ease-in-out' },
+          { transform: 'translateY(' + (-S - 0.22 * m.p) + 'px)', offset: wind / D, easing: 'cubic-bezier(0.3, 0, 0.42, 1)' },
+          { transform: 'translateY(' + (0.07 * m.p) + 'px)', offset: (D - settle) / D, easing: 'cubic-bezier(0.33, 1, 0.68, 1)' },
           { transform: 'translateY(0px)', offset: 1 }
         ], { duration: D, fill: 'forwards' });
         anims[c] = anim;
@@ -1224,7 +1224,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         (function (cc, st2) {
           anim.onfinish = function () { land(cc); };
           timers.push(setTimeout(function () { st2.classList.add('blur'); }, wind + 60));
-          timers.push(setTimeout(function () { st2.classList.remove('blur'); }, Math.max(wind + 90, D - settle - 170)));
+          timers.push(setTimeout(function () { st2.classList.remove('blur'); }, Math.max(wind + 90, D - settle - 260)));
         })(c, strip);
       }
       if (!canAnim) for (c = 0; c < REELS; c++) (function (cc) { timers.push(setTimeout(function () { land(cc); }, stopAt[cc])); })(c);
