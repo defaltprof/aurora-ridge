@@ -54,6 +54,19 @@ button:focus-visible, select:focus-visible, [role=tab]:focus-visible { outline: 
 .wrap { max-width: 1120px; margin: 0 auto; }
 .top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 18px; margin-bottom: 16px; }
 h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.topper { margin-bottom: 10px; border-radius: 14px; overflow: hidden; border: 1px solid color-mix(in srgb, #ffc23d 35%, var(--edge)); box-shadow: 0 0 18px color-mix(in srgb, #9b5de5 30%, transparent), inset 0 0 0 1px rgba(255, 255, 255, 0.05); }
+.topper svg { display: block; width: 100%; height: auto; }
+.frame { --bulb: #7fe9ff; --chase: 1.8s; position: relative; padding: 14px; border-radius: 18px; background: linear-gradient(160deg, #2c3856, #121a2c 38%, #1f2a44 68%, #0b1120); box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.16), inset 0 -2px 8px rgba(0, 0, 0, 0.6), 0 8px 20px rgba(0, 0, 0, 0.45); }
+.frame.fs { --bulb: #ffc23d; }
+.frame.rolling { --chase: 0.55s; }
+.bulbs { position: absolute; inset: 0; pointer-events: none; z-index: 1; }
+.bulb { position: absolute; width: 7px; height: 7px; margin: -3.5px 0 0 -3.5px; border-radius: 50%; background: var(--bulb); box-shadow: 0 0 7px var(--bulb), inset 0 0 2px #fff; opacity: 0.22; animation: chase var(--chase) linear infinite; animation-delay: calc(var(--k) * var(--chase) / -6); }
+.frame.win .bulb { animation: blink 0.24s steps(2, jump-none) infinite; }
+.frame.big .bulb { --bulb: #ff7ad9; animation: blink 0.14s steps(2, jump-none) infinite; animation-delay: calc(var(--k) * -0.07s); }
+@keyframes chase { 0% { opacity: 1; } 30% { opacity: 0.22; } 100% { opacity: 0.22; } }
+@keyframes blink { 0% { opacity: 1; } 100% { opacity: 0.2; } }
+@media (prefers-reduced-motion: reduce) { .bulb { animation: none !important; opacity: 0.7; } }
 .top .meta { font: 500 12px/1.4 var(--font-mono); color: var(--mute); letter-spacing: 0.04em; }
 .layout { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); align-items: start; }
 @media (min-width: 980px) { .layout { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); } }
@@ -210,18 +223,37 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 
 <div class="wrap">
   <header class="top">
-    <h1>Aurora Ridge</h1>
+    <h1 class="sr">Aurora Ridge</h1>
     <div class="meta">5 x 4 reels / 40 lines / play credits only / original art and sound</div>
   </header>
 
   <div class="layout">
     <section class="cab" aria-label="Slot machine">
+      <div class="topper" aria-hidden="true">
+        <svg viewBox="0 0 400 118">
+          <defs>
+            <linearGradient id="tSky" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#070d22"/><stop offset="1" stop-color="#1a1240"/></linearGradient>
+            <linearGradient id="tAu" x1="0" y1="0" x2="1" y2="0"><stop offset="0" stop-color="#38e8b2"/><stop offset="0.5" stop-color="#5aa9ff"/><stop offset="1" stop-color="#b06cff"/></linearGradient>
+            <linearGradient id="tGold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff7cf"/><stop offset="0.5" stop-color="#ffc23d"/><stop offset="1" stop-color="#d9690c"/></linearGradient>
+          </defs>
+          <rect width="400" height="118" fill="url(#tSky)"/>
+          <circle cx="173" cy="15" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="4.0s" begin="0.2s" repeatCount="indefinite"/></circle><circle cx="282" cy="12" r="1.2" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.7s" begin="2.7s" repeatCount="indefinite"/></circle><circle cx="117" cy="8" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.3s" begin="0.2s" repeatCount="indefinite"/></circle><circle cx="54" cy="41" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="2.2s" begin="1.7s" repeatCount="indefinite"/></circle><circle cx="122" cy="46" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.7s" begin="1.2s" repeatCount="indefinite"/></circle><circle cx="121" cy="8" r="1.0" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="2.9s" begin="0.4s" repeatCount="indefinite"/></circle><circle cx="68" cy="42" r="1.2" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.7s" begin="2.0s" repeatCount="indefinite"/></circle><circle cx="60" cy="43" r="1.0" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.1s" begin="1.6s" repeatCount="indefinite"/></circle><circle cx="40" cy="42" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.9s" begin="1.5s" repeatCount="indefinite"/></circle><circle cx="280" cy="33" r="1.2" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.4s" begin="2.8s" repeatCount="indefinite"/></circle><circle cx="193" cy="25" r="1.0" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="4.4s" begin="2.1s" repeatCount="indefinite"/></circle><circle cx="132" cy="11" r="1.2" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.6s" begin="2.6s" repeatCount="indefinite"/></circle><circle cx="381" cy="34" r="1.2" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.8s" begin="0.2s" repeatCount="indefinite"/></circle><circle cx="270" cy="32" r="1.0" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="4.3s" begin="0.5s" repeatCount="indefinite"/></circle><circle cx="258" cy="32" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="4.9s" begin="0.2s" repeatCount="indefinite"/></circle><circle cx="293" cy="42" r="1.2" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.0s" begin="1.1s" repeatCount="indefinite"/></circle><circle cx="262" cy="43" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="2.2s" begin="0.3s" repeatCount="indefinite"/></circle><circle cx="146" cy="36" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="2.2s" begin="2.1s" repeatCount="indefinite"/></circle><circle cx="339" cy="42" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="2.9s" begin="1.2s" repeatCount="indefinite"/></circle><circle cx="350" cy="28" r="0.8" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="4.8s" begin="1.1s" repeatCount="indefinite"/></circle><circle cx="320" cy="13" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="2.2s" begin="2.3s" repeatCount="indefinite"/></circle><circle cx="74" cy="21" r="1.5" fill="#fff"><animate attributeName="opacity" values="0.15;1;0.15" dur="3.2s" begin="2.6s" repeatCount="indefinite"/></circle>
+          <path fill="url(#tAu)" opacity="0.45" d="M-30 50C30 18 90 66 150 38S262 8 330 42S420 26 440 36L440 60C380 48 330 74 262 54S120 80 60 68S0 58 -30 70Z"><animateTransform attributeName="transform" type="translate" values="0 0;-18 5;0 0" dur="9s" repeatCount="indefinite"/></path>
+          <path fill="url(#tAu)" opacity="0.28" d="M-30 34C40 60 110 14 180 34S300 62 360 30S420 20 440 26L440 44C380 40 330 70 270 52S130 34 70 52S0 50 -30 50Z"><animateTransform attributeName="transform" type="translate" values="0 0;16 -4;0 0" dur="12s" repeatCount="indefinite"/></path>
+          <path fill="#18213d" d="M0 118V86L34 66L58 80L96 52L132 78L160 64L196 84L236 58L270 76L304 56L342 80L370 68L400 82V118Z"/>
+          <path fill="#0c1326" d="M0 118V98L28 88L60 100L92 84L130 102L170 90L210 104L248 88L290 102L330 90L366 104L400 94V118Z"/>
+          <text x="200" y="76" text-anchor="middle" font-family="Big Shoulders Display, Arial Narrow, sans-serif" font-weight="800" font-size="58" letter-spacing="3" fill="url(#tGold)" stroke="#2a1606" stroke-width="2.5" paint-order="stroke">AURORA RIDGE</text>
+          <text x="200" y="104" text-anchor="middle" font-family="ui-monospace, Menlo, monospace" font-size="10.5" letter-spacing="3.2" fill="#d8ecff" opacity="0.9">GROWING WILDS · FREE SPINS · 5 JACKPOTS</text>
+        </svg>
+      </div>
       <div class="fsbar" id="fsbar" hidden>
         <span>Free spins <b id="fsLeft">0</b> left</span>
         <span>Feature win <b id="fsWin">0.00</b></span>
       </div>
       <div class="jps" id="jps" aria-label="Jackpots"></div>
-      <div class="reels" id="reels"><svg class="lines-ov" id="lineSvg" aria-hidden="true"></svg></div>
+      <div class="frame" id="frame"><div class="bulbs" id="bulbs" aria-hidden="true"></div>
+        <div class="reels" id="reels"><svg class="lines-ov" id="lineSvg" aria-hidden="true"></svg></div>
+      </div>
       <div class="bigwin" id="bigwin" hidden>
         <div class="coins" id="coins"></div>
         <div class="bw-in"><div class="bw-t" id="bwT">BIG WIN</div><div class="bw-v" id="bwV">0.00</div><div class="bw-s" id="bwS"></div><div class="bw-tap">Tap to continue</div></div>
@@ -731,9 +763,17 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         if (!AC) return null;
         try {
           ctx = new AC();
-          master = ctx.createGain(); master.gain.value = 0.6; master.connect(ctx.destination);
-          sfxGain = ctx.createGain(); sfxGain.gain.value = 1; sfxGain.connect(master);
-          musGain = ctx.createGain(); musGain.gain.value = 0.5; musGain.connect(master);
+          master = ctx.createGain(); master.gain.value = 0.75; master.connect(ctx.destination);
+          var comp = ctx.createDynamicsCompressor();
+          comp.threshold.value = -16; comp.knee.value = 12; comp.ratio.value = 4; comp.attack.value = 0.004; comp.release.value = 0.2;
+          comp.connect(master);
+          var conv = ctx.createConvolver(), len = Math.floor(ctx.sampleRate * 2.2), ir = ctx.createBuffer(2, len, ctx.sampleRate);
+          for (var ch = 0; ch < 2; ch++) { var dd = ir.getChannelData(ch); for (var q = 0; q < len; q++) dd[q] = (Math.random() * 2 - 1) * Math.pow(1 - q / len, 3); }
+          conv.buffer = ir;
+          var wet = ctx.createGain(); wet.gain.value = 0.2; conv.connect(wet); wet.connect(comp);
+          sfxGain = ctx.createGain(); sfxGain.gain.value = 1; sfxGain.connect(comp); sfxGain.connect(conv);
+          musGain = ctx.createGain(); musGain.gain.value = 0.55; musGain.connect(comp);
+          var musSend = ctx.createGain(); musSend.gain.value = 1.6; musGain.connect(musSend); musSend.connect(conv);
         } catch (e) { ctx = null; return null; }
       }
       if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
@@ -783,8 +823,15 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       stop: function (i) {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime;
-        tone(150 - i * 4, t, 0.14, 'sine', 0.22, 55);
-        noise(t, 0.05, 0.06, 1800, 900);
+        tone(150 - i * 4, t, 0.16, 'sine', 0.26, 50);
+        tone(88, t, 0.1, 'triangle', 0.12, 60);
+        noise(t, 0.04, 0.09, 3200, 1800);
+        noise(t + 0.03, 0.05, 0.04, 1200, 700);
+      },
+      coin: function () {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime, f = 2300 + Math.random() * 900;
+        tone(f, t, 0.12, 'sine', 0.05); tone(f * 1.5, t, 0.08, 'sine', 0.025); tone(f * 0.5, t, 0.05, 'triangle', 0.02);
       },
       ding: function (n) {
         if (!soundOn || !ensure()) return;
@@ -813,6 +860,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       },
       win: function (x) {
         if (!soundOn || !ensure()) return;
+        var tc = ctx.currentTime + (x < 1 ? 0.18 : x < 5 ? 0.27 : x < 25 ? 0.4 : 0.68);
+        [NOTES.C5, NOTES.E5, NOTES.G5].forEach(function (f) { tone(f, tc, x < 1 ? 0.35 : 0.8, 'triangle', 0.05); });
+        tone(130.81, ctx.currentTime, x < 1 ? 0.3 : 0.9, 'triangle', 0.09);
         if (x < 1) arp([NOTES.C5, NOTES.E5], 0.09, 0.09);
         else if (x < 5) arp([NOTES.C5, NOTES.E5, NOTES.G5], 0.09, 0.11);
         else if (x < 25) arp([NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6, NOTES.E6], 0.08, 0.12);
@@ -859,32 +909,48 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       },
       resume: function () { if (musicOn) startMusic(); }
     };
-    var SCALE = [110, 130.81, 146.83, 164.81, 196, 220, 261.63, 293.66, 329.63, 392, 440];
+    // Am  F  C  G, pads + bass + bell arpeggio. Faster and brighter in free spins.
+    var PROG = [[220, 261.63, 329.63], [174.61, 220, 261.63], [196, 261.63, 329.63], [196, 246.94, 293.66]];
+    var BASS = [110, 87.31, 65.41, 98];
+    var bar = 0, nextBarT = 0;
+    function pad(freqs, t, dur) {
+      freqs.forEach(function (f) {
+        [-7, 7].forEach(function (det) {
+          var o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
+          o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det;
+          fl.type = 'lowpass'; fl.frequency.value = inFS ? 1500 : 850;
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(0.014, t + dur * 0.3);
+          g.gain.linearRampToValueAtTime(0.0001, t + dur * 1.05);
+          o.connect(fl); fl.connect(g); g.connect(musGain);
+          o.start(t); o.stop(t + dur * 1.1);
+        });
+      });
+    }
+    function scheduleBar() {
+      if (!musicOn || !ctx) { musicTimer = null; return; }
+      var len = inFS ? 1.6 : 2.6;
+      var t = Math.max(nextBarT, ctx.currentTime + 0.05);
+      var chd = PROG[bar % 4], stepT = len / 8, pat = [0, 1, 2, 1, 2, 0, 2, 1];
+      pad(chd, t, len);
+      tone(BASS[bar % 4], t, len * 0.9, 'triangle', 0.08, null, musGain);
+      for (var i = 0; i < 8; i++) {
+        if (!inFS && i % 2) continue;
+        var f = chd[pat[i]] * (inFS ? 4 : 2);
+        tone(f, t + i * stepT, stepT * 2.5, 'sine', 0.032, null, musGain);
+        tone(f * 2, t + i * stepT, stepT, 'triangle', 0.007, null, musGain);
+      }
+      bar++;
+      nextBarT = t + len;
+      musicTimer = setTimeout(scheduleBar, Math.max(50, (nextBarT - ctx.currentTime - 0.3) * 1000));
+    }
     function startMusic() {
       if (!musicOn || musicTimer || !ensure()) return;
-      var t = ctx.currentTime;
-      var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
-      o1.type = 'sawtooth'; o2.type = 'sawtooth'; o1.frequency.value = 55; o2.frequency.value = 55.4;
-      fl.type = 'lowpass'; fl.frequency.value = 220;
-      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.05, t + 2);
-      o1.connect(fl); o2.connect(fl); fl.connect(g); g.connect(musGain);
-      o1.start(t); o2.start(t);
-      drone = { o1: o1, o2: o2, g: g };
-      (function next() {
-        if (!musicOn || !ctx) { musicTimer = null; return; }
-        var n = SCALE[Math.floor(Math.random() * SCALE.length)] * (inFS ? 2 : 1), tt = ctx.currentTime;
-        tone(n, tt, 2.6, 'sine', 0.07, null, musGain);
-        tone(n * 2.005, tt, 1.6, 'sine', 0.025, null, musGain);
-        musicTimer = setTimeout(next, (inFS ? 700 : 1500) + Math.random() * (inFS ? 400 : 1100));
-      })();
+      nextBarT = 0;
+      scheduleBar();
     }
     function stopMusic() {
       if (musicTimer) { clearTimeout(musicTimer); musicTimer = null; }
-      if (drone && ctx) {
-        var t = ctx.currentTime;
-        try { drone.g.gain.cancelScheduledValues(t); drone.g.gain.setValueAtTime(drone.g.gain.value, t); drone.g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6); drone.o1.stop(t + 0.7); drone.o2.stop(t + 0.7); } catch (e) {}
-        drone = null;
-      }
     }
     return api;
   })();
@@ -907,6 +973,21 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       reelEls.push(col);
     }
   })();
+  (function buildBulbs() {
+    var host = $('bulbs'), h = '', k = 0, i, NX = 16, NY = 12;
+    function bulb(fx, fy) { h += '<span class="bulb" style="--k:' + (k % 6) + ';left:calc(7px + (100% - 14px) * ' + fx.toFixed(4) + ');top:calc(7px + (100% - 14px) * ' + fy.toFixed(4) + ')"></span>'; k++; }
+    for (i = 0; i < NX; i++) bulb(i / NX, 0);
+    for (i = 0; i < NY; i++) bulb(1, i / NY);
+    for (i = 0; i < NX; i++) bulb(1 - i / NX, 1);
+    for (i = 0; i < NY; i++) bulb(0, 1 - i / NY);
+    host.innerHTML = h;
+  })();
+  var frameTimer = null;
+  function frameState(cls, on, ms) {
+    var f = $('frame');
+    f.classList.toggle(cls, on);
+    if (on && ms) { clearTimeout(frameTimer); frameTimer = setTimeout(function () { f.classList.remove(cls); }, ms); }
+  }
   function paint(r, c, sym) { cells[r][c].innerHTML = tileHTML(sym); cells[r][c].dataset.sym = sym; }
 
   (function initialGrid() {
@@ -941,6 +1022,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     }
     for (var jj = 0; jj < 5; jj++) $('jp' + (jj + 1)).lastChild.textContent = money(cfg.jackpots[jj] * bet());
     var fs = st.mode === 'fs';
+    $('frame').classList.toggle('fs', fs);
     $('fsbar').hidden = !fs;
     if (fs) { $('fsLeft').textContent = st.fsLeft; $('fsWin').textContent = money(st.fsWin * bet()); }
   }
@@ -1056,7 +1138,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       interrupt = slam; interruptLabel = 'Stop'; updateHud();
     });
   }
-  function countUp(amount, ms, draw) {
+  function countUp(amount, ms, draw, coins) {
     return new Promise(function (resolve) {
       if (!(ms > 0) || !(amount > 0)) { draw(amount); resolve(); return; }
       var t0 = Date.now(), fin = false, lastTick = 0;
@@ -1065,7 +1147,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         if (fin) return;
         var k = Math.min(1, (Date.now() - t0) / ms);
         draw(amount * (1 - Math.pow(1 - k, 2)));
-        if (Date.now() - lastTick > 80) { lastTick = Date.now(); SFX.tick(); }
+        if (Date.now() - lastTick > (coins ? 65 : 80)) { lastTick = Date.now(); if (coins) SFX.coin(); else SFX.tick(); }
         if (k >= 1) end(); else (window.requestAnimationFrame || function (f) { setTimeout(f, 16); })(frame);
       }
       interrupt = end; interruptLabel = 'Skip'; updateHud();
@@ -1094,15 +1176,17 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     $('bwS').textContent = sub || '';
     if (amount !== null) $('bwV').textContent = money(0);
     makeCoins(coins || 0);
+    frameState('big', true);
     ov.hidden = false;
     var inner = ov.querySelector('.bw-in');
     inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = '';
     var onClick = function () { if (interrupt) { var f = interrupt; interrupt = null; f(); updateHud(); } };
     ov.addEventListener('click', onClick);
-    if (amount !== null) await countUp(amount, ms, function (x) { $('bwV').textContent = money(x); if (draw) draw(x); });
+    if (amount !== null) await countUp(amount, ms, function (x) { $('bwV').textContent = money(x); if (draw) draw(x); }, true);
     await waitOrPress(hold);
     ov.removeEventListener('click', onClick);
     ov.hidden = true;
+    frameState('big', false);
     $('coins').innerHTML = '';
   }
   var lineTok = 0;
@@ -1161,11 +1245,14 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     updateHud();
     SFX.spin();
     SFX.setFS(st.mode === 'fs');
+    frameState('win', false);
+    frameState('rolling', true);
 
     var fastMode = fast || reduceMotion;
     var c, r;
     clearBadges();
     await animateReels(res, held, fastMode);
+    frameState('rolling', false);
 
     // locked / expanding wild markers
     for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) cells[r][c].classList.remove('lock');
@@ -1222,6 +1309,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     if (res.win > 0) {
       var draw = function (v) { $('winV').textContent = money(v); $('bal').textContent = money(balBefore + v); };
       var x = res.win, jp = res.jackpots && res.jackpots.length ? res.jackpots[res.jackpots.length - 1] : null;
+      frameState('win', true, fastMode ? 900 : 1900);
       if (jp) {
         SFX.jackpot(jp.tier);
         await celebrate(NAMES['JP' + jp.tier].toUpperCase() + '!', x.toFixed(1) + 'x your bet', credit, fastMode ? 1200 : 3400, draw, fastMode ? 700 : 1800, 40);
@@ -1315,6 +1403,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   $('fast').addEventListener('click', function () {
     fast = !fast; $('fast').setAttribute('aria-pressed', fast ? 'true' : 'false');
   });
+  $('betDn').addEventListener('click', function () { SFX.click(); });
+  $('betUp').addEventListener('click', function () { SFX.click(); });
   $('betDn').addEventListener('click', function () { if (!busy && betIdx > 0) { betIdx--; updateHud(); } });
   $('betUp').addEventListener('click', function () { if (!busy && betIdx < BETS.length - 1) { betIdx++; updateHud(); } });
   $('reset').addEventListener('click', function () {
