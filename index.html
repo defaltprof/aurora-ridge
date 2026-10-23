@@ -1025,10 +1025,10 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       freqs.forEach(function (f) {
         [-7, 7].forEach(function (det) {
           var o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
-          o.type = det < 0 ? 'sine' : 'triangle'; o.frequency.value = f; o.detune.value = det;
+          o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det;
           fl.type = 'lowpass'; fl.frequency.value = inFS ? 1500 : 850;
           g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(0.022, t + dur * 0.3);
+          g.gain.linearRampToValueAtTime(0.014, t + dur * 0.3);
           g.gain.linearRampToValueAtTime(0.0001, t + dur * 1.05);
           o.connect(fl); fl.connect(g); g.connect(musGain);
           o.start(t); o.stop(t + dur * 1.1);
@@ -1041,11 +1041,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       var t = Math.max(nextBarT, ctx.currentTime + 0.05);
       var chd = PROG[bar % 4], stepT = len / 8, pat = [0, 1, 2, 1, 2, 0, 2, 1];
       pad(chd, t, len);
-      pluck(BASS[bar % 4], t, 0.2, len * 0.95, musGain);
+      tone(BASS[bar % 4], t, len * 0.9, 'triangle', 0.08, null, musGain);
       for (var i = 0; i < 8; i++) {
         if (!inFS && i % 2) continue;
         var f = chd[pat[i]] * (inFS ? 4 : 2);
-        bell(f, t + i * stepT, 0.03, 1.2, musGain);
+        tone(f, t + i * stepT, stepT * 2.5, 'sine', 0.032, null, musGain);
+        tone(f * 2, t + i * stepT, stepT, 'triangle', 0.007, null, musGain);
       }
       bar++;
       nextBarT = t + len;
