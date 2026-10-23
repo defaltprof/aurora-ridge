@@ -1,0 +1,1209 @@
+<title>Aurora Ridge</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<style>
+/* Layout: one centered column on phones; on wide screens the cabinet sits left and the math lab / paytable sit right. Single dark look on purpose. */
+:root {
+  --ink: #060a13;
+  --deep: #0a1120;
+  --panel: #0f1a2d;
+  --panel-2: #15223a;
+  --edge: #223250;
+  --text: #e8eef9;
+  --mute: #8fa0bd;
+  --aurora: #38e8b2;
+  --ice: #5aa9ff;
+  --amber: #ffb547;
+  --rose: #ff6f91;
+  --c-elk: #d9732a;
+  --c-owl: #2f9aa3;
+  --c-hare: #cdbb9c;
+  --c-lamp: #efc04a;
+  --c-pine: #3da566;
+  --c-card: #4d78b8;
+  --c-wild: #6b4df0;
+  --c-gold: #f3b93a;
+  --c-x2: #3b9cff;
+  --c-x3: #ff6489;
+  --c-scat: #d447b4;
+  --tx-light: #f7fbff;
+  --tx-dark: #1b1408;
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--ink); }
+body {
+  margin: 0;
+  color: var(--text);
+  font: 15px/1.5 var(--font-body);
+  background:
+    radial-gradient(900px 420px at 18% -10%, color-mix(in srgb, var(--aurora) 14%, transparent), transparent 70%),
+    radial-gradient(800px 380px at 92% -5%, color-mix(in srgb, var(--ice) 12%, transparent), transparent 70%),
+    var(--ink);
+  padding-left: max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  padding-block: 20px 40px;
+}
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, select:focus-visible, [role=tab]:focus-visible { outline: 2px solid var(--aurora); outline-offset: 2px; }
+.wrap { max-width: 1120px; margin: 0 auto; }
+.top { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 6px 18px; margin-bottom: 16px; }
+h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); letter-spacing: 0.03em; text-transform: uppercase; }
+.top .meta { font: 500 12px/1.4 var(--font-mono); color: var(--mute); letter-spacing: 0.04em; }
+.layout { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 980px) { .layout { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); } }
+
+/* cabinet */
+.cab { background: linear-gradient(180deg, var(--panel), var(--deep)); border: 1px solid var(--edge); border-radius: 16px; padding: 12px; }
+.fsbar { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; padding: 8px 12px; margin-bottom: 10px; border-radius: 10px; background: color-mix(in srgb, var(--scat) 22%, var(--panel)); border: 1px solid color-mix(in srgb, var(--scat) 60%, transparent); font: 600 13px/1.2 var(--font-body); }
+.fsbar b { font: 800 22px/1 var(--font-display); letter-spacing: 0.04em; }
+.reels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 8px; border-radius: 12px; background: radial-gradient(120% 60% at 20% 0%, color-mix(in srgb, var(--aurora) 22%, transparent), transparent 70%), radial-gradient(100% 55% at 85% 5%, color-mix(in srgb, #9b5de5 26%, transparent), transparent 70%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V28L10 20L18 27L30 12L42 26L52 18L63 30L75 14L88 28L100 22V40Z' fill='%23101a2e'/%3E%3C/svg%3E") bottom / 100% 38% no-repeat, var(--ink); border: 1px solid var(--edge); }
+.reel { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.cell { position: relative; aspect-ratio: 1 / 1; container-type: inline-size; }
+.tile { position: absolute; inset: 0; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; text-align: center; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.02em; color: var(--tx-light); background: linear-gradient(160deg, color-mix(in srgb, var(--c) 78%, white), var(--c) 45%, color-mix(in srgb, var(--c) 45%, black)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 60%, white), inset 0 -8px 14px color-mix(in srgb, black 25%, transparent); text-shadow: 0 1px 0 color-mix(in srgb, black 35%, transparent); }
+.tile { --det: rgba(8, 12, 24, 0.62); }
+.tile.dark { --det: rgba(255, 255, 255, 0.7); }
+.tile .art { width: 74%; height: auto; flex: 0 0 auto; filter: drop-shadow(0 2px 2px color-mix(in srgb, black 40%, transparent)); overflow: visible; }
+.tile .art .m { fill: currentColor; } .tile .art .d { fill: var(--det); }
+.tile .art .ms { fill: none; stroke: currentColor; } .tile .art .ds { fill: none; stroke: var(--det); }
+.tile .cap { margin-top: 1cqw; font: 800 15cqw/1 var(--font-display); letter-spacing: 0.1em; }
+.tile.arty { justify-content: center; padding-top: 2cqw; }
+.cell.mini .tile .cap { font-size: 15cqw; }
+.tile .lab { font-size: 32cqw; }
+.tile .lab.l1 { font-size: 58cqw; }
+.tile .lab.l2 { font-size: 46cqw; }
+.tile .lab.l4 { font-size: 26cqw; }
+.tile .sub { margin-top: 4cqw; font: 600 12cqw/1 var(--font-body); letter-spacing: 0.12em; opacity: 0.9; }
+.tile.dark { color: var(--tx-dark); text-shadow: none; }
+.t-ELK { --c: var(--c-elk); } .t-OWL { --c: var(--c-owl); } .t-HARE { --c: var(--c-hare); }
+.t-LAN { --c: var(--c-lamp); } .t-PINE { --c: var(--c-pine); }
+.t-A, .t-K, .t-Q { --c: var(--c-card); } .t-NECK { --c: #c9722e; }
+.t-W { --c: var(--c-wild); } .t-G { --c: var(--c-gold); } .t-W2 { --c: var(--c-x2); } .t-W3 { --c: var(--c-x3); } .t-SC { --c: #c3cfdf; color: var(--tx-dark); text-shadow: none; } .t-BN { --c: var(--c-scat); }
+.t-JP1 { --c: #2aa876; } .t-JP2 { --c: #3b82f6; } .t-JP3 { --c: #9b5de5; } .t-JP4 { --c: #f2791f; } .t-JP5 { --c: #e0304f; }
+.t-JP1, .t-JP2, .t-JP3, .t-JP4, .t-JP5, .t-BN { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 40%, white), 0 0 12px color-mix(in srgb, var(--c) 45%, transparent); }
+.jps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
+.jp { border-radius: 8px; padding: 5px 4px; text-align: center; background: var(--ink); border: 1px solid color-mix(in srgb, var(--c) 70%, transparent); min-width: 0; }
+.jp .n { display: block; font: 700 10px/1.2 var(--font-mono); letter-spacing: 0.08em; color: var(--c); }
+.jp .v { display: block; font: 800 15px/1.2 var(--font-display); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.jp.hit { background: color-mix(in srgb, var(--c) 45%, var(--ink)); animation: pulse 0.5s ease-in-out infinite alternate; }
+.t-W, .t-G, .t-W2, .t-W3 { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 40%, white), 0 0 16px color-mix(in srgb, var(--c) 55%, transparent); }
+
+.chev { position: absolute; z-index: 3; left: 30%; width: 40%; height: 24%; background: var(--c-gold); filter: drop-shadow(0 1px 2px color-mix(in srgb, black 60%, transparent)); pointer-events: none; }
+.chev.down { top: 2%; clip-path: polygon(0 0, 28% 0, 50% 58%, 72% 0, 100% 0, 50% 100%); }
+.chev.up { bottom: 2%; clip-path: polygon(0 100%, 28% 100%, 50% 42%, 72% 100%, 100% 100%, 50% 0); }
+.badge { position: absolute; z-index: 2; top: -4px; left: -4px; padding: 2px 6px; border-radius: 999px; background: var(--aurora); color: var(--ink); font: 600 10px/1.2 var(--font-mono); letter-spacing: 0.04em; }
+.cell.lock .tile { box-shadow: inset 0 0 0 2px var(--aurora), 0 0 14px color-mix(in srgb, var(--aurora) 55%, transparent); }
+.cell.win .tile { box-shadow: inset 0 0 0 2px var(--amber), 0 0 20px color-mix(in srgb, var(--amber) 60%, transparent); animation: pulse 0.6s ease-in-out infinite alternate; }
+.cell.dim .tile { opacity: 0.3; filter: saturate(0.4); }
+.reel.spinning .cell:not(.held) .tile { animation: jitter 0.09s linear infinite; filter: blur(1.2px); }
+.cell.landed .tile { animation: land 0.22s ease-out; }
+.cell.grow .tile { animation: grow 0.35s ease-out; }
+@keyframes jitter { from { transform: translateY(-5%); } to { transform: translateY(5%); } }
+@keyframes land { 0% { transform: translateY(-12%); } 60% { transform: translateY(3%); } 100% { transform: none; } }
+@keyframes grow { 0% { transform: translateY(-110%); opacity: 0.2; } 70% { transform: translateY(6%); opacity: 1; } 100% { transform: none; opacity: 1; } }
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
+
+.hud { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.stat { background: var(--ink); border: 1px solid var(--edge); border-radius: 10px; padding: 8px 10px; min-width: 0; }
+.stat .k { display: block; font: 500 10px/1.2 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); }
+.stat .v { display: block; font: 800 26px/1.1 var(--font-display); letter-spacing: 0.03em; font-variant-numeric: tabular-nums; }
+.stat .v.win { color: var(--amber); }
+@media (max-width: 520px) {
+  .hud { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .hud .stat:nth-child(2) { grid-column: 1 / -1; order: 3; }
+}
+.stepper { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.stepper button { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: var(--panel-2); font-size: 18px; line-height: 1; }
+.stepper button:disabled { opacity: 0.4; cursor: default; }
+.controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
+.controls .spin { grid-column: 1 / -1; }
+.controls .toggle { min-height: 40px; min-width: 0; padding: 0 6px; }
+.spin { min-height: 52px; border: 0; border-radius: 12px; background: linear-gradient(180deg, var(--aurora), color-mix(in srgb, var(--aurora) 55%, black)); color: var(--ink); font: 800 26px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.spin:disabled { opacity: 0.55; cursor: default; }
+.toggle { min-width: 64px; border-radius: 12px; border: 1px solid var(--edge); background: var(--panel-2); padding: 0 12px; font: 600 12px/1.2 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; }
+.toggle[aria-pressed=true] { background: color-mix(in srgb, var(--aurora) 25%, var(--panel-2)); border-color: var(--aurora); color: var(--aurora); }
+.msg { min-height: 44px; margin-top: 10px; font-size: 13px; color: var(--mute); }
+.msg strong { color: var(--text); font-weight: 600; }
+.msg .amt { color: var(--amber); font-variant-numeric: tabular-nums; }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; margin-top: 6px; font: 500 11px/1.4 var(--font-mono); color: var(--mute); }
+.foot button { border: 0; background: none; color: var(--ice); text-decoration: underline; padding: 0; font: inherit; }
+
+/* tabs */
+.panel { background: var(--panel); border: 1px solid var(--edge); border-radius: 16px; overflow: hidden; }
+.tabs { display: flex; gap: 2px; padding: 6px 6px 0; border-bottom: 1px solid var(--edge); background: var(--deep); overflow-x: auto; }
+[role=tab] { border: 0; background: none; padding: 10px 14px; border-radius: 8px 8px 0 0; color: var(--mute); font: 600 13px/1 var(--font-body); white-space: nowrap; }
+[role=tab][aria-selected=true] { color: var(--text); background: var(--panel); box-shadow: inset 0 -2px 0 var(--aurora); }
+.pane { padding: 16px; }
+.pane h2 { margin: 0 0 4px; font: 800 22px/1.1 var(--font-display); letter-spacing: 0.05em; text-transform: uppercase; }
+.pane p { margin: 0 0 12px; color: var(--mute); max-width: 62ch; }
+.pane p strong { color: var(--text); font-weight: 600; }
+
+/* math lab */
+.simrow { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 8px 0 12px; }
+select { background: var(--panel-2); color: var(--text); border: 1px solid var(--edge); border-radius: 8px; padding: 8px 10px; font: inherit; }
+.run { border: 0; border-radius: 8px; padding: 9px 16px; background: var(--aurora); color: var(--ink); font-weight: 600; }
+.run:disabled { opacity: 0.5; cursor: default; }
+.prog { flex: 1 1 120px; height: 6px; border-radius: 99px; background: var(--ink); overflow: hidden; }
+.prog i { display: block; height: 100%; width: 0; background: var(--aurora); }
+.tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 8px; }
+.tilestat { background: var(--ink); border: 1px solid var(--edge); border-radius: 10px; padding: 10px 12px; min-width: 0; }
+.tilestat .k { font: 500 10px/1.2 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); }
+.tilestat .v { font: 800 30px/1.1 var(--font-display); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
+.tilestat .n { font-size: 12px; color: var(--mute); }
+.split { display: flex; height: 14px; border-radius: 99px; overflow: hidden; background: var(--ink); margin: 16px 0 6px; }
+.split i { display: block; height: 100%; }
+.legend { display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 12px; color: var(--mute); }
+.legend span::before { content: ''; display: inline-block; width: 9px; height: 9px; border-radius: 3px; margin-right: 6px; background: var(--k); }
+.hist { margin-top: 16px; display: grid; gap: 5px; }
+.hist .row { display: grid; grid-template-columns: 74px minmax(0, 1fr) 58px; gap: 8px; align-items: center; font: 500 12px/1.2 var(--font-mono); color: var(--mute); }
+.hist .bar { height: 12px; background: var(--ink); border-radius: 4px; overflow: hidden; }
+.hist .bar i { display: block; height: 100%; background: var(--ice); min-width: 1px; }
+.hist .row b { text-align: right; font-weight: 500; color: var(--text); font-variant-numeric: tabular-nums; }
+.note { margin-top: 12px; font-size: 12px; color: var(--mute); }
+
+/* paytable */
+.pt { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.pt th { text-align: right; font: 500 10px/1.2 var(--font-mono); letter-spacing: 0.1em; text-transform: uppercase; color: var(--mute); padding: 4px 8px; }
+.pt th:first-child { text-align: left; }
+.pt td { padding: 6px 8px; border-top: 1px solid var(--edge); text-align: right; font: 500 14px/1 var(--font-mono); }
+.pt td:first-child { text-align: left; width: 64px; }
+.pt .mini { width: 44px; height: 44px; position: relative; container-type: inline-size; }
+.lines { display: grid; grid-template-columns: repeat(auto-fill, minmax(62px, 1fr)); gap: 8px; margin-top: 10px; }
+.lines div { background: var(--ink); border: 1px solid var(--edge); border-radius: 8px; padding: 4px; text-align: center; font: 500 10px/1.2 var(--font-mono); color: var(--mute); }
+.lines svg { display: block; width: 100%; height: auto; color: var(--aurora); }
+.list { margin: 0 0 12px; padding-left: 18px; color: var(--mute); max-width: 62ch; }
+.list li { margin: 4px 0; }
+.list li strong { color: var(--text); font-weight: 600; }
+[hidden] { display: none !important; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1>Aurora Ridge</h1>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / original art and sound</div>
+  </header>
+
+  <div class="layout">
+    <section class="cab" aria-label="Slot machine">
+      <div class="fsbar" id="fsbar" hidden>
+        <span>Free spins <b id="fsLeft">0</b> left</span>
+        <span>Feature win <b id="fsWin">0.00</b></span>
+      </div>
+      <div class="jps" id="jps" aria-label="Jackpots"></div>
+      <div class="reels" id="reels"></div>
+      <div class="hud">
+        <div class="stat"><span class="k">Balance</span><span class="v" id="bal">0.00</span></div>
+        <div class="stat">
+          <span class="k">Total bet</span>
+          <div class="stepper"><button id="betDn" aria-label="Lower bet">-</button><span class="v" id="betV">0.00</span><button id="betUp" aria-label="Raise bet">+</button></div>
+        </div>
+        <div class="stat"><span class="k">Last win</span><span class="v win" id="winV">0.00</span></div>
+      </div>
+      <div class="controls">
+        <button class="spin" id="spin">Spin</button>
+        <button class="toggle" id="auto" aria-pressed="false">Auto</button>
+        <button class="toggle" id="fast" aria-pressed="false">Fast</button>
+        <button class="toggle" id="snd" aria-pressed="true">Sound</button>
+        <button class="toggle" id="mus" aria-pressed="false">Music</button>
+      </div>
+      <div class="msg" id="msg" aria-live="polite">Press Spin or hit the space bar. Wins pay on any of the 40 lines, left to right.</div>
+      <div class="foot">
+        <span id="lineBet">Line bet 0.00</span>
+        <button id="reset">Reset credits</button>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Game details">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-lab" aria-selected="true" aria-controls="pane-lab">Math lab</button>
+        <button role="tab" id="tab-pay" aria-selected="false" aria-controls="pane-pay">Paytable</button>
+        <button role="tab" id="tab-how" aria-selected="false" aria-controls="pane-how">How it works</button>
+      </div>
+
+      <div class="pane" id="pane-lab" role="tabpanel" aria-labelledby="tab-lab">
+        <h2>Math lab</h2>
+        <p>This runs the same engine the reels use, but without animation. Each round is one paid spin plus any free spins it triggers. Results are in multiples of the total bet.</p>
+        <div class="simrow">
+          <label for="simN" class="note" style="margin:0">Rounds</label>
+          <select id="simN">
+            <option value="200000">200,000</option>
+            <option value="1000000" selected>1,000,000</option>
+            <option value="5000000">5,000,000</option>
+          </select>
+          <button class="run" id="simRun">Run simulation</button>
+          <div class="prog" aria-hidden="true"><i id="simProg"></i></div>
+        </div>
+        <div class="tiles">
+          <div class="tilestat"><div class="k">Return to player</div><div class="v" id="sRtp">-</div><div class="n" id="sRtpN">&nbsp;</div></div>
+          <div class="tilestat"><div class="k">Hit rate</div><div class="v" id="sHit">-</div><div class="n" id="sHitN">&nbsp;</div></div>
+          <div class="tilestat"><div class="k">Free spins</div><div class="v" id="sTrig">-</div><div class="n" id="sTrigN">&nbsp;</div></div>
+          <div class="tilestat"><div class="k">Swing (std dev)</div><div class="v" id="sSd">-</div><div class="n" id="sSdN">&nbsp;</div></div>
+          <div class="tilestat"><div class="k">Biggest round</div><div class="v" id="sMax">-</div><div class="n" id="sMaxN">&nbsp;</div></div>
+        </div>
+        <div class="split" id="split" aria-hidden="true"></div>
+        <div class="legend" id="legend"></div>
+        <div class="hist" id="hist"></div>
+        <div class="note" id="simNote"></div>
+      </div>
+
+      <div class="pane" id="pane-pay" role="tabpanel" aria-labelledby="tab-pay" hidden>
+        <h2>Paytable</h2>
+        <p>Pays are multiples of the <strong>line bet</strong> (total bet divided by 40). Matches start on the left reel and need 3 or more in a row. Wilds replace everything except scatter, bonus and jackpot symbols. A purple wild is normal. Yellow wilds grow.</p>
+        <table class="pt" id="ptable"></table>
+        <p style="margin-top:12px">Scatter and jackpot pays are multiples of the <strong>total bet</strong>.</p>
+        <h2 style="margin-top:18px">The 40 lines</h2>
+        <div class="lines" id="lineGrid"></div>
+      </div>
+
+      <div class="pane" id="pane-how" role="tabpanel" aria-labelledby="tab-how" hidden>
+        <h2>How it works</h2>
+        <ul class="list">
+          <li><strong>The outcome is decided first.</strong> Each reel has a fixed strip of symbols. The game picks a random stop on every strip, reads 4 symbols from each, and only then plays the animation.</li>
+          <li><strong>Two kinds of wild.</strong> The purple wild is a normal wild. It substitutes for everything except scatter, bonus and jackpot symbols and then is gone on the next spin. The yellow wilds, including the 2x and 3x ones, are <strong>growing wilds</strong>.</li>
+          <li><strong>Growing wilds.</strong> A growing wild stays on screen while the other symbols spin around it. Each spin it adds one box, in the direction of the gold arrow, which is toward the nearest edge first and then the other way. When the reel is full of wilds it shows for one spin and clears. A multiplier wild multiplies any line it is on, and wilds on the same line multiply together.</li>
+          <li><strong>Free spins.</strong> Three or more bonus symbols anywhere award 20 free spins. Three more during the feature add 10. Locked wilds carry into the feature. The free spin strips carry more wilds, which is where most of the extra return comes from.</li>
+          <li><strong>Scatters.</strong> A separate symbol. Three or more anywhere pay 5x, 10x or 25x your total bet. They do not start free spins.</li>
+          <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Three or more of the same one on adjacent reels pay 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
+          <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 95%. Change either and the return changes, so re-run the math lab after any edit.</li>
+          <li><strong>Art and sound.</strong> Every symbol is drawn in code and every sound is synthesized in your browser, so there are no image or audio files. Sound effects are on by default. Music is off until you press Music. Both buttons remember your choice. Real money is left out on purpose, this is play credits only.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>/* Aurora Ridge math engine
+ * 5 reels x 4 rows, 40 fixed paylines, left to right.
+ * Wilds on reels 1-4. Every wild stays put and grows one box per spin, toward the nearest edge first, until the reel is full.
+ * 3+ scatters anywhere = free spins (retrigger adds spins).
+ * All wins are returned in multiples of the TOTAL bet.
+ */
+(function (root) {
+  'use strict';
+
+  var REELS = 5, ROWS = 4, NLINES = 40;
+
+  function mulberry32(a) {
+    return function () {
+      a |= 0; a = a + 0x6D2B79F5 | 0;
+      var t = Math.imul(a ^ a >>> 15, 1 | a);
+      t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t;
+      return ((t ^ t >>> 14) >>> 0) / 4294967296;
+    };
+  }
+
+  var WILDMULT = { W: 1, G: 1, W2: 2, W3: 3 };
+  // W is a normal wild that just substitutes. G, W2 and W3 are growing wilds.
+  var GROWING = { G: true, W2: true, W3: true };
+  // symbols that never pay on a line and stop a line from continuing
+  var NONPAY = { SC: true, BN: true, JP1: true, JP2: true, JP3: true, JP4: true, JP5: true };
+  
+  function mk(base, x) {
+    var o = {}, k;
+    for (k in base) o[k] = base[k];
+    for (k in x) o[k] = x[k];
+    return o;
+  }
+
+  var DEFAULTS = {
+    scale: 1,
+    // pays are multiples of the LINE bet (total bet / 40) for 3, 4, 5 of a kind
+    pays: {
+      W: [24, 72, 500],
+      ELK: [12, 36, 200],
+      OWL: [10, 24, 150],
+      HARE: [7.2, 20, 100],
+      LAN: [4.8, 12, 50],
+      PINE: [2.5, 10, 36],
+      NECK: [2.5, 10, 36],
+      A: [2.5, 7.2, 24],
+      K: [2.5, 7.2, 24],
+      Q: [2.5, 7.2, 24]
+    },
+    // scatter pays are multiples of the TOTAL bet
+    scatter: { 3: 5, 4: 10, 5: 25 },
+    // jackpots, x total bet: Mini, Minor, Major, Maxi, Grand. 3+ of one tier on adjacent reels.
+    jackpots: [12.5, 62.5, 125, 312.5, 1250],
+    fsAward: 20,
+    fsRetrig: 10,
+    base: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 3, BN: 5, JP1: 4, JP2: 2 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 3, W2: 2, SC: 3, BN: 5, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 5, BN: 11, JP1: 6, JP2: 3, JP3: 2, JP4: 2, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 3, W3: 2, SC: 3, BN: 5, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, SC: 3, BN: 5, JP1: 4, JP2: 2 }
+    ],
+    fs: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 4, SC: 3, BN: 3, JP1: 4, JP2: 2 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W2: 3, SC: 3, BN: 3, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W2: 3, SC: 5, BN: 3, JP1: 6, JP2: 3, JP3: 2, JP4: 2, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 4, G: 3, W3: 3, SC: 3, BN: 3, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
+      { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, SC: 3, BN: 3, JP1: 4, JP2: 2 }
+    ]
+  };
+
+  // 40 fixed paylines: the 4 straight rows, then 36 more walks that move
+  // at most one row between neighbouring reels, picked with a fixed seed.
+  function makeLines() {
+    var all = [];
+    (function rec(p) {
+      if (p.length === REELS) { all.push(p.slice()); return; }
+      var last = p[p.length - 1];
+      for (var d = -1; d <= 1; d++) {
+        var r = last + d;
+        if (r >= 0 && r < ROWS) { p.push(r); rec(p); p.pop(); }
+      }
+    });
+    for (var s = 0; s < ROWS; s++) {
+      (function walk(p) {
+        if (p.length === REELS) { all.push(p.slice()); return; }
+        var last = p[p.length - 1];
+        for (var d = -1; d <= 1; d++) {
+          var r = last + d;
+          if (r >= 0 && r < ROWS) { p.push(r); walk(p); p.pop(); }
+        }
+      })([s]);
+    }
+    var straight = [], rest = [];
+    all.forEach(function (l) {
+      var flat = l.every(function (x) { return x === l[0]; });
+      (flat ? straight : rest).push(l);
+    });
+    var rng = mulberry32(40);
+    for (var i = rest.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var t = rest[i]; rest[i] = rest[j]; rest[j] = t;
+    }
+    return straight.concat(rest).slice(0, NLINES);
+  }
+  var LINES = makeLines();
+
+  function buildStrip(weights, rng) {
+    var a = [], k, i;
+    for (k in weights) for (i = 0; i < weights[k]; i++) a.push(k);
+    for (i = a.length - 1; i > 0; i--) {
+      var j = Math.floor(rng() * (i + 1));
+      var t = a[i]; a[i] = a[j]; a[j] = t;
+    }
+    return a;
+  }
+
+  function evalLines(grid, pays, scale, detail) {
+    var total = 0, wins = detail ? [] : null;
+    for (var li = 0; li < NLINES; li++) {
+      var line = LINES[li];
+      var target = null, n = 0, mult = 1, lead = 0, leadMult = 1, leading = true;
+      for (var c = 0; c < REELS; c++) {
+        var s = grid[line[c]][c];
+        var wm = WILDMULT[s];
+        if (wm) {
+          n++; mult *= wm;
+          if (leading) { lead++; leadMult *= wm; }
+        } else if (NONPAY[s]) {
+          break;
+        } else if (target === null) {
+          target = s; n++; leading = false;
+        } else if (s === target) {
+          n++;
+        } else {
+          break;
+        }
+      }
+      var best = 0, bSym = null, bCount = 0, bMult = 1;
+      if (target !== null && n >= 3) {
+        best = pays[target][n - 3] * mult; bSym = target; bCount = n; bMult = mult;
+      }
+      if (lead >= 3) {
+        var pw = pays.W[lead - 3] * leadMult;
+        if (pw > best) { best = pw; bSym = 'W'; bCount = lead; bMult = leadMult; }
+      }
+      if (best > 0) {
+        best *= scale;
+        total += best;
+        if (detail) {
+          var cells = [];
+          for (var k = 0; k < bCount; k++) cells.push([line[k], k]);
+          wins.push({ line: li, sym: bSym, count: bCount, mult: bMult, win: best, cells: cells });
+        }
+      }
+    }
+    return { total: total, wins: wins };
+  }
+
+  // which way a wild stack grows next: toward the nearer edge, then the other way
+  function nextDir(e) {
+    var up = e.lo, down = ROWS - 1 - e.hi;
+    if (up === 0 && down === 0) return null;
+    return (up > 0 && (up <= down || down === 0)) ? 'up' : 'down';
+  }
+
+  function createEngine(cfg, seed) {
+    cfg = cfg || DEFAULTS;
+    var srng = mulberry32(seed || 1);
+    var strips = {
+      base: cfg.base.map(function (w) { return buildStrip(w, srng); }),
+      fs: cfg.fs.map(function (w) { return buildStrip(w, srng); })
+    };
+
+    function newState() {
+      return { mode: 'base', fsLeft: 0, fsWin: 0, exp: [] };
+    }
+
+    function spin(st, rng, detail) {
+      var res = { mode: st.mode, trigger: false, retrigger: 0, fsEnded: false };
+      if (st.mode === 'fs') st.fsLeft--;
+      var S = st.mode === 'fs' ? strips.fs : strips.base;
+      var grid = [], stops = [], r, c;
+      for (r = 0; r < ROWS; r++) grid[r] = [];
+      for (c = 0; c < REELS; c++) {
+        var strip = S[c], s0 = Math.floor(rng() * strip.length);
+        stops[c] = s0;
+        for (r = 0; r < ROWS; r++) grid[r][c] = strip[(s0 + r) % strip.length];
+      }
+      // wild stacks stay in place and grow one box per spin,
+      // toward the nearest edge first, until the reel is full
+      var hasExp = {};
+      st.exp.forEach(function (e) {
+        e.age++;
+        var dir = nextDir(e);
+        if (dir === 'up') e.lo--; else if (dir === 'down') e.hi++;
+        for (var rr = e.lo; rr <= e.hi; rr++) {
+          var cur = grid[rr][e.reel];
+          if (e.cells[rr]) grid[rr][e.reel] = e.cells[rr];
+          else if (!WILDMULT[cur]) grid[rr][e.reel] = 'G';
+        }
+        hasExp[e.reel] = true;
+      });
+      // a wild that lands on a reel with no active stack starts one
+      var fresh = [];
+      for (c = 0; c < REELS; c++) {
+        if (hasExp[c]) continue;
+        for (r = 0; r < ROWS; r++) {
+          if (GROWING[grid[r][c]]) {
+            var lo = r, hi = r, cm = {};
+            cm[r] = grid[r][c];
+            while (hi + 1 < ROWS && GROWING[grid[hi + 1][c]]) { hi++; cm[hi] = grid[hi][c]; }
+            var e = { reel: c, lo: lo, hi: hi, cells: cm, age: 0 };
+            st.exp.push(e); fresh.push(e);
+            break;
+          }
+        }
+      }
+      var ev = evalLines(grid, cfg.pays, cfg.scale, detail);
+      var sc = 0, bn = 0, jpReels = [[], [], [], [], [], []];
+      for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) {
+        var g = grid[r][c];
+        if (g === 'SC') sc++;
+        else if (g === 'BN') bn++;
+        else if (g.charAt(0) === 'J' && g.length === 3) jpReels[+g.charAt(2)][c] = true;
+      }
+      var scPay = sc >= 3 ? (cfg.scatter[sc > 5 ? 5 : sc] || 0) : 0;
+      // jackpots: 3 or more reels in a row showing the same tier
+      var jpWin = 0, jps = [];
+      for (var t = 1; t <= 5; t++) {
+        var run = 0, best = 0, bestEnd = -1;
+        for (c = 0; c < REELS; c++) {
+          if (jpReels[t][c]) { run++; if (run > best) { best = run; bestEnd = c; } } else run = 0;
+        }
+        if (best >= 3) {
+          jpWin += cfg.jackpots[t - 1];
+          jps.push({ tier: t, first: bestEnd - best + 1, last: bestEnd, win: cfg.jackpots[t - 1] });
+        }
+      }
+
+      res.grid = grid;
+      res.stops = stops;
+      res.lineWin = ev.total / NLINES;
+      res.scatWin = scPay;
+      res.jpWin = jpWin;
+      res.jackpots = jps;
+      res.win = res.lineWin + scPay + jpWin;
+      res.scatterCount = sc;
+      res.bonusCount = bn;
+      res.lineWins = ev.wins;
+      res.exp = st.exp.map(function (e) {
+        return { reel: e.reel, lo: e.lo, hi: e.hi, age: e.age, dir: nextDir(e), cells: e.cells };
+      });
+      res.fresh = fresh.map(function (e) { return e.reel; });
+
+      // a full reel of wilds shows for this spin and is gone on the next
+      st.exp = st.exp.filter(function (e) { return !(e.lo === 0 && e.hi === ROWS - 1); });
+
+      if (res.mode === 'base' && bn >= 3) {
+        st.mode = 'fs'; st.fsLeft = cfg.fsAward; st.fsWin = 0;
+        res.trigger = true;
+      } else if (res.mode === 'fs') {
+        st.fsWin += res.win;
+        if (bn >= 3) { st.fsLeft += cfg.fsRetrig; res.retrigger = cfg.fsRetrig; }
+        if (st.fsLeft <= 0) { st.mode = 'base'; st.exp = []; res.fsEnded = true; }
+      }
+      res.fsLeft = st.fsLeft;
+      res.fsWin = st.fsWin;
+      return res;
+    }
+
+    return { cfg: cfg, strips: strips, newState: newState, spin: spin };
+  }
+
+  // Runs whole rounds (one paid spin plus any free spins it triggers).
+  function makeSim(engine, seed) {
+    var rng = mulberry32(seed || 7);
+    var st = engine.newState();
+    var A = {
+      rounds: 0, hits: 0, trig: 0, retrig: 0, fsSpins: 0,
+      lineBase: 0, scatBase: 0, lineFS: 0, scatFS: 0, jpBase: 0, jpFS: 0,
+      sum: 0, sumSq: 0, max: 0,
+      hist: [0, 0, 0, 0, 0, 0, 0, 0]
+    };
+    var EDGES = [0, 1, 2, 5, 10, 25, 100]; // bucket lower bounds after "no win"
+    function bucket(w) {
+      if (w <= 0) return 0;
+      if (w < 1) return 1;
+      for (var i = EDGES.length - 1; i >= 1; i--) if (w >= EDGES[i]) return i + 1;
+      return 1;
+    }
+    function run(n) {
+      for (var i = 0; i < n; i++) {
+        var r = engine.spin(st, rng, false);
+        A.rounds++;
+        A.lineBase += r.lineWin; A.scatBase += r.scatWin; A.jpBase += r.jpWin;
+        if (r.win > 0) A.hits++;
+        var rw = r.win;
+        if (r.trigger) {
+          A.trig++;
+          while (st.mode === 'fs') {
+            r = engine.spin(st, rng, false);
+            A.fsSpins++;
+            A.lineFS += r.lineWin; A.scatFS += r.scatWin; A.jpFS += r.jpWin;
+            if (r.retrigger) A.retrig++;
+            rw += r.win;
+          }
+        }
+        A.sum += rw; A.sumSq += rw * rw;
+        if (rw > A.max) A.max = rw;
+        A.hist[bucket(rw)]++;
+      }
+    }
+    function result() {
+      var n = A.rounds || 1;
+      var mean = A.sum / n;
+      var sd = Math.sqrt(Math.max(0, A.sumSq / n - mean * mean));
+      return {
+        rounds: A.rounds,
+        rtp: mean,
+        rtpLineBase: A.lineBase / n, rtpScatBase: A.scatBase / n,
+        rtpLineFS: A.lineFS / n, rtpScatFS: A.scatFS / n, rtpJackpot: (A.jpBase + A.jpFS) / n,
+        hitRate: A.hits / n,
+        trigEvery: A.trig ? n / A.trig : Infinity,
+        avgFeature: A.trig ? (A.lineFS + A.scatFS + A.jpFS) / A.trig : 0,
+        retrig: A.retrig, fsSpins: A.fsSpins,
+        sd: sd, se: sd / Math.sqrt(n), max: A.max,
+        hist: A.hist.slice()
+      };
+    }
+    return { run: run, result: result };
+  }
+
+  var api = {
+    REELS: REELS, ROWS: ROWS, NLINES: NLINES, LINES: LINES,
+    DEFAULTS: DEFAULTS, WILDMULT: WILDMULT,
+    mulberry32: mulberry32,
+    createEngine: createEngine, makeSim: makeSim
+  };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.SlotEngine = api;
+})(typeof window !== 'undefined' ? window : this);
+</script>
+<script>
+(function () {
+  'use strict';
+  var E = window.SlotEngine;
+  var cfg = E.DEFAULTS;
+  var engine = E.createEngine(cfg, 1);
+  var st = engine.newState();
+  var NL = E.NLINES, ROWS = E.ROWS, REELS = E.REELS;
+
+  var SYM = {
+    W:   { t: 'WILD', s: '' },
+    G:   { t: 'WILD', s: '' },
+    W2:  { t: '2×', s: 'WILD' },
+    W3:  { t: '3×', s: 'WILD' },
+    SC:  { t: 'SC', s: 'SCATTER', dark: true },
+    BN:  { t: 'BONUS', s: 'FREE SPINS' },
+    JP1: { t: 'MINI', s: 'JACKPOT' },
+    JP2: { t: 'MINOR', s: 'JACKPOT' },
+    JP3: { t: 'MAJOR', s: 'JACKPOT' },
+    JP4: { t: 'MAXI', s: 'JACKPOT' },
+    JP5: { t: 'GRAND', s: 'JACKPOT' },
+    ELK: { t: 'ELK', s: '' },
+    OWL: { t: 'OWL', s: '' },
+    HARE:{ t: 'HARE', s: '', dark: true },
+    LAN: { t: 'LAMP', s: '', dark: true },
+    PINE:{ t: 'PINE', s: '' },
+    A:   { t: 'A', s: '' },
+    K:   { t: 'K', s: '' },
+    Q:   { t: 'Q', s: '' },
+    NECK:{ t: 'CHARM', s: '' }
+  };
+  var NAMES = { W: 'Wild', G: 'Growing wild', W2: '2x growing wild', W3: '3x growing wild', SC: 'Scatter', BN: 'Bonus', JP1: 'Mini jackpot', JP2: 'Minor jackpot', JP3: 'Major jackpot', JP4: 'Maxi jackpot', JP5: 'Grand jackpot', ELK: 'Elk', OWL: 'Owl', HARE: 'Hare', LAN: 'Lamp', PINE: 'Pine', A: 'A', K: 'K', Q: 'Q', NECK: 'Charm' };
+  var RANDOM_POOL = ['ELK', 'OWL', 'HARE', 'LAN', 'PINE', 'A', 'K', 'Q', 'NECK', 'A', 'K', 'Q', 'LAN', 'PINE', 'SC', 'BN', 'W', 'JP1', 'JP2'];
+
+  function $(id) { return document.getElementById(id); }
+  var ART = {
+    ELK: "<path class=\"ms\" stroke-width=\"4.5\" stroke-linecap=\"round\" d=\"M40 46C30 40 26 30 24 16M33 38L19 33M29 27L31 15M60 46C70 40 74 30 76 16M67 38L81 33M71 27L69 15\"/><path class=\"m\" d=\"M35 50C35 43 65 43 65 50L59 77C55 86 45 86 41 77Z\"/><ellipse class=\"m\" cx=\"30\" cy=\"51\" rx=\"8\" ry=\"4\" transform=\"rotate(-25 30 51)\"/><ellipse class=\"m\" cx=\"70\" cy=\"51\" rx=\"8\" ry=\"4\" transform=\"rotate(25 70 51)\"/><circle class=\"d\" cx=\"43\" cy=\"58\" r=\"2.8\"/><circle class=\"d\" cx=\"57\" cy=\"58\" r=\"2.8\"/><ellipse class=\"d\" cx=\"50\" cy=\"79\" rx=\"5.5\" ry=\"3.5\"/>",
+    OWL: "<path class=\"m\" d=\"M22 26L37 37L50 32L63 37L78 26L79 58C79 77 66 88 50 88C34 88 21 77 21 58Z\"/><circle class=\"d\" cx=\"37\" cy=\"55\" r=\"13\"/><circle class=\"d\" cx=\"63\" cy=\"55\" r=\"13\"/><circle class=\"m\" cx=\"37\" cy=\"55\" r=\"9\"/><circle class=\"m\" cx=\"63\" cy=\"55\" r=\"9\"/><circle class=\"d\" cx=\"37\" cy=\"55\" r=\"4.5\"/><circle class=\"d\" cx=\"63\" cy=\"55\" r=\"4.5\"/><path class=\"d\" d=\"M50 60L45 70L50 77L55 70Z\"/>",
+    HARE: "<ellipse class=\"m\" cx=\"37\" cy=\"27\" rx=\"8.5\" ry=\"23\" transform=\"rotate(-8 37 27)\"/><ellipse class=\"m\" cx=\"63\" cy=\"27\" rx=\"8.5\" ry=\"23\" transform=\"rotate(8 63 27)\"/><ellipse class=\"d\" cx=\"37\" cy=\"29\" rx=\"3.5\" ry=\"15\" transform=\"rotate(-8 37 29)\"/><ellipse class=\"d\" cx=\"63\" cy=\"29\" rx=\"3.5\" ry=\"15\" transform=\"rotate(8 63 29)\"/><ellipse class=\"m\" cx=\"50\" cy=\"68\" rx=\"25\" ry=\"22\"/><circle class=\"d\" cx=\"40\" cy=\"63\" r=\"3.4\"/><circle class=\"d\" cx=\"60\" cy=\"63\" r=\"3.4\"/><path class=\"d\" d=\"M45 72h10l-5 6z\"/>",
+    LAN: "<path class=\"ms\" stroke-width=\"4.5\" stroke-linecap=\"round\" d=\"M37 25C37 6 63 6 63 25\"/><path class=\"m\" d=\"M31 25h38l-4 9H35z\"/><path class=\"m\" d=\"M35 34h30l4 38H31z\"/><rect class=\"d\" x=\"39\" y=\"38\" width=\"22\" height=\"30\" rx=\"3\"/><path d=\"M50 42C59 52 59 60 50 66C41 60 41 52 50 42Z\" fill=\"#ff8a1f\"/><path d=\"M50 52C55 57 55 61 50 64C45 61 45 57 50 52Z\" fill=\"#ffe27a\"/><path class=\"m\" d=\"M28 72h44l-3 11H31z\"/>",
+    PINE: "<path class=\"m\" d=\"M50 8L70 38H60L78 62H22L40 38H30Z\"/><rect class=\"m\" x=\"44\" y=\"62\" width=\"12\" height=\"20\" rx=\"2\"/><path class=\"d\" d=\"M50 18L58 33H42Z\"/>",
+    NECK: "<path class=\"ms\" stroke-width=\"4.5\" stroke-linecap=\"round\" d=\"M20 14C24 48 38 56 50 56C62 56 76 48 80 14\"/><circle class=\"m\" cx=\"50\" cy=\"58\" r=\"6\"/><path class=\"m\" d=\"M50 62L68 78L50 96L32 78Z\"/><circle class=\"d\" cx=\"50\" cy=\"78\" r=\"6\"/>",
+    W: "<path class=\"m\" d=\"M64 12A38 38 0 1 0 64 86A48 48 0 0 1 64 12Z\"/><path class=\"m\" d=\"M76 32L79 43L90 46L79 49L76 60L73 49L62 46L73 43Z\"/><circle class=\"m\" cx=\"52\" cy=\"22\" r=\"3\"/>",
+    G: "<path class=\"m\" d=\"M50.0 6.0L57.7 29.5L79.7 18.3L68.5 40.3L92.0 48.0L68.5 55.7L79.7 77.7L57.7 66.5L50.0 90.0L42.3 66.5L20.3 77.7L31.5 55.7L8.0 48.0L31.5 40.3L20.3 18.3L42.3 29.5Z\"/><circle class=\"d\" cx=\"50\" cy=\"48\" r=\"13\"/><path class=\"m\" d=\"M50 36L53 46L63 48L53 50L50 60L47 50L37 48L47 46Z\"/>",
+    W2: "<path class=\"m\" d=\"M50.0 6.0L57.7 29.5L79.7 18.3L68.5 40.3L92.0 48.0L68.5 55.7L79.7 77.7L57.7 66.5L50.0 90.0L42.3 66.5L20.3 77.7L31.5 55.7L8.0 48.0L31.5 40.3L20.3 18.3L42.3 29.5Z\"/><text class=\"d\" x=\"50\" y=\"61\" text-anchor=\"middle\" font-size=\"38\" font-weight=\"800\" font-family=\"Big Shoulders Display, Arial Narrow, sans-serif\">2x</text>",
+    W3: "<path class=\"m\" d=\"M50.0 6.0L57.7 29.5L79.7 18.3L68.5 40.3L92.0 48.0L68.5 55.7L79.7 77.7L57.7 66.5L50.0 90.0L42.3 66.5L20.3 77.7L31.5 55.7L8.0 48.0L31.5 40.3L20.3 18.3L42.3 29.5Z\"/><text class=\"d\" x=\"50\" y=\"61\" text-anchor=\"middle\" font-size=\"38\" font-weight=\"800\" font-family=\"Big Shoulders Display, Arial Narrow, sans-serif\">3x</text>",
+    SC: "<g class=\"ms\" stroke-width=\"5.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M50 10V90M15 30L85 70M15 70L85 30\"/><path d=\"M40 16L50 26L60 16M40 84L50 74L60 84M13 44L26 43L24 31M87 56L74 57L76 69M13 56L26 57L24 69M87 44L74 43L76 31\"/></g><circle class=\"m\" cx=\"50\" cy=\"50\" r=\"11\"/><circle class=\"d\" cx=\"50\" cy=\"50\" r=\"5\"/>",
+    BN: "<path class=\"m\" d=\"M30 20H70L90 42L50 90L10 42Z\"/><path class=\"ds\" stroke-width=\"3\" stroke-linejoin=\"round\" d=\"M10 42H90M30 20L40 42L50 90M70 20L60 42L50 90M40 42L50 20L60 42\"/><path class=\"m\" d=\"M82 8L84.5 16L92.5 18.5L84.5 21L82 29L79.5 21L71.5 18.5L79.5 16Z\"/>",
+    JP1: "<path class=\"m\" d=\"M20 72L13 34L34 50L50 22L66 50L87 34L80 72Z\"/><rect class=\"m\" x=\"20\" y=\"76\" width=\"60\" height=\"9\" rx=\"3\"/><circle class=\"d\" cx=\"50.0\" cy=\"61\" r=\"3.4\"/>",
+    JP2: "<path class=\"m\" d=\"M20 72L13 34L34 50L50 22L66 50L87 34L80 72Z\"/><rect class=\"m\" x=\"20\" y=\"76\" width=\"60\" height=\"9\" rx=\"3\"/><circle class=\"d\" cx=\"45.5\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"54.5\" cy=\"61\" r=\"3.4\"/>",
+    JP3: "<path class=\"m\" d=\"M20 72L13 34L34 50L50 22L66 50L87 34L80 72Z\"/><rect class=\"m\" x=\"20\" y=\"76\" width=\"60\" height=\"9\" rx=\"3\"/><circle class=\"d\" cx=\"41.0\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"50.0\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"59.0\" cy=\"61\" r=\"3.4\"/>",
+    JP4: "<path class=\"m\" d=\"M20 72L13 34L34 50L50 22L66 50L87 34L80 72Z\"/><rect class=\"m\" x=\"20\" y=\"76\" width=\"60\" height=\"9\" rx=\"3\"/><circle class=\"d\" cx=\"36.5\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"45.5\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"54.5\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"63.5\" cy=\"61\" r=\"3.4\"/>",
+    JP5: "<path class=\"m\" d=\"M20 72L13 34L34 50L50 22L66 50L87 34L80 72Z\"/><rect class=\"m\" x=\"20\" y=\"76\" width=\"60\" height=\"9\" rx=\"3\"/><circle class=\"d\" cx=\"32.0\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"41.0\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"50.0\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"59.0\" cy=\"61\" r=\"3.4\"/><circle class=\"d\" cx=\"68.0\" cy=\"61\" r=\"3.4\"/>"
+  };
+  var CAP = {"W": "WILD", "G": "WILD", "SC": "SCATTER", "BN": "BONUS", "JP1": "MINI", "JP2": "MINOR", "JP3": "MAJOR", "JP4": "MAXI", "JP5": "GRAND"};
+  function tileHTML(sym) {
+    var d = SYM[sym];
+    if (ART[sym]) {
+      return '<div class="tile arty t-' + sym + (d.dark ? ' dark' : '') + '"><svg class="art" viewBox="0 0 100 100" aria-hidden="true">' + ART[sym] + '</svg>' + (CAP[sym] ? '<span class="cap">' + CAP[sym] + '</span>' : '') + '</div>';
+    }
+    var cls = 'tile t-' + sym + (d.dark ? ' dark' : '');
+    var l = d.t.length;
+    var lc = l === 1 ? 'l1' : (l === 2 ? 'l2' : (l === 4 ? 'l4' : ''));
+    return '<div class="' + cls + '"><span class="lab ' + lc + '">' + d.t + '</span>' + (d.s ? '<span class="sub">' + d.s + '</span>' : '') + '</div>';
+  }
+  function money(x) { return x.toFixed(2); }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+
+  /* ---------- sound (synthesized in the browser, no audio files) ---------- */
+  var SFX = (function () {
+    var ctx = null, master = null, sfxGain = null, musGain = null;
+    var soundOn = true, musicOn = false, musicTimer = null, drone = null, inFS = false;
+    try {
+      if (localStorage.getItem('ar_sound') === 'off') soundOn = false;
+      if (localStorage.getItem('ar_music') === 'on') musicOn = true;
+    } catch (e) {}
+    function ensure() {
+      if (!soundOn && !musicOn) return null;
+      if (!ctx) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        try {
+          ctx = new AC();
+          master = ctx.createGain(); master.gain.value = 0.6; master.connect(ctx.destination);
+          sfxGain = ctx.createGain(); sfxGain.gain.value = 1; sfxGain.connect(master);
+          musGain = ctx.createGain(); musGain.gain.value = 0.5; musGain.connect(master);
+        } catch (e) { ctx = null; return null; }
+      }
+      if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+      return ctx;
+    }
+    function tone(f, t, dur, type, vol, to, dest) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'sine';
+      o.frequency.setValueAtTime(f, t);
+      if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.02, dur / 4));
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(dest || sfxGain);
+      o.start(t); o.stop(t + dur + 0.05);
+    }
+    function noise(t, dur, vol, f0, f1) {
+      var n = Math.floor(ctx.sampleRate * dur), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+      var src = ctx.createBufferSource(); src.buffer = buf;
+      var fl = ctx.createBiquadFilter(); fl.type = 'bandpass';
+      fl.frequency.setValueAtTime(f0, t); fl.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.3);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(fl); fl.connect(g); g.connect(sfxGain);
+      src.start(t); src.stop(t + dur + 0.05);
+    }
+    var NOTES = { C5: 523.25, D5: 587.33, E5: 659.25, G5: 783.99, A5: 880, C6: 1046.5, E6: 1318.5, G6: 1568, C7: 2093 };
+    function arp(list, step, vol, type) {
+      var t = ctx.currentTime;
+      list.forEach(function (f, i) {
+        tone(f, t + i * step, 0.35, type || 'triangle', vol);
+        tone(f * 2, t + i * step, 0.2, 'sine', vol * 0.35);
+      });
+    }
+    var api = {
+      get sound() { return soundOn; }, get music() { return musicOn; },
+      click: function () { if (!soundOn || !ensure()) return; tone(520, ctx.currentTime, 0.06, 'square', 0.05, 380); },
+      spin: function () {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime;
+        noise(t, 0.45, 0.12, 300, 2400);
+        tone(110, t, 0.35, 'sawtooth', 0.04, 220);
+      },
+      stop: function (i) {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime;
+        tone(150 - i * 4, t, 0.14, 'sine', 0.22, 55);
+        noise(t, 0.05, 0.06, 1800, 900);
+      },
+      ding: function (n) {
+        if (!soundOn || !ensure()) return;
+        var f = [NOTES.E6, NOTES.G6, NOTES.C7][Math.min(n, 3) - 1] || NOTES.E6, t = ctx.currentTime;
+        tone(f, t, 0.5, 'sine', 0.12); tone(f * 2.76, t, 0.25, 'sine', 0.04);
+      },
+      wild: function () {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime, o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+        o.type = 'sawtooth';
+        o.frequency.setValueAtTime(260, t);
+        o.frequency.exponentialRampToValueAtTime(520, t + 0.45);
+        o.frequency.exponentialRampToValueAtTime(380, t + 1.0);
+        fl.type = 'lowpass'; fl.frequency.value = 900;
+        lfo.frequency.value = 6; lg.gain.value = 14; lfo.connect(lg); lg.connect(o.frequency);
+        g.gain.setValueAtTime(0.0001, t);
+        g.gain.exponentialRampToValueAtTime(0.11, t + 0.25);
+        g.gain.exponentialRampToValueAtTime(0.0001, t + 1.05);
+        o.connect(fl); fl.connect(g); g.connect(sfxGain);
+        o.start(t); lfo.start(t); o.stop(t + 1.1); lfo.stop(t + 1.1);
+      },
+      grow: function () {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime;
+        tone(330, t, 0.22, 'triangle', 0.1, 660); tone(495, t + 0.06, 0.2, 'sine', 0.05, 990);
+      },
+      win: function (x) {
+        if (!soundOn || !ensure()) return;
+        if (x < 1) arp([NOTES.C5, NOTES.E5], 0.09, 0.09);
+        else if (x < 5) arp([NOTES.C5, NOTES.E5, NOTES.G5], 0.09, 0.11);
+        else if (x < 25) arp([NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6, NOTES.E6], 0.08, 0.12);
+        else arp([NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6, NOTES.E6, NOTES.G6, NOTES.C7, NOTES.G6, NOTES.C7], 0.075, 0.13);
+      },
+      bonus: function (retrigger) {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime;
+        arp(retrigger ? [NOTES.G5, NOTES.C6, NOTES.E6] : [NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6, NOTES.E6, NOTES.G6], 0.11, 0.13);
+        tone(130.8, t, 1.4, 'sawtooth', 0.05); tone(196, t, 1.4, 'sawtooth', 0.035);
+      },
+      jackpot: function (tier) {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime, base = [NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6, NOTES.E6, NOTES.G6, NOTES.C7];
+        var n = 5 + tier * 2;
+        for (var i = 0; i < n; i++) {
+          var f = base[i % base.length] * (i >= base.length ? 2 : 1);
+          tone(f, t + i * 0.08, 0.5, 'triangle', 0.13); tone(f / 2, t + i * 0.08, 0.5, 'sine', 0.08);
+        }
+        var end = t + n * 0.08;
+        [NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6].forEach(function (f) { tone(f, end, 1.6, 'triangle', 0.1); });
+        noise(end, 1.2, 0.08, 4000, 800);
+      },
+      end: function (x) {
+        if (!soundOn || !ensure()) return;
+        arp(x >= 20 ? [NOTES.G5, NOTES.E5, NOTES.C5, NOTES.G5, NOTES.C6] : [NOTES.G5, NOTES.E5, NOTES.C5], 0.14, 0.1);
+      },
+      setFS: function (on) { inFS = on; },
+      setSound: function (on) {
+        soundOn = on;
+        try { localStorage.setItem('ar_sound', on ? 'on' : 'off'); } catch (e) {}
+        if (on) { ensure(); api.click(); }
+      },
+      setMusic: function (on) {
+        musicOn = on;
+        try { localStorage.setItem('ar_music', on ? 'on' : 'off'); } catch (e) {}
+        if (on) startMusic(); else stopMusic();
+      },
+      resume: function () { if (musicOn) startMusic(); }
+    };
+    var SCALE = [110, 130.81, 146.83, 164.81, 196, 220, 261.63, 293.66, 329.63, 392, 440];
+    function startMusic() {
+      if (!musicOn || musicTimer || !ensure()) return;
+      var t = ctx.currentTime;
+      var o1 = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
+      o1.type = 'sawtooth'; o2.type = 'sawtooth'; o1.frequency.value = 55; o2.frequency.value = 55.4;
+      fl.type = 'lowpass'; fl.frequency.value = 220;
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(0.05, t + 2);
+      o1.connect(fl); o2.connect(fl); fl.connect(g); g.connect(musGain);
+      o1.start(t); o2.start(t);
+      drone = { o1: o1, o2: o2, g: g };
+      (function next() {
+        if (!musicOn || !ctx) { musicTimer = null; return; }
+        var n = SCALE[Math.floor(Math.random() * SCALE.length)] * (inFS ? 2 : 1), tt = ctx.currentTime;
+        tone(n, tt, 2.6, 'sine', 0.07, null, musGain);
+        tone(n * 2.005, tt, 1.6, 'sine', 0.025, null, musGain);
+        musicTimer = setTimeout(next, (inFS ? 700 : 1500) + Math.random() * (inFS ? 400 : 1100));
+      })();
+    }
+    function stopMusic() {
+      if (musicTimer) { clearTimeout(musicTimer); musicTimer = null; }
+      if (drone && ctx) {
+        var t = ctx.currentTime;
+        try { drone.g.gain.cancelScheduledValues(t); drone.g.gain.setValueAtTime(drone.g.gain.value, t); drone.g.gain.exponentialRampToValueAtTime(0.0001, t + 0.6); drone.o1.stop(t + 0.7); drone.o2.stop(t + 0.7); } catch (e) {}
+        drone = null;
+      }
+    }
+    return api;
+  })();
+
+  /* ---------- build reels ---------- */
+  var reelEls = [], cells = [];
+  (function build() {
+    var host = $('reels'), r, c;
+    for (r = 0; r < ROWS; r++) cells[r] = [];
+    for (c = 0; c < REELS; c++) {
+      var col = document.createElement('div');
+      col.className = 'reel';
+      for (r = 0; r < ROWS; r++) {
+        var cell = document.createElement('div');
+        cell.className = 'cell';
+        col.appendChild(cell);
+        cells[r][c] = cell;
+      }
+      host.appendChild(col);
+      reelEls.push(col);
+    }
+  })();
+  function paint(r, c, sym) { cells[r][c].innerHTML = tileHTML(sym); cells[r][c].dataset.sym = sym; }
+
+  (function initialGrid() {
+    var stops = [4, 19, 33, 12, 27];
+    for (var c = 0; c < REELS; c++) {
+      var strip = engine.strips.base[c];
+      for (var r = 0; r < ROWS; r++) paint(r, c, strip[(stops[c] + r) % strip.length]);
+    }
+  })();
+
+  /* ---------- state ---------- */
+  var BETS = [0.8, 2, 4, 8, 20, 40];
+  var betIdx = 1, balance = 500, busy = false, auto = false, fast = false, lastWin = 0;
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function bet() { return BETS[betIdx]; }
+
+  function updateHud() {
+    $('bal').textContent = money(balance);
+    $('betV').textContent = money(bet());
+    $('winV').textContent = money(lastWin);
+    $('lineBet').textContent = 'Line bet ' + (bet() / NL).toFixed(3);
+    $('betDn').disabled = busy || betIdx === 0;
+    $('betUp').disabled = busy || betIdx === BETS.length - 1;
+    $('spin').disabled = busy;
+    $('spin').textContent = busy ? (st.mode === 'fs' ? 'Free spin' : 'Spinning') : 'Spin';
+    if (!$('jps').firstChild) {
+      var JN = ['MINI', 'MINOR', 'MAJOR', 'MAXI', 'GRAND'], jh = '';
+      for (var ji = 0; ji < 5; ji++) jh += '<div class="jp" id="jp' + (ji + 1) + '" style="--c:' + ['#2aa876', '#3b82f6', '#9b5de5', '#f2791f', '#e0304f'][ji] + '"><span class="n">' + JN[ji] + '</span><span class="v"></span></div>';
+      $('jps').innerHTML = jh;
+    }
+    for (var jj = 0; jj < 5; jj++) $('jp' + (jj + 1)).lastChild.textContent = money(cfg.jackpots[jj] * bet());
+    var fs = st.mode === 'fs';
+    $('fsbar').hidden = !fs;
+    if (fs) { $('fsLeft').textContent = st.fsLeft; $('fsWin').textContent = money(st.fsWin * bet()); }
+  }
+  function moveNote(n) { return (n > 1 ? n + ' growing wilds landed. ' : 'A growing wild landed. ') + 'It stays put and grows one box each spin, following the arrow, until the reel is full.'; }
+  function say(html) { $('msg').innerHTML = html; }
+
+  function clearFx() {
+    for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) {
+      var cl = cells[r][c].classList;
+      cl.remove('win', 'dim', 'landed', 'grow');
+    }
+    for (var jx = 1; jx <= 5; jx++) { var jel = $('jp' + jx); if (jel) jel.classList.remove('hit'); }
+  }
+  function clearBadges() {
+    var b = document.querySelectorAll('.badge, .chev');
+    for (var i = 0; i < b.length; i++) b[i].remove();
+  }
+
+  /* ---------- one spin ---------- */
+  async function spinOnce() {
+    var b = bet();
+    if (st.mode === 'base') balance -= b;
+    // reels that already hold a locked wild keep those rows still while spinning
+    var held = {};
+    st.exp.forEach(function (e) { held[e.reel] = held[e.reel] || []; for (var q = e.lo; q <= e.hi; q++) held[e.reel].push(q); });
+    var res = engine.spin(st, Math.random, true);
+    lastWin = 0;
+    clearFx();
+    updateHud();
+    SFX.spin();
+    SFX.setFS(st.mode === 'fs');
+
+    var fastMode = fast || reduceMotion;
+    var first = fastMode ? 220 : 480, gap = fastMode ? 90 : 190;
+    var stopped = [], c, r, bonusSeen = 0;
+    for (c = 0; c < REELS; c++) {
+      var h = held[c] || [];
+      for (r = 0; r < ROWS; r++) {
+        var keep = h.indexOf(r) !== -1;
+        cells[r][c].classList.toggle('held', keep);
+        if (!keep) cells[r][c].classList.remove('lock');
+      }
+      reelEls[c].classList.add('spinning');
+    }
+    clearBadges();
+    var t0 = Date.now();
+    await new Promise(function (resolve) {
+      var timer = setInterval(function () {
+        var now = Date.now() - t0;
+        for (var c = 0; c < REELS; c++) {
+          if (stopped[c]) continue;
+          if (now >= first + c * gap) {
+            stopped[c] = true;
+            reelEls[c].classList.remove('spinning');
+            SFX.stop(c);
+            var sp = 0;
+            for (var r0 = 0; r0 < ROWS; r0++) { var g0 = res.grid[r0][c]; if (g0 === 'BN' || g0 === 'SC' || g0.indexOf('JP') === 0) sp++; }
+            if (sp) { bonusSeen = (bonusSeen || 0) + 1; SFX.ding(bonusSeen); }
+            for (var r = 0; r < ROWS; r++) {
+              paint(r, c, res.grid[r][c]);
+              cells[r][c].classList.remove('held');
+              cells[r][c].classList.add('landed');
+            }
+          } else {
+            var hh = held[c] || [];
+            for (var rr = 0; rr < ROWS; rr++) {
+              if (hh.indexOf(rr) === -1) paint(rr, c, RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]);
+            }
+          }
+        }
+        if (stopped.length === REELS && stopped.every(Boolean)) { clearInterval(timer); resolve(); }
+      }, 70);
+    });
+
+    // locked / expanding wild markers
+    for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) cells[r][c].classList.remove('lock');
+    var chevs = document.querySelectorAll('.chev');
+    for (var ci = 0; ci < chevs.length; ci++) chevs[ci].remove();
+    res.exp.forEach(function (e) {
+      for (var rr = e.lo; rr <= e.hi; rr++) {
+        var cell = cells[rr][e.reel];
+        cell.classList.add('lock');
+        if (!held[e.reel] || held[e.reel].indexOf(rr) === -1) { if (e.age > 0) cell.classList.add('grow'); }
+      }
+      if (e.dir) {
+        var nr = e.dir === 'up' ? e.lo - 1 : e.hi + 1;
+        var ch = document.createElement('span');
+        ch.className = 'chev ' + (e.dir === 'up' ? 'up' : 'down');
+        cells[nr][e.reel].appendChild(ch);
+      }
+    });
+
+    if (res.fresh.length) SFX.wild();
+    else if (res.exp.some(function (e) { return e.age > 0; })) SFX.grow();
+
+    // wins
+    var credit = res.win * b;
+    balance += credit;
+    lastWin = credit;
+    var parts = [];
+    if (res.win > 0) {
+      var hit = {};
+      (res.lineWins || []).forEach(function (w) { w.cells.forEach(function (p) { hit[p[0] + ',' + p[1]] = true; }); });
+      if (res.scatWin > 0) {
+        for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) if (res.grid[r][c] === 'SC') hit[r + ',' + c] = true;
+      }
+      (res.jackpots || []).forEach(function (j) {
+        for (r = 0; r < ROWS; r++) for (c = j.first; c <= j.last; c++) if (res.grid[r][c] === 'JP' + j.tier) hit[r + ',' + c] = true;
+        var el = $('jp' + j.tier); if (el) el.classList.add('hit');
+      });
+      for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) {
+        var cl = cells[r][c].classList;
+        if (hit[r + ',' + c]) cl.add('win'); else cl.add('dim');
+      }
+      var lw = (res.lineWins || []).slice().sort(function (a, z) { return z.win - a.win; });
+      lw.slice(0, 4).forEach(function (w) {
+        var cr = w.win * (b / NL);
+        parts.push('<strong>' + NAMES[w.sym] + ' x' + w.count + '</strong>' + (w.mult > 1 ? ' (' + w.mult + 'x wild)' : '') + ' on line ' + (w.line + 1) + ' <span class="amt">+' + money(cr) + '</span>');
+      });
+      if (lw.length > 4) parts.push('and ' + (lw.length - 4) + ' more lines');
+      if (res.scatWin > 0) parts.push('<strong>' + res.scatterCount + ' scatters</strong> <span class="amt">+' + money(res.scatWin * b) + '</span>');
+      (res.jackpots || []).forEach(function (j) { parts.unshift('<strong>' + NAMES['JP' + j.tier].toUpperCase() + '!</strong> <span class="amt">+' + money(j.win * b) + '</span>'); });
+      say(parts.join(' / ') + '<br><strong>Total <span class="amt">' + money(credit) + '</span></strong>');
+    } else {
+      var ex = res.fresh.length ? moveNote(res.fresh.length) : 'No win.';
+      say(ex);
+    }
+    if (res.fresh.length && res.win > 0) say($('msg').innerHTML + '<br>' + moveNote(res.fresh.length));
+    updateHud();
+    if (res.win > 0) { if (res.jackpots && res.jackpots.length) SFX.jackpot(res.jackpots[res.jackpots.length - 1].tier); else SFX.win(res.win); }
+    await sleep(res.win > 0 ? (fastMode ? 350 : 900) : (fastMode ? 60 : 250));
+
+    if (res.trigger) {
+      SFX.bonus(false);
+      say('<strong>Free spins!</strong> ' + res.bonusCount + ' bonus symbols award ' + cfg.fsAward + ' spins. Locked wilds carry in.');
+      updateHud();
+      await sleep(fastMode ? 700 : 1500);
+    } else if (res.retrigger) {
+      SFX.bonus(true);
+      say('<strong>Retrigger.</strong> ' + res.bonusCount + ' bonus symbols add ' + res.retrigger + ' free spins.');
+      await sleep(fastMode ? 500 : 1100);
+    }
+    if (res.fsEnded) {
+      SFX.end(res.fsWin);
+      SFX.setFS(false);
+      var total = res.fsWin * b;
+      say('<strong>Free spins finished.</strong> The feature paid <span class="amt">' + money(total) + '</span> (' + res.fsWin.toFixed(1) + 'x your bet).');
+      updateHud();
+      await sleep(fastMode ? 600 : 1400);
+    }
+    return res;
+  }
+
+  async function round() {
+    if (busy) return;
+    if (st.mode === 'base' && balance < bet() - 1e-9) {
+      say('Not enough credits for that bet. Lower the bet or reset credits.');
+      setAuto(false);
+      return;
+    }
+    busy = true; updateHud();
+    try {
+      await spinOnce();
+      while (st.mode === 'fs') { await sleep(fast ? 120 : 380); await spinOnce(); }
+    } finally {
+      busy = false; updateHud();
+    }
+  }
+
+  function setAuto(on) {
+    auto = on;
+    $('auto').setAttribute('aria-pressed', on ? 'true' : 'false');
+  }
+  var autoRunning = false;
+  async function autoLoop() {
+    if (autoRunning) return;
+    autoRunning = true;
+    try {
+      while (auto) {
+        await round();
+        if (!auto) break;
+        await sleep(fast ? 150 : 450);
+      }
+    } finally { autoRunning = false; }
+  }
+
+  function syncToggles() {
+    $('snd').setAttribute('aria-pressed', SFX.sound ? 'true' : 'false');
+    $('mus').setAttribute('aria-pressed', SFX.music ? 'true' : 'false');
+  }
+  $('snd').addEventListener('click', function () { SFX.setSound(!SFX.sound); syncToggles(); });
+  $('mus').addEventListener('click', function () { SFX.setMusic(!SFX.music); syncToggles(); });
+  syncToggles();
+  $('spin').addEventListener('click', function () { SFX.resume(); round(); });
+  $('auto').addEventListener('click', function () {
+    setAuto(!auto);
+    if (auto) autoLoop();
+  });
+  $('fast').addEventListener('click', function () {
+    fast = !fast; $('fast').setAttribute('aria-pressed', fast ? 'true' : 'false');
+  });
+  $('betDn').addEventListener('click', function () { if (!busy && betIdx > 0) { betIdx--; updateHud(); } });
+  $('betUp').addEventListener('click', function () { if (!busy && betIdx < BETS.length - 1) { betIdx++; updateHud(); } });
+  $('reset').addEventListener('click', function () {
+    if (busy) return;
+    balance = 500; lastWin = 0; updateHud(); say('Credits reset to 500.00.');
+  });
+  document.addEventListener('keydown', function (e) {
+    if (e.code === 'Space' && (e.target === document.body || e.target === document.documentElement)) {
+      e.preventDefault(); round();
+    }
+  });
+  updateHud();
+
+  /* ---------- tabs ---------- */
+  var tabs = ['lab', 'pay', 'how'];
+  tabs.forEach(function (k) {
+    $('tab-' + k).addEventListener('click', function () {
+      tabs.forEach(function (j) {
+        $('tab-' + j).setAttribute('aria-selected', j === k ? 'true' : 'false');
+        $('pane-' + j).hidden = j !== k;
+      });
+    });
+  });
+
+  /* ---------- paytable ---------- */
+  function buildPaytable() {
+    var order = ['W', 'ELK', 'OWL', 'HARE', 'LAN', 'PINE', 'NECK', 'A', 'K', 'Q'];
+    var html = '<tr><th>Symbol</th><th>3</th><th>4</th><th>5</th></tr>';
+    order.forEach(function (s) {
+      var p = cfg.pays[s];
+      html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td>' + p[0] + '</td><td>' + p[1] + '</td><td>' + p[2] + '</td></tr>';
+    });
+    ['G', 'W2', 'W3', 'SC', 'BN', 'JP1', 'JP2', 'JP3', 'JP4', 'JP5'].forEach(function (s) {
+      var note = s === 'SC' ? 'Pays anywhere: 3 = ' + cfg.scatter[3] + 'x, 4 = ' + cfg.scatter[4] + 'x, 5 = ' + cfg.scatter[5] + 'x your total bet' : s === 'BN' ? 'Pays nothing itself. 3 or more anywhere award ' + cfg.fsAward + ' free spins' : s.indexOf('JP') === 0 ? NAMES[s] + ': 3 or more on adjacent reels pays ' + cfg.jackpots[+s.charAt(2) - 1] + 'x your total bet' : (s === 'G' ? 'Growing wild: stays and grows a box each spin' : 'Growing wild that multiplies the wins it joins');
+      html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">' + note + '</td></tr>';
+    });
+    $('ptable').innerHTML = html;
+    var g = '';
+    E.LINES.forEach(function (ln, i) {
+      var pts = ln.map(function (row, c) { return (8 + c * 11) + ',' + (6 + row * 9); }).join(' ');
+      var dots = '';
+      for (var c = 0; c < REELS; c++) for (var r = 0; r < ROWS; r++) dots += '<circle cx="' + (8 + c * 11) + '" cy="' + (6 + r * 9) + '" r="1.1" fill="currentColor" opacity="0.25"/>';
+      g += '<div><svg viewBox="0 0 60 40" aria-hidden="true">' + dots + '<polyline points="' + pts + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/></svg>' + (i + 1) + '</div>';
+    });
+    $('lineGrid').innerHTML = g;
+  }
+  buildPaytable();
+
+  /* ---------- math lab ---------- */
+  var LABELS = ['No win', 'Under 1x', '1 to 2x', '2 to 5x', '5 to 10x', '10 to 25x', '25 to 100x', '100x +'];
+  var simEngine = E.createEngine(cfg, 1);
+  var simBusy = false;
+  function renderSim(r, target) {
+    $('sRtp').textContent = (r.rtp * 100).toFixed(1) + '%';
+    $('sRtpN').textContent = 'give or take ' + (2 * r.se * 100).toFixed(1) + ' at ' + r.rounds.toLocaleString() + ' rounds';
+    $('sHit').textContent = (r.hitRate * 100).toFixed(1) + '%';
+    $('sHitN').textContent = 'a win every ' + (1 / Math.max(r.hitRate, 1e-9)).toFixed(1) + ' spins, any size';
+    $('sTrig').textContent = isFinite(r.trigEvery) ? '1 in ' + Math.round(r.trigEvery) : 'none yet';
+    $('sTrigN').textContent = r.avgFeature ? 'feature averages ' + r.avgFeature.toFixed(0) + 'x your bet' : ' ';
+    $('sSd').textContent = r.sd.toFixed(1) + 'x';
+    $('sSdN').textContent = 'spread of one round, in bets';
+    $('sMax').textContent = Math.round(r.max) + 'x';
+    $('sMaxN').textContent = 'best round in this run';
+
+    var base = r.rtpLineBase, sc = r.rtpScatBase + r.rtpScatFS, fs = r.rtpLineFS, jp = r.rtpJackpot;
+    var tot = base + sc + fs + jp || 1;
+    var segs = [
+      ['Line wins, base game', base, 'var(--aurora)'],
+      ['Scatter pays', sc, 'var(--ice)'],
+      ['Line wins, free spins', fs, 'var(--amber)'],
+      ['Jackpots', jp, 'var(--rose)']
+    ];
+    $('split').innerHTML = segs.map(function (s) { return '<i style="width:' + (s[1] / tot * 100) + '%;background:' + s[2] + '"></i>'; }).join('');
+    $('legend').innerHTML = segs.map(function (s) { return '<span style="--k:' + s[2] + '">' + s[0] + ' ' + (s[1] * 100).toFixed(1) + '%</span>'; }).join('');
+    var n = r.rounds || 1, h = '';
+    r.hist.forEach(function (v, i) {
+      var p = v / n * 100;
+      h += '<div class="row"><span>' + LABELS[i] + '</span><div class="bar"><i style="width:' + Math.max(p, 0) + '%"></i></div><b>' + p.toFixed(p < 1 ? 2 : 1) + '%</b></div>';
+    });
+    $('hist').innerHTML = h;
+    $('simNote').textContent = 'Share of rounds by size of the total round win. Return to player is the total won divided by the total bet, with free spin wins counted against the spin that triggered them.';
+  }
+  function runSim(n, seed) {
+    if (simBusy) return;
+    simBusy = true;
+    $('simRun').disabled = true;
+    var sim = E.makeSim(simEngine, seed), done = 0, chunk = 50000;
+    (function step() {
+      var k = Math.min(chunk, n - done);
+      sim.run(k); done += k;
+      $('simProg').style.width = (done / n * 100) + '%';
+      renderSim(sim.result());
+      if (done < n) setTimeout(step, 0);
+      else { simBusy = false; $('simRun').disabled = false; }
+    })();
+  }
+  $('simRun').addEventListener('click', function () {
+    runSim(parseInt($('simN').value, 10), (Math.random() * 1e9) | 0);
+  });
+  runSim(200000, 20261023);
+})();
+</script>
