@@ -383,7 +383,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>Growing wilds.</strong> A growing wild stays on screen while the other symbols spin around it. Each spin it adds one box, in the direction of the gold arrow, which is toward the nearest edge first and then the other way. When the reel is full of wilds it shows for one spin and clears. A multiplier wild multiplies any line it is on, and wilds on the same line multiply together.</li>
           <li><strong>Free spins.</strong> Three or more bonus symbols anywhere award 20 free spins. Two or more during the feature add 10 more. Locked wilds carry into the feature. The free spin strips carry more wilds, which is where most of the extra return comes from.</li>
           <li><strong>Scatters.</strong> A separate symbol. Three or more anywhere pay 5x, 10x or 25x your total bet. They do not start free spins.</li>
-          <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Three or more of the same one on adjacent reels pay 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
+          <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Three or more of the same one on adjacent reels pay 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. Mini and Minor can hit on any spin. Major, Maxi and Grand only land during free spins, where they hit far more often than they could in the base game. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
           <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 95%. Change either and the return changes, so re-run the math lab after any edit.</li>
           <li><strong>Art and sound.</strong> The animal and moon pictures are original images made for this game with Higgsfield and embedded in the page. The other symbols are drawn in code, and every sound is synthesized in your browser, so there are no separate image or audio files. Sound effects are on by default. Music is off until you press Music. Both buttons remember your choice. Real money is left out on purpose, this is play credits only.</li>
         </ul>
@@ -447,6 +447,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     fsAward: 20,
     fsRetrig: 10,
     fsRetrigMin: 2, // bonus symbols needed during free spins to add more spins
+    // Major, Maxi and Grand jackpots only appear in free spins. Their base-game spots become cards,
+    // free-spin reels get extra crowns in place of cards, and a few free-spin wilds become cards to pay for them.
+    baseSwap: { JP3: 'A', JP4: 'K', JP5: 'Q' },
+    fsAdd: [{}, { JP3: 5, JP4: 3, JP5: 2 }, { JP3: 5, JP4: 5, JP5: 2 }, { JP3: 5, JP4: 3, JP5: 2 }, {}],
+    fsTrim: [{}, { W2: 1, W: 1 }, { W: 1 }, { G: 1, W: 1 }, {}],
     base: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 3, BN: 5, JP1: 4, JP2: 2 },
       { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 3, W2: 2, SC: 3, BN: 5, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
       { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 5, BN: 11, JP1: 6, JP2: 3, JP3: 2, JP4: 2, JP5: 1 },
@@ -563,6 +568,25 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       base: cfg.base.map(function (w) { return buildStrip(w, srng); }),
       fs: cfg.fs.map(function (w) { return buildStrip(w, srng); })
     };
+    // after the strips are built: swap symbols in place so nothing else on the reel moves
+    if (cfg.baseSwap) strips.base.forEach(function (strip) {
+      for (var i = 0; i < strip.length; i++) if (cfg.baseSwap[strip[i]]) strip[i] = cfg.baseSwap[strip[i]];
+    });
+    if (cfg.fsTrim) strips.fs.forEach(function (strip, c) {
+      var trim = cfg.fsTrim[c] || {};
+      Object.keys(trim).forEach(function (sym) {
+        var left = trim[sym];
+        for (var i = 0; i < strip.length && left > 0; i++) if (strip[i] === sym) { strip[i] = 'K'; left--; }
+      });
+    });
+    if (cfg.fsAdd) strips.fs.forEach(function (strip, c) {
+      var add = cfg.fsAdd[c] || {};
+      Object.keys(add).forEach(function (sym) {
+        var cand = [], i, n = add[sym];
+        for (i = 0; i < strip.length; i++) if (strip[i] === 'A' || strip[i] === 'K' || strip[i] === 'Q') cand.push(i);
+        for (i = 0; i < n && cand.length; i++) strip[cand.splice(Math.floor(cand.length * (i + 0.5) / (n - i + 0.5)) % cand.length, 1)[0]] = sym;
+      });
+    });
 
     function newState() {
       return { mode: 'base', fsLeft: 0, fsWin: 0, exp: [] };
@@ -1594,7 +1618,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td>' + p[0] + '</td><td>' + p[1] + '</td><td>' + p[2] + '</td></tr>';
     });
     ['G', 'W2', 'W3', 'SC', 'BN', 'JP1', 'JP2', 'JP3', 'JP4', 'JP5'].forEach(function (s) {
-      var note = s === 'SC' ? 'Pays anywhere: 3 = ' + cfg.scatter[3] + 'x, 4 = ' + cfg.scatter[4] + 'x, 5 = ' + cfg.scatter[5] + 'x your total bet' : s === 'BN' ? 'Pays nothing itself. 3 or more anywhere award ' + cfg.fsAward + ' free spins. 2 or more during free spins add ' + cfg.fsRetrig + ' more' : s.indexOf('JP') === 0 ? NAMES[s] + ': 3 or more on adjacent reels pays ' + cfg.jackpots[+s.charAt(2) - 1] + 'x your total bet' : (s === 'G' ? 'Growing wild: stays and grows a box each spin' : 'Growing wild that multiplies the wins it joins');
+      var note = s === 'SC' ? 'Pays anywhere: 3 = ' + cfg.scatter[3] + 'x, 4 = ' + cfg.scatter[4] + 'x, 5 = ' + cfg.scatter[5] + 'x your total bet' : s === 'BN' ? 'Pays nothing itself. 3 or more anywhere award ' + cfg.fsAward + ' free spins. 2 or more during free spins add ' + cfg.fsRetrig + ' more' : s.indexOf('JP') === 0 ? NAMES[s] + ': 3 or more on adjacent reels pays ' + cfg.jackpots[+s.charAt(2) - 1] + 'x your total bet' + (+s.charAt(2) >= 3 ? '. Free spins only' : '') : (s === 'G' ? 'Growing wild: stays and grows a box each spin' : 'Growing wild that multiplies the wins it joins');
       html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">' + note + '</td></tr>';
     });
     $('ptable').innerHTML = html;
