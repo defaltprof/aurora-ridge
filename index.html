@@ -951,8 +951,17 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       tick: function () { if (!soundOn || !ensure()) return; tone(1650 + Math.random() * 200, ctx.currentTime, 0.035, 'square', 0.02); },
       tease: function () {
         if (!soundOn || !ensure()) return;
-        var t = ctx.currentTime;
-        tone(196, t, 1.2, 'sawtooth', 0.04, 784); tone(294, t, 1.2, 'triangle', 0.05, 1175);
+        var t = ctx.currentTime, at = 0, gap = 0.16;
+        // soft tom roll that speeds up and swells
+        for (var i = 0; i < 12; i++) {
+          var v = 0.06 + i * 0.012;
+          tone(92, t + at, 0.22, 'sine', v, 52);
+          tone(140, t + at, 0.08, 'triangle', v * 0.25, 90);
+          noise(t + at, 0.05, v * 0.25, 700, 400);
+          at += gap; gap = Math.max(0.055, gap * 0.86);
+        }
+        // a rush of air rising underneath
+        noise(t, at + 0.25, 0.05, 350, 1800);
       },
       setFS: function (on) { inFS = on; },
       setSound: function (on) {
