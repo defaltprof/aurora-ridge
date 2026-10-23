@@ -63,7 +63,32 @@ h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); lette
 .fsbar { display: flex; justify-content: space-between; gap: 10px; flex-wrap: wrap; align-items: center; padding: 8px 12px; margin-bottom: 10px; border-radius: 10px; background: color-mix(in srgb, var(--scat) 22%, var(--panel)); border: 1px solid color-mix(in srgb, var(--scat) 60%, transparent); font: 600 13px/1.2 var(--font-body); }
 .fsbar b { font: 800 22px/1 var(--font-display); letter-spacing: 0.04em; }
 .reels { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; padding: 8px; border-radius: 12px; background: radial-gradient(120% 60% at 20% 0%, color-mix(in srgb, var(--aurora) 22%, transparent), transparent 70%), radial-gradient(100% 55% at 85% 5%, color-mix(in srgb, #9b5de5 26%, transparent), transparent 70%), url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 40' preserveAspectRatio='none'%3E%3Cpath d='M0 40V28L10 20L18 27L30 12L42 26L52 18L63 30L75 14L88 28L100 22V40Z' fill='%23101a2e'/%3E%3C/svg%3E") bottom / 100% 38% no-repeat, var(--ink); border: 1px solid var(--edge); }
-.reel { display: flex; flex-direction: column; gap: 6px; min-width: 0; }
+.reel { display: flex; flex-direction: column; gap: 6px; min-width: 0; position: relative; }
+.reels { position: relative; }
+.cab { position: relative; }
+.spinner { position: absolute; inset: 0; overflow: hidden; z-index: 2; border-radius: 10px; pointer-events: none; }
+.strip { position: absolute; left: 0; right: 0; top: 0; will-change: transform; }
+.strip.blur { filter: blur(1.3px); }
+.scell { position: absolute; left: 0; right: 0; container-type: inline-size; }
+.cell.hide .tile { visibility: hidden; }
+.cell.held { z-index: 3; }
+.reel.tease .spinner { background: color-mix(in srgb, var(--c-scat) 16%, transparent); animation: teaseGlow 0.45s ease-in-out infinite alternate; }
+@keyframes teaseGlow { from { box-shadow: inset 0 0 0 2px var(--c-scat), 0 0 10px color-mix(in srgb, var(--c-scat) 50%, transparent); } to { box-shadow: inset 0 0 0 3px color-mix(in srgb, var(--c-scat) 60%, white), 0 0 26px var(--c-scat); } }
+.lines-ov { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 5; overflow: visible; }
+.lines-ov polyline { fill: none; stroke-width: 5; stroke-linejoin: round; stroke-linecap: round; filter: drop-shadow(0 0 4px rgba(0, 0, 0, 0.7)); }
+.lines-ov text { font: 800 22px var(--font-display); fill: #fff; paint-order: stroke; stroke: rgba(0, 0, 0, 0.85); stroke-width: 5px; letter-spacing: 0.03em; }
+.bigwin { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; border-radius: 16px; overflow: hidden; cursor: pointer; background: radial-gradient(70% 55% at 50% 45%, rgba(40, 20, 70, 0.9), rgba(4, 8, 18, 0.94)); }
+.bigwin[hidden] { display: none; }
+.bw-in { position: relative; z-index: 2; text-align: center; padding: 16px; animation: bwPop 0.45s cubic-bezier(0.2, 1.4, 0.4, 1); }
+.bw-t { font: 800 clamp(40px, 13vw, 64px)/1 var(--font-display); letter-spacing: 0.06em; background: linear-gradient(180deg, #fff6c8, #ffc23d 55%, #e07a12); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, 0.5)); }
+.bw-v { margin-top: 10px; font: 800 clamp(34px, 11vw, 52px)/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums; letter-spacing: 0.03em; }
+.bw-s { margin-top: 10px; font: 600 14px/1.3 var(--font-body); color: var(--mute); }
+.bw-tap { margin-top: 14px; font: 500 11px/1 var(--font-mono); letter-spacing: 0.12em; text-transform: uppercase; color: var(--mute); opacity: 0.8; }
+.coins { position: absolute; inset: 0; z-index: 1; pointer-events: none; }
+.coin { position: absolute; top: -8%; width: 18px; height: 18px; border-radius: 50%; background: radial-gradient(circle at 35% 35%, #fff4b0, #ffc23d 45%, #b8700f); box-shadow: 0 0 6px rgba(255, 194, 61, 0.6); animation: coinFall linear infinite; }
+@keyframes coinFall { from { transform: translateY(0) rotate(0); } to { transform: translateY(115cqh) rotate(540deg); } }
+.coins { container-type: size; }
+@keyframes bwPop { from { transform: scale(0.4); opacity: 0; } to { transform: scale(1); opacity: 1; } }
 .cell { position: relative; aspect-ratio: 1 / 1; container-type: inline-size; }
 .tile { position: absolute; inset: 0; border-radius: 10px; display: flex; flex-direction: column; align-items: center; justify-content: center; line-height: 1; text-align: center; font-family: var(--font-display); font-weight: 800; letter-spacing: 0.02em; color: var(--tx-light); background: linear-gradient(160deg, color-mix(in srgb, var(--c) 78%, white), var(--c) 45%, color-mix(in srgb, var(--c) 45%, black)); box-shadow: inset 0 0 0 1px color-mix(in srgb, var(--c) 60%, white), inset 0 -8px 14px color-mix(in srgb, black 25%, transparent); text-shadow: 0 1px 0 color-mix(in srgb, black 35%, transparent); }
 .tile { --det: rgba(8, 12, 24, 0.62); }
@@ -196,7 +221,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         <span>Feature win <b id="fsWin">0.00</b></span>
       </div>
       <div class="jps" id="jps" aria-label="Jackpots"></div>
-      <div class="reels" id="reels"></div>
+      <div class="reels" id="reels"><svg class="lines-ov" id="lineSvg" aria-hidden="true"></svg></div>
+      <div class="bigwin" id="bigwin" hidden>
+        <div class="coins" id="coins"></div>
+        <div class="bw-in"><div class="bw-t" id="bwT">BIG WIN</div><div class="bw-v" id="bwV">0.00</div><div class="bw-s" id="bwS"></div><div class="bw-tap">Tap to continue</div></div>
+      </div>
       <div class="hud">
         <div class="stat"><span class="k">Balance</span><span class="v" id="bal">0.00</span></div>
         <div class="stat">
@@ -811,6 +840,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         if (!soundOn || !ensure()) return;
         arp(x >= 20 ? [NOTES.G5, NOTES.E5, NOTES.C5, NOTES.G5, NOTES.C6] : [NOTES.G5, NOTES.E5, NOTES.C5], 0.14, 0.1);
       },
+      tick: function () { if (!soundOn || !ensure()) return; tone(1650 + Math.random() * 200, ctx.currentTime, 0.035, 'square', 0.02); },
+      tease: function () {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime;
+        tone(196, t, 1.2, 'sawtooth', 0.04, 784); tone(294, t, 1.2, 'triangle', 0.05, 1175);
+      },
       setFS: function (on) { inFS = on; },
       setSound: function (on) {
         soundOn = on;
@@ -884,6 +919,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 
   /* ---------- state ---------- */
   var BETS = [0.8, 2, 4, 8, 20, 40];
+  var interrupt = null, interruptLabel = '';
   var betIdx = 1, balance = 500, busy = false, auto = false, fast = false, lastWin = 0;
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function bet() { return BETS[betIdx]; }
@@ -895,8 +931,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     $('lineBet').textContent = 'Line bet ' + (bet() / NL).toFixed(3);
     $('betDn').disabled = busy || betIdx === 0;
     $('betUp').disabled = busy || betIdx === BETS.length - 1;
-    $('spin').disabled = busy;
-    $('spin').textContent = busy ? (st.mode === 'fs' ? 'Free spin' : 'Spinning') : 'Spin';
+    $('spin').disabled = busy && !interrupt;
+    $('spin').textContent = interrupt ? interruptLabel : (busy ? (st.mode === 'fs' ? 'Free spin' : 'Spinning') : 'Spin');
+    document.documentElement.dataset.busy = busy ? '1' : '0';
     if (!$('jps').firstChild) {
       var JN = ['MINI', 'MINOR', 'MAJOR', 'MAXI', 'GRAND'], jh = '';
       for (var ji = 0; ji < 5; ji++) jh += '<div class="jp" id="jp' + (ji + 1) + '" style="--c:' + ['#2aa876', '#3b82f6', '#9b5de5', '#f2791f', '#e0304f'][ji] + '"><span class="n">' + JN[ji] + '</span><span class="v"></span></div>';
@@ -922,6 +959,194 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     for (var i = 0; i < b.length; i++) b[i].remove();
   }
 
+
+  /* ---------- reel motion, rollups, win lines, celebrations ---------- */
+  function pressSpin() {
+    if (interrupt) { var f = interrupt; interrupt = null; f(); updateHud(); return; }
+    SFX.resume(); round();
+  }
+  function reelPitch() {
+    var a = cells[0][0].getBoundingClientRect(), b2 = cells[1][0].getBoundingClientRect();
+    return { h: a.height, p: b2.top - a.top };
+  }
+  function animateReels(res, held, fastMode) {
+    return new Promise(function (resolve) {
+      var m = reelPitch();
+      var canAnim = m.p > 0 && typeof reelEls[0].animate === 'function';
+      var base = fastMode ? 0.42 : 0.95, step = fastMode ? 0.13 : 0.3, teaseAdd = fastMode ? 0.5 : 1.3;
+      var tease = [], bn = 0, c, r, i;
+      for (c = 0; c < REELS; c++) {
+        tease[c] = bn >= 2;
+        for (r = 0; r < ROWS; r++) if (res.grid[r][c] === 'BN') bn++;
+      }
+      var stopAt = [], t = base;
+      for (c = 0; c < REELS; c++) { if (c > 0) t += step + (tease[c] ? teaseAdd : 0); stopAt[c] = t * 1000; }
+      var done = [], ndone = 0, anims = [], timers = [], spinners = [], seen = 0, slammed = false;
+      function land(c, quiet) {
+        if (done[c]) return;
+        done[c] = true;
+        if (anims[c]) { try { anims[c].onfinish = null; anims[c].cancel(); } catch (e) {} }
+        if (spinners[c] && spinners[c].parentNode) spinners[c].parentNode.removeChild(spinners[c]);
+        reelEls[c].classList.remove('tease');
+        if (!quiet) SFX.stop(c);
+        var sp = 0;
+        for (var r0 = 0; r0 < ROWS; r0++) { var g0 = res.grid[r0][c]; if (g0 === 'BN' || g0 === 'SC' || g0.indexOf('JP') === 0) sp++; }
+        if (sp && !quiet) { seen++; SFX.ding(seen); }
+        for (var r = 0; r < ROWS; r++) {
+          paint(r, c, res.grid[r][c]);
+          cells[r][c].classList.remove('held', 'hide');
+          cells[r][c].classList.add('landed');
+        }
+        var nx = c + 1;
+        while (nx < REELS && done[nx]) nx++;
+        if (!slammed && nx < REELS && tease[nx]) { reelEls[nx].classList.add('tease'); SFX.tease(); }
+        ndone++;
+        if (ndone === REELS) {
+          timers.forEach(clearTimeout);
+          if (interrupt === slam) interrupt = null;
+          updateHud();
+          resolve();
+        }
+      }
+      function slam() {
+        slammed = true;
+        SFX.stop(2);
+        for (var k = 0; k < REELS; k++) land(k, true);
+      }
+      for (c = 0; c < REELS; c++) {
+        var h = held[c] || [];
+        for (r = 0; r < ROWS; r++) {
+          var keep = h.indexOf(r) !== -1;
+          cells[r][c].classList.toggle('held', keep);
+          if (!keep) cells[r][c].classList.remove('lock');
+        }
+        if (!canAnim) continue;
+        var L = Math.max(10, Math.round(stopAt[c] / 1000 * (fastMode ? 24 : 19)));
+        var syms = [RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]];
+        for (r = 0; r < ROWS; r++) syms.push(res.grid[r][c]);
+        for (i = 0; i < L; i++) syms.push(RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]);
+        for (r = 0; r < ROWS; r++) syms.push(cells[r][c].dataset.sym || 'A');
+        var spn = document.createElement('div');
+        spn.className = 'spinner';
+        var strip = document.createElement('div');
+        strip.className = 'strip';
+        var html = '';
+        for (i = 0; i < syms.length; i++) html += '<div class="scell" style="top:' + ((i - 1) * m.p) + 'px;height:' + m.h + 'px">' + tileHTML(syms[i]) + '</div>';
+        strip.innerHTML = html;
+        spn.appendChild(strip);
+        reelEls[c].appendChild(spn);
+        spinners[c] = spn;
+        for (r = 0; r < ROWS; r++) if (h.indexOf(r) === -1) cells[r][c].classList.add('hide');
+        var S = (L + ROWS) * m.p, D = stopAt[c];
+        var wind = fastMode ? 70 : 150, settle = fastMode ? 150 : 260;
+        var anim = strip.animate([
+          { transform: 'translateY(' + (-S) + 'px)', offset: 0, easing: 'ease-out' },
+          { transform: 'translateY(' + (-S - 0.22 * m.p) + 'px)', offset: wind / D, easing: 'cubic-bezier(0.32, 0, 0.62, 1)' },
+          { transform: 'translateY(' + (0.17 * m.p) + 'px)', offset: (D - settle) / D, easing: 'ease-in-out' },
+          { transform: 'translateY(0px)', offset: 1 }
+        ], { duration: D, fill: 'forwards' });
+        anims[c] = anim;
+        (function (cc, st2) {
+          anim.onfinish = function () { land(cc); };
+          timers.push(setTimeout(function () { st2.classList.add('blur'); }, wind + 60));
+          timers.push(setTimeout(function () { st2.classList.remove('blur'); }, Math.max(wind + 90, D - settle - 170)));
+        })(c, strip);
+      }
+      if (!canAnim) for (c = 0; c < REELS; c++) (function (cc) { timers.push(setTimeout(function () { land(cc); }, stopAt[cc])); })(c);
+      interrupt = slam; interruptLabel = 'Stop'; updateHud();
+    });
+  }
+  function countUp(amount, ms, draw) {
+    return new Promise(function (resolve) {
+      if (!(ms > 0) || !(amount > 0)) { draw(amount); resolve(); return; }
+      var t0 = Date.now(), fin = false, lastTick = 0;
+      function end() { if (fin) return; fin = true; draw(amount); if (interrupt === end) interrupt = null; updateHud(); resolve(); }
+      function frame() {
+        if (fin) return;
+        var k = Math.min(1, (Date.now() - t0) / ms);
+        draw(amount * (1 - Math.pow(1 - k, 2)));
+        if (Date.now() - lastTick > 80) { lastTick = Date.now(); SFX.tick(); }
+        if (k >= 1) end(); else (window.requestAnimationFrame || function (f) { setTimeout(f, 16); })(frame);
+      }
+      interrupt = end; interruptLabel = 'Skip'; updateHud();
+      frame();
+    });
+  }
+  function waitOrPress(ms) {
+    return new Promise(function (resolve) {
+      var fin = false, tm = setTimeout(go, ms);
+      function go() { if (fin) return; fin = true; clearTimeout(tm); if (interrupt === go) interrupt = null; updateHud(); resolve(); }
+      interrupt = go; interruptLabel = 'Continue'; updateHud();
+    });
+  }
+  function makeCoins(n) {
+    var host = $('coins'), h = '';
+    if (reduceMotion) { host.innerHTML = ''; return; }
+    for (var i = 0; i < n; i++) {
+      var sz = 12 + Math.random() * 14;
+      h += '<span class="coin" style="left:' + (Math.random() * 96).toFixed(1) + '%;width:' + sz.toFixed(0) + 'px;height:' + sz.toFixed(0) + 'px;animation-duration:' + (1.4 + Math.random() * 1.6).toFixed(2) + 's;animation-delay:' + (-Math.random() * 2).toFixed(2) + 's"></span>';
+    }
+    host.innerHTML = h;
+  }
+  async function celebrate(title, sub, amount, ms, draw, hold, coins) {
+    var ov = $('bigwin');
+    $('bwT').textContent = title;
+    $('bwS').textContent = sub || '';
+    if (amount !== null) $('bwV').textContent = money(0);
+    makeCoins(coins || 0);
+    ov.hidden = false;
+    var inner = ov.querySelector('.bw-in');
+    inner.style.animation = 'none'; void inner.offsetWidth; inner.style.animation = '';
+    var onClick = function () { if (interrupt) { var f = interrupt; interrupt = null; f(); updateHud(); } };
+    ov.addEventListener('click', onClick);
+    if (amount !== null) await countUp(amount, ms, function (x) { $('bwV').textContent = money(x); if (draw) draw(x); });
+    await waitOrPress(hold);
+    ov.removeEventListener('click', onClick);
+    ov.hidden = true;
+    $('coins').innerHTML = '';
+  }
+  var lineTok = 0;
+  function clearLines() { lineTok++; $('lineSvg').innerHTML = ''; }
+  async function cycleLines(wins, b, hit) {
+    var tok = ++lineTok, svg = $('lineSvg');
+    var box = $('reels').getBoundingClientRect();
+    if (!box.width || !wins.length) return;
+    svg.setAttribute('viewBox', '0 0 ' + box.width + ' ' + box.height);
+    function ctr(r, c) { var rc = cells[r][c].getBoundingClientRect(); return [rc.left - box.left + rc.width / 2, rc.top - box.top + rc.height / 2]; }
+    function mark(w, label) {
+      var col = 'hsl(' + ((w.line * 47) % 360) + ' 95% 62%)';
+      var pts = E.LINES[w.line].map(function (row, c) { return ctr(row, c).map(function (v) { return v.toFixed(1); }).join(','); }).join(' ');
+      var out = '<polyline points="' + pts + '" stroke="' + col + '"/>';
+      if (label) {
+        var end = ctr(E.LINES[w.line][w.count - 1], w.count - 1);
+        out += '<text x="' + end[0].toFixed(1) + '" y="' + (end[1] + 8).toFixed(1) + '" text-anchor="middle">+' + money(w.win * (b / NL)) + '</text>';
+      }
+      return out;
+    }
+    function setHits(map) {
+      for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) {
+        var cl = cells[r][c].classList, on = !!map[r + ',' + c];
+        cl.toggle('win', on); cl.toggle('dim', !on);
+      }
+    }
+    svg.innerHTML = wins.map(function (w) { return mark(w, false); }).join('');
+    await sleep(1200);
+    if (tok !== lineTok || wins.length < 2) return;
+    for (var loop = 0; loop < 2; loop++) {
+      for (var i = 0; i < wins.length; i++) {
+        if (tok !== lineTok) return;
+        var w = wins[i], one = {};
+        w.cells.forEach(function (p) { one[p[0] + ',' + p[1]] = true; });
+        setHits(one);
+        svg.innerHTML = mark(w, true);
+        await sleep(950);
+      }
+    }
+    if (tok !== lineTok) return;
+    setHits(hit);
+    svg.innerHTML = wins.map(function (w) { return mark(w, false); }).join('');
+  }
+
   /* ---------- one spin ---------- */
   async function spinOnce() {
     var b = bet();
@@ -931,52 +1156,16 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     st.exp.forEach(function (e) { held[e.reel] = held[e.reel] || []; for (var q = e.lo; q <= e.hi; q++) held[e.reel].push(q); });
     var res = engine.spin(st, Math.random, true);
     lastWin = 0;
+    clearLines();
     clearFx();
     updateHud();
     SFX.spin();
     SFX.setFS(st.mode === 'fs');
 
     var fastMode = fast || reduceMotion;
-    var first = fastMode ? 220 : 480, gap = fastMode ? 90 : 190;
-    var stopped = [], c, r, bonusSeen = 0;
-    for (c = 0; c < REELS; c++) {
-      var h = held[c] || [];
-      for (r = 0; r < ROWS; r++) {
-        var keep = h.indexOf(r) !== -1;
-        cells[r][c].classList.toggle('held', keep);
-        if (!keep) cells[r][c].classList.remove('lock');
-      }
-      reelEls[c].classList.add('spinning');
-    }
+    var c, r;
     clearBadges();
-    var t0 = Date.now();
-    await new Promise(function (resolve) {
-      var timer = setInterval(function () {
-        var now = Date.now() - t0;
-        for (var c = 0; c < REELS; c++) {
-          if (stopped[c]) continue;
-          if (now >= first + c * gap) {
-            stopped[c] = true;
-            reelEls[c].classList.remove('spinning');
-            SFX.stop(c);
-            var sp = 0;
-            for (var r0 = 0; r0 < ROWS; r0++) { var g0 = res.grid[r0][c]; if (g0 === 'BN' || g0 === 'SC' || g0.indexOf('JP') === 0) sp++; }
-            if (sp) { bonusSeen = (bonusSeen || 0) + 1; SFX.ding(bonusSeen); }
-            for (var r = 0; r < ROWS; r++) {
-              paint(r, c, res.grid[r][c]);
-              cells[r][c].classList.remove('held');
-              cells[r][c].classList.add('landed');
-            }
-          } else {
-            var hh = held[c] || [];
-            for (var rr = 0; rr < ROWS; rr++) {
-              if (hh.indexOf(rr) === -1) paint(rr, c, RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]);
-            }
-          }
-        }
-        if (stopped.length === REELS && stopped.every(Boolean)) { clearInterval(timer); resolve(); }
-      }, 70);
-    });
+    await animateReels(res, held, fastMode);
 
     // locked / expanding wild markers
     for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) cells[r][c].classList.remove('lock');
@@ -1001,11 +1190,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 
     // wins
     var credit = res.win * b;
-    balance += credit;
-    lastWin = credit;
-    var parts = [];
+    var balBefore = balance;
+    var parts = [], hit = {};
     if (res.win > 0) {
-      var hit = {};
       (res.lineWins || []).forEach(function (w) { w.cells.forEach(function (p) { hit[p[0] + ',' + p[1]] = true; }); });
       if (res.scatWin > 0) {
         for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) if (res.grid[r][c] === 'SC') hit[r + ',' + c] = true;
@@ -1032,19 +1219,41 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       say(ex);
     }
     if (res.fresh.length && res.win > 0) say($('msg').innerHTML + '<br>' + moveNote(res.fresh.length));
+    if (res.win > 0) {
+      var draw = function (v) { $('winV').textContent = money(v); $('bal').textContent = money(balBefore + v); };
+      var x = res.win, jp = res.jackpots && res.jackpots.length ? res.jackpots[res.jackpots.length - 1] : null;
+      if (jp) {
+        SFX.jackpot(jp.tier);
+        await celebrate(NAMES['JP' + jp.tier].toUpperCase() + '!', x.toFixed(1) + 'x your bet', credit, fastMode ? 1200 : 3400, draw, fastMode ? 700 : 1800, 40);
+      } else if (x >= 15) {
+        SFX.jackpot(x >= 100 ? 5 : x >= 40 ? 3 : 1);
+        await celebrate(x >= 100 ? 'EPIC WIN' : x >= 40 ? 'MEGA WIN' : 'BIG WIN', x.toFixed(1) + 'x your bet', credit, fastMode ? 1000 : (x >= 40 ? 4200 : 2800), draw, fastMode ? 500 : 1500, x >= 40 ? 36 : 22);
+      } else {
+        SFX.win(x);
+        await countUp(credit, fastMode ? 150 : (x < 1 ? 280 : x < 5 ? 750 : 1500), draw);
+      }
+    }
+    balance = balBefore + credit;
+    lastWin = credit;
     updateHud();
-    if (res.win > 0) { if (res.jackpots && res.jackpots.length) SFX.jackpot(res.jackpots[res.jackpots.length - 1].tier); else SFX.win(res.win); }
-    await sleep(res.win > 0 ? (fastMode ? 350 : 900) : (fastMode ? 60 : 250));
+    if (res.win > 0 && res.lineWins && res.lineWins.length) {
+      cycleLines(res.lineWins.slice().sort(function (a2, z) { return z.win - a2.win; }), b, hit);
+    }
+    await sleep(res.win > 0 ? (fastMode ? 250 : 650) : (fastMode ? 60 : 220));
 
     if (res.trigger) {
       SFX.bonus(false);
       say('<strong>Free spins!</strong> ' + res.bonusCount + ' bonus symbols award ' + cfg.fsAward + ' spins. Locked wilds carry in.');
       updateHud();
-      await sleep(fastMode ? 700 : 1500);
+      await sleep(fastMode ? 300 : 900);
+      clearLines();
+      $('bwV').textContent = cfg.fsAward + ' SPINS';
+      await celebrate('FREE SPINS', 'Locked wilds carry into the feature', null, 0, null, fastMode ? 900 : 2400, 18);
     } else if (res.retrigger) {
       SFX.bonus(true);
       say('<strong>Retrigger.</strong> ' + res.bonusCount + ' bonus symbols add ' + res.retrigger + ' free spins.');
-      await sleep(fastMode ? 500 : 1100);
+      $('bwV').textContent = '+' + res.retrigger + ' SPINS';
+      await celebrate('RETRIGGER', '', null, 0, null, fastMode ? 700 : 1700, 10);
     }
     if (res.fsEnded) {
       SFX.end(res.fsWin);
@@ -1052,7 +1261,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       var total = res.fsWin * b;
       say('<strong>Free spins finished.</strong> The feature paid <span class="amt">' + money(total) + '</span> (' + res.fsWin.toFixed(1) + 'x your bet).');
       updateHud();
-      await sleep(fastMode ? 600 : 1400);
+      clearLines();
+      await celebrate('FEATURE WIN', 'Free spins paid ' + res.fsWin.toFixed(1) + 'x your bet', total, fastMode ? 900 : (res.fsWin >= 20 ? 3200 : 1800), null, fastMode ? 600 : 1600, res.fsWin >= 20 ? 30 : 12);
     }
     return res;
   }
@@ -1097,7 +1307,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   $('snd').addEventListener('click', function () { SFX.setSound(!SFX.sound); syncToggles(); });
   $('mus').addEventListener('click', function () { SFX.setMusic(!SFX.music); syncToggles(); });
   syncToggles();
-  $('spin').addEventListener('click', function () { SFX.resume(); round(); });
+  $('spin').addEventListener('click', pressSpin);
   $('auto').addEventListener('click', function () {
     setAuto(!auto);
     if (auto) autoLoop();
@@ -1113,7 +1323,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   });
   document.addEventListener('keydown', function (e) {
     if (e.code === 'Space' && (e.target === document.body || e.target === document.documentElement)) {
-      e.preventDefault(); round();
+      e.preventDefault(); pressSpin();
     }
   });
   updateHud();
