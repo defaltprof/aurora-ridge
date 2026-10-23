@@ -277,7 +277,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / original art and sound</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 23, 3:55 PM ET</div>
   </header>
 
   <div class="layout">
@@ -1260,7 +1260,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         var syms = [RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]];
         for (r = 0; r < ROWS; r++) syms.push(res.grid[r][c]);
         for (i = 0; i < L; i++) syms.push(RANDOM_POOL[Math.floor(Math.random() * RANDOM_POOL.length)]);
-        for (r = 0; r < ROWS; r++) syms.push(cells[r][c].dataset.sym || 'A');
+        for (r = 0; r < ROWS; r++) { var cur = cells[r][c].dataset.sym || 'A'; syms.push(res.mode === 'base' && /^JP[345]$/.test(cur) ? 'K' : cur); }
         var spn = document.createElement('div');
         spn.className = 'spinner';
         var strip = document.createElement('div');
