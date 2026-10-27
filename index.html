@@ -323,7 +323,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 2:54 PM ET</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 3:18 PM ET</div>
   </header>
 
   <div class="layout">
@@ -975,7 +975,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       // the bar is drawn against the longest possible meter, so it never shows exactly how close a bonus is
       var top = cfg.bonus[k].size * 1.5, v = st.meters[k];
       var ready = st.targets && st.targets[k] >= 0 && v >= st.targets[k];
-      var pct = ready ? 100 : Math.min(94, v / top * 100);
+      // fast early, slower near the top: the bar moves a lot each spin without changing when bonuses trigger
+      var pct = ready ? 100 : Math.min(94, 100 * (1 - Math.pow(1 - Math.min(1, v / top), 2.2)));
       $('mb-' + k).style.width = pct.toFixed(1) + '%';
       $('mp-' + k).textContent = ready ? 'READY' : '';
       var el = $('mt-' + k);
