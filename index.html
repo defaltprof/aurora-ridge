@@ -323,7 +323,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 3:18 PM ET</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 3:33 PM ET</div>
   </header>
 
   <div class="layout">
@@ -1203,8 +1203,17 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       },
       ding: function (n) {
         if (!soundOn || !ensure()) return;
-        var f = [NOTES.E5, NOTES.G5, NOTES.C6][Math.min(n, 3) - 1] || NOTES.E5;
-        bell(f, ctx.currentTime, 0.1, 1.6);
+        var t = ctx.currentTime;
+        if (n >= 3) {
+          // the big one: louder, brighter, with a low hit and a chord under it
+          bell(NOTES.C6, t, 0.2, 2.4);
+          bell(NOTES.G5, t, 0.08, 2);
+          bell(NOTES.E5, t + 0.02, 0.06, 1.8);
+          tone(NOTES.C4, t, 0.5, 'sine', 0.12);
+          noise(t, 0.6, 0.04, 6000, 2500);
+          return;
+        }
+        bell(n === 2 ? NOTES.G5 : NOTES.E5, t, n === 2 ? 0.11 : 0.09, 1.6);
       },
       wild: function () {
         if (!soundOn || !ensure()) return;
@@ -1434,7 +1443,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       }
       var stopAt = [], t = base;
       for (c = 0; c < REELS; c++) { if (c > 0) t += step + (tease[c] ? teaseAdd : 0); stopAt[c] = t * 1000; }
-      var done = [], ndone = 0, anims = [], timers = [], spinners = [], growEls = [], seen = 0, slammed = false;
+      var done = [], ndone = 0, anims = [], timers = [], spinners = [], growEls = [], seen = 0, slammed = false, matchCount = {}, matchLast = {};
       // symbols that can't appear in this bonus never flash past while the reels spin either
       var pool = RANDOM_POOL.filter(function (x) {
         if (hasB(res.bonus, 'fox') && (x === 'K' || x === 'Q')) return false;
@@ -1457,9 +1466,20 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         (growEls[c] || []).forEach(function (g) { if (g.parentNode) g.parentNode.removeChild(g); });
         reelEls[c].classList.remove('tease');
         if (!quiet) SFX.stop(c);
-        var sp = 0;
-        for (var r0 = 0; r0 < ROWS; r0++) { var g0 = res.grid[r0][c]; if (g0 === 'BN' || g0 === 'SC' || g0.indexOf('JP') === 0) sp++; }
-        if (sp && !quiet) { seen++; SFX.ding(seen); }
+        // bells climb only for matching symbols: ding, ding (higher), DING on the third
+        if (!quiet) {
+          var here = {};
+          for (var r0 = 0; r0 < ROWS; r0++) { var g0 = res.grid[r0][c]; if (g0 === 'BN' || g0 === 'SC' || /^JP[1-5]$/.test(g0)) here[g0] = (here[g0] || 0) + 1; }
+          // a crown only counts toward a run if the reel before it had the same crown
+          Object.keys(matchCount).forEach(function (k) { if (/^JP/.test(k) && !here[k] && matchLast[k] === c - 1) matchCount[k] = 0; });
+          var level = 0;
+          Object.keys(here).forEach(function (k) {
+            if (/^JP/.test(k)) { matchCount[k] = (matchLast[k] === c - 1 ? matchCount[k] || 0 : 0) + 1; matchLast[k] = c; }
+            else matchCount[k] = (matchCount[k] || 0) + here[k];
+            level = Math.max(level, matchCount[k]);
+          });
+          if (level) SFX.ding(Math.min(level, 3));
+        }
         for (var r = 0; r < ROWS; r++) {
           paint(r, c, res.grid[r][c]);
           cells[r][c].classList.remove('held', 'hide');
