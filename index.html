@@ -337,7 +337,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 7:27 PM ET</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 7:46 PM ET</div>
   </header>
 
   <div class="layout">
@@ -460,7 +460,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>Growing wilds.</strong> A growing wild stays on screen while the other symbols spin around it. Each spin it adds one box, in the direction of the gold arrow, which is toward the nearest edge first and then the other way. When the reel is full of wilds it shows for one spin and clears. A multiplier wild multiplies any line it is on, and wilds on the same line multiply together.</li>
           <li><strong>Free spins.</strong> Three or more bonus symbols anywhere award 20 free spins. Two or more during the feature add 10 more. Locked wilds carry into the feature. The free spin strips carry more wilds, which is where most of the extra return comes from.</li>
           <li><strong>Scatters.</strong> A separate symbol. Three or more anywhere pay 5x, 10x or 25x your total bet. They do not start free spins.</li>
-          <li><strong>Animal bonuses.</strong> Three meters sit above the reels. Every fox, hare or bear that lands in the base game fills its meter, and the bear meter takes the longest. Each meter is ready at a random point, so a bonus can show up early or late. When a meter reads READY, your next free spins become that animal's bonus. The <strong>Fox bonus</strong> steals every King and Queen off the reels and brings out more hares. The <strong>Hare bonus</strong> fills the reels with snowflake scatters. The <strong>Bear bonus</strong>, the rarest, turns every wild into a growing 2x wild and has no diamonds. If two or three meters are ready at the same time, you get them all at once: a double or triple bonus with every effect combined. Jackpots can land in all of them. Meter progress is saved on this device, and so are your credits, bet size and session history.</li>
+          <li><strong>Animal bonuses.</strong> Three meters sit above the reels. Every fox, hare or bear that lands fills its meter, in the base game and during free spins. Each meter fires at a hidden random point, so any single fox, hare or bear can be the one that sets off its bonus: 20 free spins with that animal's twist. When one animal fires, the others can jump in too, and the fuller their meters the better the chance, which is how double and triple bonuses happen. If an animal fires during free spins, its bonus starts as soon as those spins end. The <strong>Fox bonus</strong> steals every King and Queen off the reels and brings out more hares. The <strong>Hare bonus</strong> fills the reels with snowflake scatters. The <strong>Bear bonus</strong>, the rarest, turns every wild into a growing 2x wild and has no diamonds. Jackpots can land in all of them, and the bonus diamonds still give regular free spins on their own. Meter progress is saved on this device.</li>
           <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Crowns only land on reels 2, 3 and 4, and three of the same one across those reels pays 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. A reel never shows more than one jackpot crown or bonus diamond at a time. Mini and Minor can hit on any spin. Major, Maxi and Grand only land during free spins, where they hit far more often than they could in the base game. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
           <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 95%. Change either and the return changes, so re-run the math lab after any edit.</li>
           <li><strong>Art and sound.</strong> The animal and moon pictures are original images made for this game with Higgsfield and embedded in the page. The other symbols are drawn in code, and every sound is synthesized in your browser, so there are no separate image or audio files. Sound effects are on by default. Music is off until you press Music. Both buttons remember your choice. Real money is left out on purpose, this is play credits only.</li>
@@ -536,9 +536,10 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     // animal bonuses: a meter fills as that animal lands in the base game.
     // A full meter turns the next free spins into that bonus (bear first, then hare, then fox).
     bonus: {
-      fox: { sym: 'PINE', size: 800, hareEvery: 3, keepCards: 0.35 },
-      hare: { sym: 'NECK', size: 1200, addSC: [18, 18, 20, 18, 18] },
-      bear: { sym: 'ELK', size: 1000 }
+      fox: { sym: 'PINE', size: 1880, hareEvery: 3, keepCards: 0.35 },
+      hare: { sym: 'NECK', size: 2810, addSC: [18, 18, 20, 18, 18] },
+      bear: { sym: 'ELK', size: 2340 },
+      joinPower: 4
     },
     base: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 3, BN: 5, JP1: 4, JP2: 2 },
       { ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 3, W2: 2, SC: 3, BN: 5, JP1: 6, JP2: 3, JP3: 2, JP4: 1, JP5: 1 },
@@ -847,8 +848,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       // a full reel of wilds shows for this spin and is gone on the next
       st.exp = st.exp.filter(function (e) { return !(e.lo === 0 && e.hi === ROWS - 1); });
 
-      // meters fill as animals land in the base game
-      if (res.mode === 'base' && cfg.bonus) {
+      // meters fill as animals land, in the base game and in free spins
+      if (cfg.bonus) {
         if (!st.meters) st.meters = { fox: 0, hare: 0, bear: 0 };
         if (!st.targets) st.targets = {};
         res.meterAdd = {};
@@ -861,28 +862,57 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           st.meters[k] = Math.min(st.targets[k], st.meters[k] + n);
         });
       }
-      if (res.mode === 'base' && bn >= 3) {
+      // a meter that reaches its hidden random point fires its bonus right away:
+      // any single fox, hare or bear can be the one that sets it off
+      var fired = [];
+      if (cfg.bonus) KINDS.forEach(function (bk) {
+        if (st.targets[bk] >= 0 && st.meters[bk] >= st.targets[bk]) { fired.push(bk); st.meters[bk] = 0; delete st.targets[bk]; }
+      });
+      // when one animal fires, the others can jump in too: the fuller their meter, the better the chance
+      if (fired.length && cfg.bonus) KINDS.forEach(function (bk) {
+        if (fired.indexOf(bk) >= 0 || !(st.targets[bk] > 0)) return;
+        var f = st.meters[bk] / st.targets[bk];
+        if (rng() < Math.pow(f, cfg.bonus.joinPower || 3)) { fired.push(bk); st.meters[bk] = 0; delete st.targets[bk]; }
+      });
+      fired = KINDS.filter(function (k) { return fired.indexOf(k) >= 0; });
+      res.fired = fired.slice();
+      function startFeature(kinds) {
         st.mode = 'fs'; st.fsLeft = cfg.fsAward; st.fsWin = 0;
-        res.trigger = true;
-        // every meter that is ready joins in, so double and triple bonuses can happen
-        var joined = [];
-        if (cfg.bonus) KINDS.forEach(function (bk) {
-          if (st.targets && st.targets[bk] >= 0 && st.meters[bk] >= st.targets[bk]) { joined.push(bk); st.meters[bk] = 0; delete st.targets[bk]; }
-        });
-        st.bonus = joined.length ? joined.join('+') : null;
+        st.bonus = kinds.length ? kinds.join('+') : null;
         res.bonusStart = st.bonus || 'regular';
         // with the bear in the bonus every wild already on screen becomes a growing 2x wild
         if (st.bonus && st.bonus.indexOf('bear') >= 0) st.exp.forEach(function (e) { for (var q in e.cells) e.cells[q] = 'W2'; });
+      }
+      if (res.mode === 'base' && (bn >= 3 || fired.length)) {
+        // diamonds give free spins; any animals that fire on the same spin join in (double and triple bonuses)
+        st.chains = 0;
+        startFeature(fired);
+        res.trigger = true;
+        res.byDiamonds = bn >= 3;
+        res.byAnimal = fired.length > 0;
       } else if (res.mode === 'fs') {
+        // an animal that fires during free spins starts its bonus as soon as these free spins end
+        if (fired.length) { st.pending = st.pending || []; fired.forEach(function (k) { if (st.pending.indexOf(k) < 0) st.pending.push(k); }); }
         st.fsWin += res.win;
         if (bn >= (cfg.fsRetrigMin || 3)) { st.fsLeft += cfg.fsRetrig; res.retrigger = cfg.fsRetrig; }
-        if (st.fsLeft <= 0) { st.mode = 'base'; st.exp = []; res.fsEnded = true; st.bonus = null; }
+        if (st.fsLeft <= 0) {
+          res.fsEnded = true;
+          res.fsTotal = st.fsWin;
+          st.exp = [];
+          // safety cap: at most 5 animal bonuses chained in one round
+          if (st.pending && st.pending.length && (st.chains || 0) < 5) {
+            st.chains = (st.chains || 0) + 1;
+            var next = KINDS.filter(function (k) { return st.pending.indexOf(k) >= 0; });
+            st.pending = [];
+            startFeature(next);
+            res.chainStart = true;
+          } else { st.mode = 'base'; st.bonus = null; }
+        }
       }
       res.fsLeft = st.fsLeft;
-      res.fsWin = st.fsWin;
+      res.fsWin = res.fsEnded ? res.fsTotal : st.fsWin;
       res.meters = st.meters ? { fox: st.meters.fox, hare: st.meters.hare, bear: st.meters.bear } : null;
-      res.ready = {};
-      BONUS_ORDER.forEach(function (k) { res.ready[k] = !!(st.targets && st.targets[k] >= 0 && st.meters[k] >= st.targets[k]); });
+      res.pending = (st.pending || []).slice();
       return res;
     }
 
@@ -915,6 +945,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         var rw = r.win;
         if (r.trigger) {
           A.trig++;
+          if (r.byDiamonds) A.trigD = (A.trigD || 0) + 1;
           var bt = r.bonusStart || 'regular', fw = 0;
           while (st.mode === 'fs') {
             r = engine.spin(st, rng, false);
@@ -922,9 +953,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
             A.lineFS += r.lineWin; A.scatFS += r.scatWin; A.jpFS += r.jpWin;
             if (r.retrigger) A.retrig++;
             rw += r.win; fw += r.win;
+            if (r.fsEnded) {
+              var bb = A.byBonus[bt] || (A.byBonus[bt] = { n: 0, win: 0, max: 0 });
+              bb.n++; bb.win += fw; if (fw > bb.max) bb.max = fw;
+              if (r.chainStart) { bt = r.bonusStart; fw = 0; A.chains = (A.chains || 0) + 1; }
+            }
           }
-          var bb = A.byBonus[bt] || (A.byBonus[bt] = { n: 0, win: 0, max: 0 });
-          bb.n++; bb.win += fw; if (fw > bb.max) bb.max = fw;
         }
         A.sum += rw; A.sumSq += rw * rw;
         if (rw > A.max) A.max = rw;
@@ -946,7 +980,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         retrig: A.retrig, fsSpins: A.fsSpins,
         sd: sd, se: sd / Math.sqrt(n), max: A.max,
         hist: A.hist.slice(),
-        byBonus: JSON.parse(JSON.stringify(A.byBonus))
+        byBonus: JSON.parse(JSON.stringify(A.byBonus)),
+        trigDiamonds: A.trigD || 0, chains: A.chains || 0
       };
     }
     return { run: run, result: result };
@@ -1008,11 +1043,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     ['fox', 'hare', 'bear'].forEach(function (k) {
       // the bar is drawn against the longest possible meter, so it never shows exactly how close a bonus is
       var top = cfg.bonus[k].size * 1.5, v = st.meters[k];
-      var ready = st.targets && st.targets[k] >= 0 && v >= st.targets[k];
+      // a meter only glows while its bonus is waiting for the current free spins to end
+      var ready = (st.pending || []).indexOf(k) >= 0;
       // fast early, slower near the top: the bar moves a lot each spin without changing when bonuses trigger
       var pct = ready ? 100 : Math.min(94, 100 * (1 - Math.pow(1 - Math.min(1, v / top), 2.2)));
       $('mb-' + k).style.width = pct.toFixed(1) + '%';
-      $('mp-' + k).textContent = ready ? 'READY' : '';
+      $('mp-' + k).textContent = '';
       var el = $('mt-' + k);
       el.classList.toggle('ready', ready);
       el.classList.toggle('active', st.mode === 'fs' && hasB(st.bonus, k));
@@ -1810,6 +1846,37 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     }
   }
 
+  var ANIMAL_NAME = { fox: 'fox', hare: 'hare', bear: 'bear' };
+  var ANIMAL_SYM = { fox: 'PINE', hare: 'NECK', bear: 'ELK' };
+  async function featureIntro(res, fastMode, chained) {
+    var fired = res.bonusStart && res.bonusStart !== 'regular' ? res.bonusStart.split('+') : [];
+    var who = fired.map(function (k) { return ANIMAL_NAME[k]; }).join(' and the ');
+    if (chained) say('<strong>Here comes the ' + who + '!</strong> ' + (fired.length > 1 ? 'Their bonuses start' : 'Its bonus starts') + ' right now.');
+    else if (res.byAnimal && !res.byDiamonds) say('<strong>The ' + who + ' set off ' + (fired.length > 1 ? 'their bonuses' : 'its bonus') + '!</strong> ' + cfg.fsAward + ' free spins.');
+    else if (fired.length) say('<strong>Free spins!</strong> ' + res.bonusCount + ' bonus symbols, and the ' + who + ' joined in.');
+    else say('<strong>Free spins!</strong> ' + res.bonusCount + ' bonus symbols award ' + cfg.fsAward + ' spins. Locked wilds carry in.');
+    // light up the animals that set it off
+    if (!chained && fired.length) {
+      for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) {
+        fired.forEach(function (k) { if (res.grid[r][c] === ANIMAL_SYM[k]) { var cl = cells[r][c].classList; cl.remove('dim'); cl.add('win'); } });
+      }
+    }
+    SFX.bonus(false);
+    updateHud();
+    await sleep(fastMode ? 300 : 900);
+    clearLines();
+    var bi = bonusInfo(res.bonusStart);
+    var nParts = fired.length;
+    $('bwV').textContent = cfg.fsAward + ' SPINS';
+    if (nParts) SFX.jackpot(nParts === 3 ? 5 : nParts === 2 ? 4 : hasB(res.bonusStart, 'bear') ? 4 : 2);
+    await celebrate(bi.title, bi.sub, null, 0, null, fastMode ? 1300 : (nParts > 1 ? 3800 : 3000), nParts > 1 ? 40 : hasB(res.bonusStart, 'bear') ? 34 : 18, bi.pic, bi.color);
+    renderMeters();
+    updateHud();
+    if (hasB(res.bonusStart, 'fox')) await bonusIntro('fox', fastMode);
+    if (hasB(res.bonusStart, 'bear')) await bonusIntro('bear', fastMode);
+    if (hasB(res.bonusStart, 'hare')) await bonusIntro('hare', fastMode);
+  }
+
   /* ---------- one spin ---------- */
   async function spinOnce() {
     var b = bet();
@@ -1910,21 +1977,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     await sleep(res.win > 0 ? (fastMode ? 250 : 650) : (fastMode ? 60 : 220));
 
     if (res.trigger) {
-      SFX.bonus(false);
-      say('<strong>Free spins!</strong> ' + res.bonusCount + ' bonus symbols award ' + cfg.fsAward + ' spins. Locked wilds carry in.');
-      updateHud();
-      await sleep(fastMode ? 300 : 900);
-      clearLines();
-      var bi = bonusInfo(res.bonusStart);
-      var nParts = res.bonusStart && res.bonusStart !== 'regular' ? res.bonusStart.split('+').length : 0;
-      $('bwV').textContent = cfg.fsAward + ' SPINS';
-      if (nParts) SFX.jackpot(nParts === 3 ? 5 : nParts === 2 ? 4 : hasB(res.bonusStart, 'bear') ? 4 : 2);
-      await celebrate(bi.title, bi.sub, null, 0, null, fastMode ? 1300 : (nParts > 1 ? 3800 : 3000), nParts > 1 ? 40 : hasB(res.bonusStart, 'bear') ? 34 : 18, bi.pic, bi.color);
-      renderMeters();
-      updateHud();
-      if (hasB(res.bonusStart, 'fox')) await bonusIntro('fox', fastMode);
-      if (hasB(res.bonusStart, 'bear')) await bonusIntro('bear', fastMode);
-      if (hasB(res.bonusStart, 'hare')) await bonusIntro('hare', fastMode);
+      await featureIntro(res, fastMode, false);
     } else if (res.retrigger) {
       SFX.bonus(true);
       say('<strong>Retrigger.</strong> ' + res.bonusCount + ' bonus symbols add ' + res.retrigger + ' free spins.');
@@ -1939,6 +1992,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       updateHud();
       clearLines();
       await celebrate('FEATURE WIN', 'Free spins paid ' + res.fsWin.toFixed(1) + 'x your bet', total, fastMode ? 900 : (res.fsWin >= 20 ? 3200 : 1800), null, fastMode ? 600 : 1600, res.fsWin >= 20 ? 30 : 12);
+      if (res.chainStart) { SFX.setFS(true); await featureIntro(res, fastMode, true); }
     }
     return res;
   }
