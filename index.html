@@ -323,7 +323,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 3:33 PM ET</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 3:56 PM ET</div>
   </header>
 
   <div class="layout">
@@ -435,7 +435,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>Free spins.</strong> Three or more bonus symbols anywhere award 20 free spins. Two or more during the feature add 10 more. Locked wilds carry into the feature. The free spin strips carry more wilds, which is where most of the extra return comes from.</li>
           <li><strong>Scatters.</strong> A separate symbol. Three or more anywhere pay 5x, 10x or 25x your total bet. They do not start free spins.</li>
           <li><strong>Animal bonuses.</strong> Three meters sit above the reels. Every fox, hare or bear that lands in the base game fills its meter, and the bear meter takes the longest. Each meter is ready at a random point, so a bonus can show up early or late. When a meter reads READY, your next free spins become that animal's bonus. The <strong>Fox bonus</strong> steals every King and Queen off the reels and brings out more hares. The <strong>Hare bonus</strong> fills the reels with snowflake scatters. The <strong>Bear bonus</strong>, the rarest, turns every wild into a growing 2x wild and has no diamonds. If two or three meters are ready at the same time, you get them all at once: a double or triple bonus with every effect combined. Jackpots can land in all of them. Meter progress is saved on this device.</li>
-          <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Three or more of the same one on adjacent reels pay 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. A reel never shows more than one jackpot crown or bonus diamond at a time. Mini and Minor can hit on any spin. Major, Maxi and Grand only land during free spins, where they hit far more often than they could in the base game. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
+          <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Crowns only land on reels 2, 3 and 4, and three of the same one across those reels pays 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. A reel never shows more than one jackpot crown or bonus diamond at a time. Mini and Minor can hit on any spin. Major, Maxi and Grand only land during free spins, where they hit far more often than they could in the base game. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
           <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 95%. Change either and the return changes, so re-run the math lab after any edit.</li>
           <li><strong>Art and sound.</strong> The animal and moon pictures are original images made for this game with Higgsfield and embedded in the page. The other symbols are drawn in code, and every sound is synthesized in your browser, so there are no separate image or audio files. Sound effects are on by default. Music is off until you press Music. Both buttons remember your choice. Real money is left out on purpose, this is play credits only.</li>
         </ul>
@@ -502,10 +502,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     // Major, Maxi and Grand jackpots only appear in free spins. Their base-game spots become cards,
     // free-spin reels get extra crowns in place of cards, and a few free-spin wilds become cards to pay for them.
     baseSwap: { JP3: 'A', JP4: 'K', JP5: 'Q' },
-    fsAdd: [{}, { JP3: 5, JP4: 3, JP5: 2 }, { JP3: 5, JP4: 5, JP5: 2 }, { JP3: 5, JP4: 3, JP5: 2 }, {}],
+    fsAdd: [{}, { JP3: 5, JP4: 3, JP5: 2, JP1: 2, JP2: 1 }, { JP3: 5, JP4: 5, JP5: 2, JP1: 2, JP2: 1 }, { JP3: 5, JP4: 3, JP5: 2, JP1: 2, JP2: 1 }, {}],
     fsTrim: [{ G: 1, W: 1 }, { W2: 2, W: 2, G: 1 }, { W2: 1, W: 2, G: 1 }, { G: 2, W: 2, W3: 1 }, {}],
     // diamonds can't double up on a reel any more, so a few cards become diamonds to keep free spins near 1 in 86
-    baseAdd: [{ BN: 1 }, { BN: 2 }, { BN: 2 }, { BN: 2 }, { BN: 1 }],
+    baseAdd: [{ BN: 1 }, { BN: 2, JP1: 2, JP2: 1 }, { BN: 2, JP1: 2, JP2: 1 }, { BN: 2, JP1: 2, JP2: 1 }, { BN: 1 }],
+    edgeJackpots: false, // no crowns on reels 1 and 5
     // animal bonuses: a meter fills as that animal lands in the base game.
     // A full meter turns the next free spins into that bonus (bear first, then hare, then fox).
     bonus: {
@@ -726,6 +727,13 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         return o;
       });
     }
+    // jackpot crowns never land on the first or last reel: swap them for cards in place
+    if (cfg.edgeJackpots === false) Object.keys(strips).forEach(function (key) {
+      [0, REELS - 1].forEach(function (c) {
+        var strip = strips[key][c];
+        for (var i = 0; i < strip.length; i++) if (/^JP[1-5]$/.test(strip[i])) strip[i] = 'A';
+      });
+    });
     var BONUS_ORDER = ['bear', 'hare', 'fox'];
 
     function newState() {
@@ -1510,9 +1518,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         }
         if (!canAnim) continue;
         var L = Math.max(10, Math.round(stopAt[c] / 1000 * (fastMode ? 24 : 19)));
-        var syms = [pool[Math.floor(Math.random() * pool.length)]];
+        // no crowns ever spin past on the first or last reel
+        var pc = (c === 0 || c === REELS - 1) ? pool.filter(function (x) { return !/^JP/.test(x); }) : pool;
+        var syms = [pc[Math.floor(Math.random() * pc.length)]];
         for (r = 0; r < ROWS; r++) syms.push(res.grid[r][c]);
-        for (i = 0; i < L; i++) syms.push(pool[Math.floor(Math.random() * pool.length)]);
+        for (i = 0; i < L; i++) syms.push(pc[Math.floor(Math.random() * pc.length)]);
         for (r = 0; r < ROWS; r++) { var cur = cells[r][c].dataset.sym || 'A'; syms.push(res.mode === 'base' && /^JP[345]$/.test(cur) ? 'K' : (hasB(res.bonus, 'fox') && (cur === 'K' || cur === 'Q')) ? 'NECK' : cur); }
         var spn = document.createElement('div');
         spn.className = 'spinner';
@@ -1954,7 +1964,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td>' + p[0] + '</td><td>' + p[1] + '</td><td>' + p[2] + '</td></tr>';
     });
     ['G', 'W2', 'W3', 'SC', 'BN', 'JP1', 'JP2', 'JP3', 'JP4', 'JP5'].forEach(function (s) {
-      var note = s === 'SC' ? 'Pays anywhere: 3 = ' + cfg.scatter[3] + 'x, 4 = ' + cfg.scatter[4] + 'x, 5 = ' + cfg.scatter[5] + 'x your total bet' : s === 'BN' ? 'Pays nothing itself. 3 or more anywhere award ' + cfg.fsAward + ' free spins. 2 or more during free spins add ' + cfg.fsRetrig + ' more' : s.indexOf('JP') === 0 ? NAMES[s] + ': 3 or more on adjacent reels pays ' + cfg.jackpots[+s.charAt(2) - 1] + 'x your total bet' + (+s.charAt(2) >= 3 ? '. Free spins only' : '') : (s === 'G' ? 'Growing wild: stays and grows a box each spin' : 'Growing wild that multiplies the wins it joins');
+      var note = s === 'SC' ? 'Pays anywhere: 3 = ' + cfg.scatter[3] + 'x, 4 = ' + cfg.scatter[4] + 'x, 5 = ' + cfg.scatter[5] + 'x your total bet' : s === 'BN' ? 'Pays nothing itself. 3 or more anywhere award ' + cfg.fsAward + ' free spins. 2 or more during free spins add ' + cfg.fsRetrig + ' more' : s.indexOf('JP') === 0 ? NAMES[s] + ': 3 across reels 2, 3 and 4 pays ' + cfg.jackpots[+s.charAt(2) - 1] + 'x your total bet' + (+s.charAt(2) >= 3 ? '. Free spins only' : '') : (s === 'G' ? 'Growing wild: stays and grows a box each spin' : 'Growing wild that multiplies the wins it joins');
       html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">' + note + '</td></tr>';
     });
     $('ptable').innerHTML = html;
