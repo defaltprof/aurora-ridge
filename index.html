@@ -284,7 +284,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 .m-fox { --mc: #ff8a3d; } .m-hare { --mc: #8fd3ff; } .m-bear { --mc: #ffc23d; }
 /* bonus intro portrait */
 .bw-pic { width: 120px; height: 120px; margin: 0 auto 12px; border-radius: 50%; background-size: cover; background-position: center; box-shadow: 0 0 0 4px var(--bc, #ffc23d), 0 0 34px var(--bc, #ffc23d); animation: bwPop 0.5s cubic-bezier(0.2, 1.4, 0.4, 1); }
-.bw-pic[hidden] { display: none; }
+.bw-pics { display: flex; justify-content: center; gap: 10px; margin-bottom: 12px; }
+.bw-pics[hidden] { display: none; }
+.bw-pics .bw-pic { margin: 0; animation-fill-mode: both; }
+.bw-pics .bw-pic:not(:only-child) { width: 92px; height: 92px; }
+.frame.fs.b-multi .bulb { animation: chaseRainbow var(--chase) linear infinite; animation-delay: calc(var(--k) * var(--chase) / -6); }
+@keyframes chaseRainbow { 0% { opacity: 1; background: #ff8a3d; box-shadow: 0 0 8px #ff8a3d; } 15% { background: #9fe0ff; box-shadow: 0 0 8px #9fe0ff; } 30% { opacity: 0.25; background: #ff4d6d; } 100% { opacity: 0.25; } }
 /* frame colors per bonus */
 .frame.fs.b-fox { --bulb: #ff8a3d; } .frame.fs.b-hare { --bulb: #9fe0ff; } .frame.fs.b-bear { --bulb: #ff4d6d; }
 /* the fox steals the Kings and Queens */
@@ -318,7 +323,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 2:50 PM ET</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 2:54 PM ET</div>
   </header>
 
   <div class="layout">
@@ -355,7 +360,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       </div>
       <div class="bigwin" id="bigwin" hidden>
         <div class="coins" id="coins"></div>
-        <div class="bw-in"><div class="bw-pic" id="bwPic" hidden></div><div class="bw-t" id="bwT">BIG WIN</div><div class="bw-v" id="bwV">0.00</div><div class="bw-s" id="bwS"></div><div class="bw-tap">Tap to continue</div></div>
+        <div class="bw-in"><div class="bw-pics" id="bwPics" hidden></div><div class="bw-t" id="bwT">BIG WIN</div><div class="bw-v" id="bwV">0.00</div><div class="bw-s" id="bwS"></div><div class="bw-tap">Tap to continue</div></div>
       </div>
       <div class="hud">
         <div class="stat"><span class="k">Balance</span><span class="v" id="bal">0.00</span></div>
@@ -429,7 +434,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>Growing wilds.</strong> A growing wild stays on screen while the other symbols spin around it. Each spin it adds one box, in the direction of the gold arrow, which is toward the nearest edge first and then the other way. When the reel is full of wilds it shows for one spin and clears. A multiplier wild multiplies any line it is on, and wilds on the same line multiply together.</li>
           <li><strong>Free spins.</strong> Three or more bonus symbols anywhere award 20 free spins. Two or more during the feature add 10 more. Locked wilds carry into the feature. The free spin strips carry more wilds, which is where most of the extra return comes from.</li>
           <li><strong>Scatters.</strong> A separate symbol. Three or more anywhere pay 5x, 10x or 25x your total bet. They do not start free spins.</li>
-          <li><strong>Animal bonuses.</strong> Three meters sit above the reels. Every fox, hare or bear that lands in the base game fills its meter, and the bear meter takes the longest. Each meter is ready at a random point, so a bonus can show up early or late. When a meter reads READY, your next free spins become that animal's bonus. The <strong>Fox bonus</strong> steals every King and Queen off the reels and brings out more hares. The <strong>Hare bonus</strong> fills the reels with snowflake scatters. The <strong>Bear bonus</strong>, the rarest, turns every wild into a growing 2x wild and has no diamonds. Jackpots can land in all of them. Meter progress is saved on this device.</li>
+          <li><strong>Animal bonuses.</strong> Three meters sit above the reels. Every fox, hare or bear that lands in the base game fills its meter, and the bear meter takes the longest. Each meter is ready at a random point, so a bonus can show up early or late. When a meter reads READY, your next free spins become that animal's bonus. The <strong>Fox bonus</strong> steals every King and Queen off the reels and brings out more hares. The <strong>Hare bonus</strong> fills the reels with snowflake scatters. The <strong>Bear bonus</strong>, the rarest, turns every wild into a growing 2x wild and has no diamonds. If two or three meters are ready at the same time, you get them all at once: a double or triple bonus with every effect combined. Jackpots can land in all of them. Meter progress is saved on this device.</li>
           <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Three or more of the same one on adjacent reels pay 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. A reel never shows more than one jackpot crown or bonus diamond at a time. Mini and Minor can hit on any spin. Major, Maxi and Grand only land during free spins, where they hit far more often than they could in the base game. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
           <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 95%. Change either and the return changes, so re-run the math lab after any edit.</li>
           <li><strong>Art and sound.</strong> The animal and moon pictures are original images made for this game with Higgsfield and embedded in the page. The other symbols are drawn in code, and every sound is synthesized in your browser, so there are no separate image or audio files. Sound effects are on by default. Music is off until you press Music. Both buttons remember your choice. Real money is left out on purpose, this is play credits only.</li>
@@ -681,7 +686,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     if (cfg.spread !== false) strips.base.concat(strips.fs).forEach(spreadOut);
     // free-spin reels for each animal bonus, made from the regular free-spin reels
     var B = cfg.bonus || {};
-    strips.fox = strips.fs.map(function (s0) {
+    function foxify(s0) {
       var out = [], k = 0, every = (B.fox && B.fox.hareEvery) || 3;
       var keepCards = (B.fox && B.fox.keepCards) || 0, kc = 0;
       s0.forEach(function (x) {
@@ -692,22 +697,35 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         else out.push(x);
       });
       return out;
-    });
-    strips.hare = strips.fs.map(function (s0, c) {
+    }
+    function harify(s0, c) {
       var o = s0.slice(), n = (B.hare && B.hare.addSC && B.hare.addSC[c]) || 0, cand = [], i;
       for (i = 0; i < o.length; i++) if (o[i] === 'A' || o[i] === 'K' || o[i] === 'Q') cand.push(i);
       for (i = 0; i < n && cand.length; i++) o[cand.splice(Math.floor(cand.length * (i + 0.5) / (n - i + 0.5)) % cand.length, 1)[0]] = 'SC';
       return o;
-    });
-    strips.bear = strips.fs.map(function (s0) {
+    }
+    function bearify(s0) {
       var keep = (B.bear && B.bear.wildKeep) || 1, n = 0;
       return s0.map(function (x) {
         if (x === 'BN') return 'A';
         if (WILDMULT[x]) { n++; return Math.floor(n * keep) > Math.floor((n - 1) * keep) ? 'W2' : 'A'; }
         return x;
       });
-    });
-    if (cfg.spread !== false) strips.fox.concat(strips.hare, strips.bear).forEach(spreadOut);
+    }
+    // one set of free-spin reels for every mix of animal bonuses: fox, hare, bear,
+    // fox+hare, fox+bear, hare+bear and fox+hare+bear
+    var KINDS = ['fox', 'hare', 'bear'];
+    for (var mask = 1; mask < 8; mask++) {
+      var parts = KINDS.filter(function (k, i) { return mask & (1 << i); });
+      strips[parts.join('+')] = strips.fs.map(function (s0, c) {
+        var o = s0;
+        if (parts.indexOf('fox') >= 0) o = foxify(o);
+        if (parts.indexOf('hare') >= 0) o = harify(o, c);
+        if (parts.indexOf('bear') >= 0) o = bearify(o);
+        if (cfg.spread !== false) spreadOut(o);
+        return o;
+      });
+    }
     var BONUS_ORDER = ['bear', 'hare', 'fox'];
 
     function newState() {
@@ -736,7 +754,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         for (var rr = e.lo; rr <= e.hi; rr++) {
           var cur = grid[rr][e.reel];
           if (e.cells[rr]) grid[rr][e.reel] = e.cells[rr];
-          else if (!WILDMULT[cur]) grid[rr][e.reel] = (st.mode === 'fs' && st.bonus === 'bear') ? 'W2' : 'G';
+          else if (!WILDMULT[cur]) grid[rr][e.reel] = (st.mode === 'fs' && st.bonus && st.bonus.indexOf('bear') >= 0) ? 'W2' : 'G';
         }
         hasExp[e.reel] = true;
       });
@@ -812,14 +830,15 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       if (res.mode === 'base' && bn >= 3) {
         st.mode = 'fs'; st.fsLeft = cfg.fsAward; st.fsWin = 0;
         res.trigger = true;
-        st.bonus = null;
-        if (cfg.bonus) for (var bi = 0; bi < BONUS_ORDER.length; bi++) {
-          var bk = BONUS_ORDER[bi];
-          if (st.targets && st.targets[bk] >= 0 && st.meters[bk] >= st.targets[bk]) { st.bonus = bk; st.meters[bk] = 0; delete st.targets[bk]; break; }
-        }
+        // every meter that is ready joins in, so double and triple bonuses can happen
+        var joined = [];
+        if (cfg.bonus) KINDS.forEach(function (bk) {
+          if (st.targets && st.targets[bk] >= 0 && st.meters[bk] >= st.targets[bk]) { joined.push(bk); st.meters[bk] = 0; delete st.targets[bk]; }
+        });
+        st.bonus = joined.length ? joined.join('+') : null;
         res.bonusStart = st.bonus || 'regular';
-        // in the bear bonus every wild already on screen becomes a growing 2x wild
-        if (st.bonus === 'bear') st.exp.forEach(function (e) { for (var q in e.cells) e.cells[q] = 'W2'; });
+        // with the bear in the bonus every wild already on screen becomes a growing 2x wild
+        if (st.bonus && st.bonus.indexOf('bear') >= 0) st.exp.forEach(function (e) { for (var q in e.cells) e.cells[q] = 'W2'; });
       } else if (res.mode === 'fs') {
         st.fsWin += res.win;
         if (bn >= (cfg.fsRetrigMin || 3)) { st.fsLeft += cfg.fsRetrig; res.retrigger = cfg.fsRetrig; }
@@ -932,6 +951,24 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     hare: { title: 'HARE BONUS', sub: 'Snowflake scatters everywhere. 3 or more pay up to 25x your bet', pic: 'NECK', color: '#8fd3ff', name: 'Hare bonus' },
     bear: { title: 'BEAR BONUS', sub: 'Every wild is a growing 2x wild. No diamonds, no retriggers', pic: 'ELK', color: '#ff4d6d', name: 'Bear bonus' }
   };
+  function hasB(key, k) { return !!key && key.split('+').indexOf(k) >= 0; }
+  function bonusInfo(key) {
+    if (!key || key === 'regular') return BONUS_INFO.regular;
+    var parts = key.split('+');
+    if (parts.length === 1) return BONUS_INFO[key];
+    var NAMES_B = { fox: 'Fox', hare: 'Hare', bear: 'Bear' };
+    var what = [];
+    if (hasB(key, 'fox')) what.push('no Kings or Queens');
+    if (hasB(key, 'hare')) what.push('snowflakes everywhere');
+    if (hasB(key, 'bear')) what.push('only growing 2x wilds');
+    return {
+      title: (parts.length === 3 ? 'TRIPLE' : 'DOUBLE') + ' BONUS!',
+      sub: parts.map(function (k) { return NAMES_B[k]; }).join(' + ') + ': ' + what.join(', '),
+      pic: parts.map(function (k) { return BONUS_INFO[k].pic; }),
+      color: parts.map(function (k) { return BONUS_INFO[k].color; }),
+      name: parts.map(function (k) { return NAMES_B[k]; }).join(' + ') + ' bonus'
+    };
+  }
   var lastReady = {};
   function renderMeters(add) {
     ['fox', 'hare', 'bear'].forEach(function (k) {
@@ -943,7 +980,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       $('mp-' + k).textContent = ready ? 'READY' : '';
       var el = $('mt-' + k);
       el.classList.toggle('ready', ready);
-      el.classList.toggle('active', st.mode === 'fs' && st.bonus === k);
+      el.classList.toggle('active', st.mode === 'fs' && hasB(st.bonus, k));
       if (add && add[k]) { el.classList.remove('bump'); void el.offsetWidth; el.classList.add('bump'); }
       if (ready && !lastReady[k] && add) SFX.ding(3);
       lastReady[k] = ready;
@@ -1353,8 +1390,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     for (var jj = 0; jj < 5; jj++) $('jp' + (jj + 1)).lastChild.textContent = money(cfg.jackpots[jj] * bet());
     var fs = st.mode === 'fs';
     $('frame').classList.toggle('fs', fs);
-    ['fox', 'hare', 'bear'].forEach(function (k) { $('frame').classList.toggle('b-' + k, fs && st.bonus === k); });
-    $('fsName').textContent = (BONUS_INFO[fs && st.bonus ? st.bonus : 'regular'] || BONUS_INFO.regular).name;
+    ['fox', 'hare', 'bear'].forEach(function (k) { $('frame').classList.toggle('b-' + k, fs && hasB(st.bonus, k)); });
+    $('frame').classList.toggle('b-multi', fs && !!st.bonus && st.bonus.indexOf('+') >= 0);
+    $('fsName').textContent = bonusInfo(fs ? st.bonus : null).name;
     $('fsbar').hidden = !fs;
     if (fs) { $('fsLeft').textContent = st.fsLeft; $('fsWin').textContent = money(st.fsWin * bet()); }
   }
@@ -1398,11 +1436,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       var done = [], ndone = 0, anims = [], timers = [], spinners = [], growEls = [], seen = 0, slammed = false;
       // symbols that can't appear in this bonus never flash past while the reels spin either
       var pool = RANDOM_POOL.filter(function (x) {
-        if (res.bonus === 'fox') return x !== 'K' && x !== 'Q';
-        if (res.bonus === 'bear') return x !== 'BN' && x !== 'W' && x !== 'G' && x !== 'W3';
+        if (hasB(res.bonus, 'fox') && (x === 'K' || x === 'Q')) return false;
+        if (hasB(res.bonus, 'bear') && (x === 'BN' || x === 'W' || x === 'G' || x === 'W3')) return false;
         return true;
       });
-      if (res.bonus === 'bear') pool.push('W2');
+      if (hasB(res.bonus, 'bear')) pool.push('W2');
       var still = [];
       for (c = 0; c < REELS; c++) {
         var hk = (held[c] || []).slice();
@@ -1454,7 +1492,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         var syms = [pool[Math.floor(Math.random() * pool.length)]];
         for (r = 0; r < ROWS; r++) syms.push(res.grid[r][c]);
         for (i = 0; i < L; i++) syms.push(pool[Math.floor(Math.random() * pool.length)]);
-        for (r = 0; r < ROWS; r++) { var cur = cells[r][c].dataset.sym || 'A'; syms.push(res.mode === 'base' && /^JP[345]$/.test(cur) ? 'K' : (res.bonus === 'fox' && (cur === 'K' || cur === 'Q')) ? 'NECK' : cur); }
+        for (r = 0; r < ROWS; r++) { var cur = cells[r][c].dataset.sym || 'A'; syms.push(res.mode === 'base' && /^JP[345]$/.test(cur) ? 'K' : (hasB(res.bonus, 'fox') && (cur === 'K' || cur === 'Q')) ? 'NECK' : cur); }
         var spn = document.createElement('div');
         spn.className = 'spinner';
         var strip = document.createElement('div');
@@ -1546,8 +1584,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   }
   async function celebrate(title, sub, amount, ms, draw, hold, coins, pic, picColor) {
     var ov = $('bigwin');
-    var bp = $('bwPic');
-    if (pic) { bp.className = 'bw-pic pic-' + pic; bp.style.setProperty('--bc', picColor || '#ffc23d'); bp.hidden = false; } else bp.hidden = true;
+    var bp = $('bwPics');
+    if (pic) {
+      var pics = [].concat(pic), cols = [].concat(picColor || '#ffc23d');
+      bp.innerHTML = pics.map(function (p2, i) { return '<div class="bw-pic pic-' + p2 + '" style="--bc:' + (cols[i] || cols[0]) + ';animation-delay:' + (i * 0.18) + 's"></div>'; }).join('');
+      bp.hidden = false;
+    } else { bp.hidden = true; bp.innerHTML = ''; }
     $('bwT').textContent = title;
     $('bwS').textContent = sub || '';
     if (amount !== null) $('bwV').textContent = money(0);
@@ -1779,13 +1821,16 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       updateHud();
       await sleep(fastMode ? 300 : 900);
       clearLines();
-      var bi = BONUS_INFO[res.bonusStart || 'regular'];
+      var bi = bonusInfo(res.bonusStart);
+      var nParts = res.bonusStart && res.bonusStart !== 'regular' ? res.bonusStart.split('+').length : 0;
       $('bwV').textContent = cfg.fsAward + ' SPINS';
-      if (res.bonusStart && res.bonusStart !== 'regular') SFX.jackpot(res.bonusStart === 'bear' ? 4 : 2);
-      await celebrate(bi.title, bi.sub, null, 0, null, fastMode ? 1100 : 3000, res.bonusStart === 'bear' ? 34 : 18, bi.pic, bi.color);
+      if (nParts) SFX.jackpot(nParts === 3 ? 5 : nParts === 2 ? 4 : hasB(res.bonusStart, 'bear') ? 4 : 2);
+      await celebrate(bi.title, bi.sub, null, 0, null, fastMode ? 1300 : (nParts > 1 ? 3800 : 3000), nParts > 1 ? 40 : hasB(res.bonusStart, 'bear') ? 34 : 18, bi.pic, bi.color);
       renderMeters();
       updateHud();
-      await bonusIntro(res.bonusStart, fastMode);
+      if (hasB(res.bonusStart, 'fox')) await bonusIntro('fox', fastMode);
+      if (hasB(res.bonusStart, 'bear')) await bonusIntro('bear', fastMode);
+      if (hasB(res.bonusStart, 'hare')) await bonusIntro('hare', fastMode);
     } else if (res.retrigger) {
       SFX.bonus(true);
       say('<strong>Retrigger.</strong> ' + res.bonusCount + ' bonus symbols add ' + res.retrigger + ' free spins.');
