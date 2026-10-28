@@ -337,7 +337,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 7:46 PM ET</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 27, 7:59 PM ET</div>
   </header>
 
   <div class="layout">
@@ -462,7 +462,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>Scatters.</strong> A separate symbol. Three or more anywhere pay 5x, 10x or 25x your total bet. They do not start free spins.</li>
           <li><strong>Animal bonuses.</strong> Three meters sit above the reels. Every fox, hare or bear that lands fills its meter, in the base game and during free spins. Each meter fires at a hidden random point, so any single fox, hare or bear can be the one that sets off its bonus: 20 free spins with that animal's twist. When one animal fires, the others can jump in too, and the fuller their meters the better the chance, which is how double and triple bonuses happen. If an animal fires during free spins, its bonus starts as soon as those spins end. The <strong>Fox bonus</strong> steals every King and Queen off the reels and brings out more hares. The <strong>Hare bonus</strong> fills the reels with snowflake scatters. The <strong>Bear bonus</strong>, the rarest, turns every wild into a growing 2x wild and has no diamonds. Jackpots can land in all of them, and the bonus diamonds still give regular free spins on their own. Meter progress is saved on this device.</li>
           <li><strong>Jackpots.</strong> Five jackpot symbols: Mini, Minor, Major, Maxi and Grand. Crowns only land on reels 2, 3 and 4, and three of the same one across those reels pays 12.5x, 62.5x, 125x, 312.5x or 1,250x your total bet. A reel never shows more than one jackpot crown or bonus diamond at a time. Mini and Minor can hit on any spin. Major, Maxi and Grand only land during free spins, where they hit far more often than they could in the base game. In this prototype each tier is its own symbol, which is my guess at how the real game picks the prize.</li>
-          <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 95%. Change either and the return changes, so re-run the math lab after any edit.</li>
+          <li><strong>The numbers.</strong> Symbol weights and the paytable were tuned in the simulator until the return settled near 98%, which is looser than most real casino slots. Change either and the return changes, so re-run the math lab after any edit.</li>
           <li><strong>Art and sound.</strong> The animal and moon pictures are original images made for this game with Higgsfield and embedded in the page. The other symbols are drawn in code, and every sound is synthesized in your browser, so there are no separate image or audio files. Sound effects are on by default. Music is off until you press Music. Both buttons remember your choice. Real money is left out on purpose, this is play credits only.</li>
         </ul>
       </div>
@@ -536,9 +536,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     // animal bonuses: a meter fills as that animal lands in the base game.
     // A full meter turns the next free spins into that bonus (bear first, then hare, then fox).
     bonus: {
-      fox: { sym: 'PINE', size: 1880, hareEvery: 3, keepCards: 0.35 },
-      hare: { sym: 'NECK', size: 2810, addSC: [18, 18, 20, 18, 18] },
-      bear: { sym: 'ELK', size: 2340 },
+      fox: { sym: 'PINE', size: 1590, hareEvery: 3, keepCards: 0.35 },
+      hare: { sym: 'NECK', size: 2390, addSC: [18, 18, 20, 18, 18] },
+      bear: { sym: 'ELK', size: 1990 },
       joinPower: 4
     },
     base: [{ ELK: 6, OWL: 8, HARE: 12, LAN: 18, PINE: 24, NECK: 26, A: 44, K: 44, Q: 44, W: 2, G: 2, SC: 3, BN: 5, JP1: 4, JP2: 2 },
