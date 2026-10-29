@@ -386,6 +386,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 .wheel svg { display: block; width: 100%; height: 100%; }
 .hub { position: absolute; left: 50%; top: 50%; width: 26%; height: 26%; margin: -13% 0 0 -13%; border-radius: 50%; background-size: cover; background-position: center; box-shadow: 0 0 0 4px #e8dcc0, 0 0 18px #ff8a3d; animation: roll 1.2s linear infinite; }
 .pointer { position: absolute; left: 50%; top: -14px; width: 34px; height: 44px; margin-left: -17px; background: linear-gradient(180deg, #fffbe8, #e8dcc0 60%, #b9a77e); clip-path: polygon(0 0, 100% 0, 50% 100%); filter: drop-shadow(0 3px 4px rgba(0, 0, 0, 0.8)); z-index: 2; }
+.wheelov.gold { background: radial-gradient(70% 55% at 50% 45%, rgba(110, 70, 10, 0.9), rgba(10, 5, 2, 0.96)); }
+.wheelov.gold .wheel { box-shadow: 0 0 0 6px #ffd75e, 0 0 0 9px #5a3a08, 0 0 46px rgba(255, 215, 94, 0.6); }
+.wheel-x { font: 900 clamp(18px, 5.4vw, 26px)/1 'Cinzel', Georgia, serif; color: #fff; background: linear-gradient(180deg, #ff5a6e, #b0102e); padding: 6px 14px; border-radius: 999px; box-shadow: 0 0 18px #ff5a6e; animation: pulse 0.5s ease-in-out infinite alternate; }
 .wheelov.done .wheel { box-shadow: 0 0 0 6px #e8dcc0, 0 0 0 9px #3a2a14, 0 0 50px #ffe07a; }
 @keyframes pop { 0% { transform: scale(0.3); opacity: 0.2; } 100% { transform: scale(1); opacity: 1; } }
 .cell.pop .tile { animation: pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
@@ -407,7 +410,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">The Curse</h1>
-    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 3:21 PM ET</div>
+    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 3:26 PM ET</div>
   </header>
 
   <div class="layout">
@@ -535,7 +538,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>Lines.</strong> Only 5 lines: the three rows and two V shapes. Line hits are rare, but every one pays at least 2x your bet. The horned demon skull pays the most, then the crystal skull, the candle skull and the old skull, then the cards.</li>
           <li><strong>Wild.</strong> The golden skull lands on reels 2, 3 and 4 and stands in for every symbol except bones. Five on a line pays the top prize.</li>
           <li><strong>Graveyard bonus.</strong> Six or more bones anywhere start it, and each bone digs a grave where it landed. You get 6 bonus spins where only bones can land. Every bone builds its spot up one level: an empty plot becomes a grave, a grave becomes a tombstone, and a tombstone becomes a mausoleum. A bone that lands on a finished mausoleum flies to the smallest spot and builds that instead, so no bone is wasted. Three or more bones in one spin add a spin.</li>
-          <li><strong>Bone Wheel.</strong> Three or more rolling bone piles anywhere spin the Bone Wheel, the way the buzz saws do in Huff N' More Puff. The wheel is weighted: it mostly lands on cash (5x to 25x your bet), sometimes on a jackpot or the Graveyard bonus, and now and then on the Cursed Graveyard, which starts with 2 mausoleums, 3 tombstones and 6 graves already built. The paytable lists the exact chances.</li>
+          <li><strong>Bone Wheel.</strong> Three or more rolling bone piles anywhere spin the Bone Wheel, the way the buzz saws do in Huff N' More Puff. The wheel is weighted: it mostly lands on cash (5x to 25x your bet), sometimes on a jackpot or the Graveyard bonus, and now and then on the Cursed Graveyard, which starts with 2 mausoleums, 3 tombstones and 6 graves already built. Four piles spin the Golden Wheel instead: every cash slice pays double and jackpots and bonuses come up more often. Five piles, one on every reel, spin the Golden Wheel, double whatever it lands on (a Graveyard bonus pays every prize double) and add a 50x credit bonus on top. The paytable lists the exact chances.</li>
           <li><strong>The Reaper.</strong> When the spins run out, the Grim Reaper sweeps the graveyard three times: first the graves (1x to 5x your bet), then the tombstones (3x to 10x, or the Mini or Minor), then the mausoleums (10x to 50x, or the Minor, Major or Grand).</li>
           <li><strong>The numbers.</strong> Symbol weights, pays and prizes were tuned in the simulator until the return settled near 97.5%. About a third comes from line wins, close to 60% from the Graveyard bonus (about once every 85 spins) and about 9% from the Bone Wheel (about once every 110 spins).</li>
           <li><strong>Art and sound.</strong> The skulls, bones, graves and Reaper are original images made for this game with Higgsfield and embedded in the page. Every sound is synthesized in your browser. Credits and session stats are saved on this device. Play credits only, no real money.</li>
@@ -598,7 +601,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       trigger: 6,
       spins: 6,
       plusAt: 3, // bones in one bonus spin that add a spin
-      pLand: 0.082,
+      pLand: 0.079,
       // prizes in multiples of the total bet, with weights, by level 1 grave, 2 tombstone, 3 mausoleum
       prizes: [
         null,
@@ -613,10 +616,13 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     // Bone Wheel: 3+ rolling bone piles anywhere spin the wheel. Segments in display order with weights.
     wheel: {
       trigger: 3,
+      // 4 piles spin the Golden Wheel: cash doubled (v4) and better odds (w4) for jackpots and bonuses.
+      // 5 piles (one on every reel) spin the Golden Wheel, double whatever it lands on, and add a big credit bonus.
+      big: 4, huge: 5, hugeCash: 50, hugeMult: 2,
       segs: [
-        { k: 'C', v: 5, w: 30 }, { k: 'J', v: 'MINI', w: 8 }, { k: 'C', v: 10, w: 22 }, { k: 'B', v: 'GRAVEYARD', w: 9 },
-        { k: 'C', v: 15, w: 14 }, { k: 'J', v: 'MINOR', w: 4 }, { k: 'C', v: 5, w: 30 }, { k: 'B', v: 'CURSED', w: 4 },
-        { k: 'C', v: 25, w: 8 }, { k: 'J', v: 'MAJOR', w: 1 }, { k: 'C', v: 10, w: 22 }, { k: 'J', v: 'GRAND', w: 0.05 }
+        { k: 'C', v: 5, v4: 10, w: 30, w4: 26 }, { k: 'J', v: 'MINI', w: 8, w4: 9 }, { k: 'C', v: 10, v4: 20, w: 22, w4: 20 }, { k: 'B', v: 'GRAVEYARD', w: 9, w4: 12 },
+        { k: 'C', v: 15, v4: 30, w: 14, w4: 13 }, { k: 'J', v: 'MINOR', w: 4, w4: 6 }, { k: 'C', v: 5, v4: 10, w: 30, w4: 26 }, { k: 'B', v: 'CURSED', w: 4, w4: 9 },
+        { k: 'C', v: 25, v4: 50, w: 8, w4: 8 }, { k: 'J', v: 'MAJOR', w: 1, w4: 2.5 }, { k: 'C', v: 10, v4: 20, w: 22, w4: 20 }, { k: 'J', v: 'GRAND', w: 0.05, w4: 0.25 }
       ]
     },
     base: [mk(B, {}), mk(B, { W: 3 }), mk(B, { W: 3 }), mk(B, { W: 3 }), mk(B, {})]
@@ -700,11 +706,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       return t[0][0];
     }
     function valueOf(v) { return typeof v === 'number' ? v : (GY.jackpots[v] || 0); }
-    var WH = cfg.wheel, whTotal = 0;
-    WH.segs.forEach(function (sg) { whTotal += sg.w; });
-    function drawSeg(rng) {
-      var x = rng() * whTotal;
-      for (var i = 0; i < WH.segs.length; i++) { x -= WH.segs[i].w; if (x < 0) return i; }
+    var WH = cfg.wheel, whTotal = 0, whTotal4 = 0;
+    WH.segs.forEach(function (sg) { whTotal += sg.w; whTotal4 += sg.w4; });
+    function drawSeg(rng, big) {
+      var x = rng() * (big ? whTotal4 : whTotal);
+      for (var i = 0; i < WH.segs.length; i++) { x -= big ? WH.segs[i].w4 : WH.segs[i].w; if (x < 0) return i; }
       return 0;
     }
     // a head start for a bonus won on the wheel: graves (and for Cursed, tombstones and mausoleums) on random spots
@@ -766,6 +772,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           }
           res.gyEnded = true;
           res.gyPrizes = prizes;
+          res.gyMult = g.mult || 1;
+          total *= res.gyMult;
           res.gyTotal = total;
           res.win = total;
           st.gy = null;
@@ -789,11 +797,20 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       res.wheelWin = 0;
       var wheelBonus = null;
       if (piles >= WH.trigger) {
-        var si = drawSeg(rng), sg = WH.segs[si];
+        var pileReels = 0;
+        for (c = 0; c < REELS; c++) for (r = 0; r < ROWS; r++) if (grid[r][c] === 'PILE') { pileReels++; break; }
+        // the top tier needs a pile on every reel
+        var tier = pileReels >= WH.huge ? 5 : piles >= WH.big ? 4 : 3;
+        var si = drawSeg(rng, tier >= 4), sg = WH.segs[si], mult = tier === 5 ? WH.hugeMult : 1;
         res.wheelTrigger = true;
+        res.wheelTier = tier;
+        res.wheelMult = mult;
         res.wheelSeg = si;
+        res.wheelCash = tier === 5 ? WH.hugeCash : 0;
+        res.wheelPrize = 0;
         if (sg.k === 'B') wheelBonus = sg.v;
-        else res.wheelWin = valueOf(sg.v);
+        else res.wheelPrize = valueOf(tier >= 4 && sg.k === 'C' ? sg.v4 : sg.v) * mult;
+        res.wheelWin = res.wheelPrize + res.wheelCash;
       }
       res.grid = grid;
       res.stops = stops;
@@ -808,7 +825,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         res.wheelBonus = wheelBonus;
       }
       if (bn >= GY.trigger || wheelBonus) {
-        st.gy = { lv: lv, left: GY.spins };
+        st.gy = { lv: lv, left: GY.spins, mult: wheelBonus && res.wheelMult ? res.wheelMult : 1 };
+        res.gyMult = st.gy.mult;
         st.mode = 'gy';
         res.gyTrigger = true;
         res.gyLv = copyLv(lv);
@@ -831,7 +849,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       for (var i = 0; i < n; i++) {
         var r = engine.spin(st, rng, false);
         A.rounds++;
-        A.line += r.lineWin; A.wheel += r.wheelWin || 0; if (r.wheelTrigger) A.wheelT++; if (r.wheelBonus) A.wheelB++;
+        A.line += r.lineWin; A.wheel += r.wheelWin || 0; if (r.wheelTrigger) A.wheelT++; if (r.wheelTier >= 4) A.w4 = (A.w4 || 0) + 1; if (r.wheelTier === 5) A.w5 = (A.w5 || 0) + 1; if (r.wheelBonus) A.wheelB++;
         if (r.win > 0) A.hits++;
         var rw = r.win;
         if (r.gyTrigger) A.trig++;
@@ -851,7 +869,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     function result() {
       var n = A.rounds || 1, mean = A.sum / n;
       return {
-        rounds: A.rounds, rtp: mean, rtpLine: A.line / n, rtpGY: A.gy / n, rtpWheel: A.wheel / n, wheelEvery: A.wheelT ? n / A.wheelT : Infinity, wheelBonusEvery: A.wheelB ? n / A.wheelB : Infinity,
+        rounds: A.rounds, rtp: mean, rtpLine: A.line / n, rtpGY: A.gy / n, rtpWheel: A.wheel / n, wheelEvery: A.wheelT ? n / A.wheelT : Infinity, w4Every: A.w4 ? n / A.w4 : Infinity, w5Every: A.w5 ? n / A.w5 : Infinity, wheelBonusEvery: A.wheelB ? n / A.wheelB : Infinity,
         hitRate: A.hits / n, gyEvery: A.trig ? n / A.trig : Infinity,
         avgGY: A.trig ? A.gy / A.trig : 0,
         avgGraves: A.trig ? A.graves / A.trig : 0, avgMaus: A.trig ? A.maus / A.trig : 0,
@@ -1284,9 +1302,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         tone(D.Cs5 * 2, t + 0.35, 1.2, 'sine', 0.03, D.D6);
         moan(t, D.D3, 1.6, 0.05);
       },
-      saw: function () {
+      saw: function (tier) {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime;
+        if (tier >= 4) { toll(D.D3, t + 0.3, 0.16, 4); [D.D5, D.F5, D.A5, D.D6].forEach(function (f, k) { bell(f, t + 0.4 + k * 0.09, 0.07, 1.6); }); }
+        if (tier === 5) { thunder(t, 0.25); toll(D.A2 * 2, t + 1.2, 0.16, 4); }
         // a buzz saw revs up and screams, while a pile of bones tumbles and rattles
         var o = ctx.createOscillator(), o2 = ctx.createOscillator(), g = ctx.createGain(), bp = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), lg = ctx.createGain();
         o.type = 'sawtooth'; o2.type = 'square';
@@ -1875,7 +1895,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   }
   async function gyIntro(res, fastMode) {
     var cursed = res.wheelBonus === 'CURSED';
-    if (res.wheelBonus) say('<strong>The wheel opens the graveyard!</strong> ' + (cursed ? 'The Cursed bonus starts with mausoleums and tombstones already standing. ' : '') + cfg.gy.spins + ' bonus spins where only bones can land.');
+    if (res.wheelBonus) say('<strong>The wheel opens the graveyard!</strong> ' + (cursed ? 'The Cursed bonus starts with mausoleums and tombstones already standing. ' : '') + ((res.gyMult || 1) > 1 ? '<strong>Every prize is doubled.</strong> ' : '') + cfg.gy.spins + ' bonus spins where only bones can land.');
     else {
       say('<strong>The Curse awakens!</strong> ' + res.boneCount + ' bones dig ' + res.boneCount + ' graves. ' + cfg.gy.spins + ' bonus spins where only bones can land.');
       for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) { var cl = cells[r][c].classList; if (res.grid[r][c] === 'BN') { cl.remove('dim'); cl.add('win'); } else { cl.remove('win'); cl.add('dim'); } }
@@ -1885,7 +1905,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     clearLines();
     SFX.bonus(false);
     $('bwV').textContent = cfg.gy.spins + ' BONUS SPINS';
-    await celebrate(cursed ? 'CURSED GRAVEYARD' : 'GRAVEYARD BONUS', (cursed ? 'A head start: ' + cfg.gy.cursed[3] + ' mausoleums, ' + cfg.gy.cursed[2] + ' tombstones and ' + cfg.gy.cursed[1] + ' graves. ' : '') + 'Every bone builds the graveyard: grave, tombstone, mausoleum. ' + cfg.gy.plusAt + ' bones in one spin add a spin', null, 0, null, fastMode ? 1100 : 2800, 20, cursed ? 'G3' : 'BN', '#9dff7a');
+    await celebrate(cursed ? 'CURSED GRAVEYARD' : 'GRAVEYARD BONUS', ((res.gyMult || 1) > 1 ? 'All prizes x' + res.gyMult + '. ' : '') + (cursed ? 'A head start: ' + cfg.gy.cursed[3] + ' mausoleums, ' + cfg.gy.cursed[2] + ' tombstones and ' + cfg.gy.cursed[1] + ' graves. ' : '') + 'Every bone builds the graveyard: grave, tombstone, mausoleum. ' + cfg.gy.plusAt + ' bones in one spin add a spin', null, 0, null, fastMode ? 1100 : 2800, 20, cursed ? 'G3' : 'BN', '#9dff7a');
     gyLv = res.gyLv;
     SFX.setFS(true);
     paintGraves(gyLv);
@@ -2032,7 +2052,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     var credit = res.win * b;
     var draw = function (x) { $('winV').textContent = money(x); $('bal').textContent = money(balBefore + x); };
     var cnt = gyCounts(res.gyPrizes.reduce(function (lv, p) { lv[p.r][p.c] = p.level; return lv; }, [[0, 0, 0, 0, 0], [0, 0, 0, 0, 0], [0, 0, 0, 0, 0]]));
-    var sub = cnt[1] + ' graves, ' + cnt[2] + ' tombstones, ' + cnt[3] + ' mausoleums' + (jps.length ? ', ' + jps.join(' + ') : '') + '. ' + res.win.toFixed(0) + 'x your bet';
+    var sub = cnt[1] + ' graves, ' + cnt[2] + ' tombstones, ' + cnt[3] + ' mausoleums' + (jps.length ? ', ' + jps.join(' + ') : '') + ((res.gyMult || 1) > 1 ? ', doubled' : '') + '. ' + res.win.toFixed(0) + 'x your bet';
     var top = jps.indexOf('GRAND') >= 0 ? 'GRAND' : jps.indexOf('MAJOR') >= 0 ? 'MAJOR' : null;
     SFX.jackpot(top === 'GRAND' ? 5 : res.win >= 40 ? 4 : 2);
     say('<strong>The graveyard paid <span class="amt">' + money(credit) + '</span></strong> (' + sub + ').');
@@ -2047,15 +2067,15 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   /* ---------- Bone Wheel ---------- */
   var WSEG = cfg.wheel.segs, WN = WSEG.length, WSTEP = 360 / WN;
   var WCOL = { C: ['#2a1640', '#3b1f58'], MINI: '#1c7a4a', MINOR: '#2456b0', MAJOR: '#b8540c', GRAND: '#b0102e', GRAVEYARD: '#2f6b1e', CURSED: '#5a0f3a' };
-  function segLabel(sg) { return sg.k === 'C' ? sg.v + 'x' : sg.k === 'J' ? sg.v : sg.v === 'CURSED' ? 'CURSED' : 'BONUS'; }
-  function buildWheelSVG() {
+  function segLabel(sg, big) { return sg.k === 'C' ? (big ? sg.v4 : sg.v) + 'x' : sg.k === 'J' ? sg.v : sg.v === 'CURSED' ? 'CURSED' : 'BONUS'; }
+  function buildWheelSVG(big) {
     var cx = 150, cy = 150, R0 = 146, h = '';
     function pt(a, r) { var rad = a * Math.PI / 180; return (cx + r * Math.sin(rad)).toFixed(2) + ' ' + (cy - r * Math.cos(rad)).toFixed(2); }
     WSEG.forEach(function (sg, i) {
       var a0 = i * WSTEP, a1 = a0 + WSTEP, mid = a0 + WSTEP / 2;
-      var col = sg.k === 'C' ? WCOL.C[i % 2] : WCOL[sg.v];
+      var col = sg.k === 'C' ? (big ? ['#5a3a08', '#7a520e'][i % 2] : WCOL.C[i % 2]) : WCOL[sg.v];
       h += '<path d="M' + cx + ' ' + cy + ' L' + pt(a0, R0) + ' A' + R0 + ' ' + R0 + ' 0 0 1 ' + pt(a1, R0) + ' Z" fill="' + col + '" stroke="#e8dcc0" stroke-width="2"/>';
-      var lab = segLabel(sg), fs = lab.length > 4 ? 15 : 22;
+      var lab = segLabel(sg, big), fs = lab.length > 4 ? 15 : 22;
       h += '<text transform="rotate(' + mid + ' ' + cx + ' ' + cy + ')" x="' + cx + '" y="' + (cy - R0 + 34) + '" text-anchor="middle" font-family="Cinzel, Georgia, serif" font-weight="900" font-size="' + fs + '" fill="#fff4d6" stroke="#120818" stroke-width="3" paint-order="stroke">' + lab + '</text>';
     });
     // bone studs around the rim
@@ -2065,7 +2085,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   (function mountWheel() {
     var ov = document.createElement('div');
     ov.className = 'wheelov'; ov.id = 'wheelov'; ov.hidden = true;
-    ov.innerHTML = '<div class="wheel-t">BONE WHEEL</div><div class="wheelbox"><div class="wheel" id="wheel">' + buildWheelSVG() + '</div><div class="hub pic-SAW"></div><div class="pointer"></div></div><div class="wheel-s" id="wheelS">Spinning...</div>';
+    ov.innerHTML = '<div class="wheel-t" id="wheelT">BONE WHEEL</div><div class="wheel-x" id="wheelX" hidden></div><div class="wheelbox"><div class="wheel" id="wheel">' + buildWheelSVG(false) + '</div><div class="hub pic-SAW"></div><div class="pointer"></div></div><div class="wheel-s" id="wheelS">Spinning...</div>';
     document.querySelector('.cab').appendChild(ov);
   })();
   var wheelAngle = 0;
@@ -2089,12 +2109,18 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     });
   }
   async function wheelFeature(res, b, fastMode) {
-    var sg = WSEG[res.wheelSeg];
-    say('<strong>' + res.pileCount + ' bone piles!</strong> The Bone Wheel spins.');
+    var sg = WSEG[res.wheelSeg], tier = res.wheelTier || 3, big = tier >= 4;
+    var wname = tier === 5 ? 'DOUBLE GOLDEN WHEEL' : tier === 4 ? 'GOLDEN WHEEL' : 'BONE WHEEL';
+    say('<strong>' + res.pileCount + ' bone piles!</strong> ' + (tier === 5 ? 'One on every reel: the Golden Wheel, everything doubled, plus a ' + cfg.wheel.hugeCash + 'x bonus.' : tier === 4 ? 'The Golden Wheel spins: bigger cash and better odds.' : 'The Bone Wheel spins.'));
     for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) { var cl = cells[r][c].classList; if (res.grid[r][c] === 'PILE') { cl.remove('dim'); cl.add('win', 'rolling-pile'); } else { cl.remove('win'); cl.add('dim'); } }
-    SFX.saw();
+    SFX.saw(tier);
     await sleep(fastMode ? 700 : 1700);
     var ov = $('wheelov');
+    $('wheel').innerHTML = buildWheelSVG(big);
+    $('wheelT').textContent = wname;
+    ov.classList.toggle('gold', big);
+    $('wheelX').hidden = tier !== 5;
+    $('wheelX').textContent = 'x2 + ' + cfg.wheel.hugeCash + 'x BONUS';
     $('wheelS').textContent = 'Cash, a jackpot, or the graveyard...';
     ov.hidden = false;
     ov.classList.remove('done');
@@ -2102,8 +2128,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     await spinWheel(res.wheelSeg, fastMode);
     ov.classList.add('done');
     SFX.wheelStop(sg.k);
-    var label = segLabel(sg);
-    $('wheelS').textContent = sg.k === 'C' ? label + ' your bet!' : sg.k === 'J' ? sg.v + ' JACKPOT!' : sg.v === 'CURSED' ? 'THE CURSED GRAVEYARD!' : 'THE GRAVEYARD BONUS!';
+    var label = segLabel(sg, big);
+    $('wheelS').textContent = (sg.k === 'C' ? label + ' your bet!' : sg.k === 'J' ? sg.v + ' JACKPOT!' : sg.v === 'CURSED' ? 'THE CURSED GRAVEYARD!' : 'THE GRAVEYARD BONUS!') + (tier === 5 ? (sg.k === 'B' ? ' ALL PRIZES x2' : ' x2') : '');
     await sleep(fastMode ? 700 : 1700);
     ov.hidden = true;
     for (r = 0; r < ROWS; r++) for (c = 0; c < REELS; c++) cells[r][c].classList.remove('rolling-pile');
@@ -2112,8 +2138,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       var draw = function (x) { $('winV').textContent = money(lastWin + x); $('bal').textContent = money(balBefore + x); };
       if (sg.k === 'J') { var je = $('jp' + JP_TIER[sg.v]); if (je) je.classList.add('hit'); SFX.jackpot(JP_TIER[sg.v] + 1); }
       else SFX.win(res.wheelWin);
-      say('<strong>Bone Wheel: ' + (sg.k === 'J' ? sg.v + ' jackpot' : label) + '</strong> <span class="amt">+' + money(credit) + '</span>');
-      await celebrate(sg.k === 'J' ? sg.v + ' JACKPOT!' : 'BONE WHEEL', res.wheelWin + 'x your bet', credit, fastMode ? 900 : (res.wheelWin >= 25 ? 3000 : 1800), draw, fastMode ? 600 : 1500, sg.k === 'J' ? 40 : 16, 'PILE', '#ff8a3d');
+      var how = tier === 5 ? (res.wheelPrize ? (sg.k === 'J' ? sg.v + ' jackpot' : label) + ' doubled to ' + res.wheelPrize + 'x, plus ' + res.wheelCash + 'x bonus' : res.wheelCash + 'x bonus credits') : (sg.k === 'J' ? sg.v + ' jackpot' : label);
+      say('<strong>' + (tier === 5 ? 'Double Golden Wheel' : tier === 4 ? 'Golden Wheel' : 'Bone Wheel') + ': ' + how + '</strong> <span class="amt">+' + money(credit) + '</span>');
+      await celebrate(sg.k === 'J' && res.wheelPrize ? sg.v + ' JACKPOT!' : wname, how + '. ' + res.wheelWin + 'x your bet', credit, fastMode ? 900 : (res.wheelWin >= 25 ? 3000 : 1800), draw, fastMode ? 600 : 1500, sg.k === 'J' || tier === 5 ? 40 : 16, 'PILE', big ? '#ffd75e' : '#ff8a3d');
       balance = balBefore + credit;
       lastWin += credit;
       updateHud();
@@ -2349,7 +2376,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       html += '<tr><td><div class="cell mini">' + tileHTML(s) + '</div></td><td>' + p[0] + '</td><td>' + p[1] + '</td><td>' + p[2] + '</td></tr>';
     });
     html += '<tr><td><div class="cell mini">' + tileHTML('BN') + '</div></td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">6 or more anywhere start the Graveyard bonus: ' + cfg.gy.spins + ' bonus spins where every bone builds the graveyard up, ' + cfg.gy.plusAt + ' bones in one spin add a spin, then the Reaper collects every prize.</td></tr>';
-    html += '<tr><td><div class="cell mini">' + tileHTML('PILE') + '</div></td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">3 or more anywhere spin the Bone Wheel: cash prizes, a jackpot, the Graveyard bonus, or the Cursed Graveyard (which starts with mausoleums and tombstones already built).</td></tr>';
+    html += '<tr><td><div class="cell mini">' + tileHTML('PILE') + '</div></td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">3 anywhere spin the Bone Wheel: cash prizes, a jackpot, the Graveyard bonus, or the Cursed Graveyard (which starts with mausoleums and tombstones already built). 4 spin the Golden Wheel: cash prizes doubled and better odds of jackpots and bonuses. 5, one on every reel, spin the Golden Wheel, double whatever it lands on (a bonus pays double too) and add a ' + cfg.wheel.hugeCash + 'x credit bonus.</td></tr>';
     $('ptable').innerHTML = html;
     var gh = '<tr><th>Built</th><th colspan="3" style="text-align:left">Prize when the Reaper collects</th></tr>';
     [1, 2, 3].forEach(function (lv) {
@@ -2361,10 +2388,13 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     var tw = 0; WSEG.forEach(function (sg) { tw += sg.w; });
     var wsum = {};
     WSEG.forEach(function (sg) { var k = segLabel(sg); wsum[k] = (wsum[k] || 0) + sg.w; });
-    gh += '<tr><th>Bone Wheel</th><th colspan="3" style="text-align:left">Chance per wheel spin</th></tr>';
+    var tw4 = 0, wsum4 = {};
+    WSEG.forEach(function (sg) { tw4 += sg.w4; var k = segLabel(sg); wsum4[k] = (wsum4[k] || 0) + sg.w4; });
+    function pf(x) { return (x >= 1 ? x.toFixed(0) : x.toFixed(x >= 0.1 ? 1 : 2)) + '%'; }
+    gh += '<tr><th>Bone Wheel</th><th colspan="3" style="text-align:left">Chance per spin: 3 piles / Golden Wheel (4 or 5 piles)</th></tr>';
     Object.keys(wsum).forEach(function (k) {
-      var pct = wsum[k] / tw * 100, nm = k === 'BONUS' ? 'Graveyard bonus' : k === 'CURSED' ? 'Cursed Graveyard bonus' : /^[A-Z]+$/.test(k) ? k.charAt(0) + k.slice(1).toLowerCase() + ' jackpot' : k + ' your bet';
-      gh += '<tr><td style="font-family:Cinzel,Georgia,serif;font-weight:900">' + k + '</td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">' + nm + ': ' + (pct >= 1 ? pct.toFixed(0) : pct.toFixed(pct >= 0.1 ? 1 : 2)) + '%</td></tr>';
+      var pct = wsum[k] / tw * 100, pct4 = wsum4[k] / tw4 * 100, nm = k === 'BONUS' ? 'Graveyard bonus' : k === 'CURSED' ? 'Cursed Graveyard bonus' : /^[A-Z]+$/.test(k) ? k.charAt(0) + k.slice(1).toLowerCase() + ' jackpot' : k + ' your bet';
+      gh += '<tr><td style="font-family:Cinzel,Georgia,serif;font-weight:900">' + k + '</td><td colspan="3" style="text-align:left;font-family:var(--font-body);font-size:13px;color:var(--mute)">' + nm + (/x$/.test(k) ? ' (Golden: ' + (parseInt(k, 10) * 2) + 'x)' : '') + ': ' + pf(pct) + ' / ' + pf(pct4) + '</td></tr>';
     });
     $('gtable').innerHTML = gh;
     var g = '';
