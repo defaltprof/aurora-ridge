@@ -118,9 +118,10 @@ h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); lette
 .tile .cap { margin-top: 1cqw; font: 800 15cqw/1 var(--font-display); letter-spacing: 0.1em; }
 .tile.arty { justify-content: center; padding-top: 2cqw; }
 .cell.mini .tile .cap { font-size: 15cqw; }
-.tile .lab { font-size: 32cqw; }
-.tile .lab.l1 { font-size: 58cqw; }
-.tile .lab.l2 { font-size: 46cqw; }
+.tile .lab { font-size: 32cqw; font-family: 'Cinzel', Georgia, 'Times New Roman', serif; font-weight: 900; letter-spacing: 0; }
+.tile .lab.l1 { font-size: 56cqw; }
+.t-Q .lab.l1 { font-size: 48cqw; transform: translateX(-5%); }
+.tile .lab.l2 { font-size: 40cqw; letter-spacing: -0.04em; }
 .tile .lab.l4 { font-size: 26cqw; }
 .tile .sub { margin-top: 4cqw; font: 600 12cqw/1 var(--font-body); letter-spacing: 0.12em; opacity: 0.9; }
 .tile.dark { color: var(--tx-dark); text-shadow: none; }
@@ -321,7 +322,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 .jps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .t-J { --c: #8a5cf6; } .t-T { --c: #f2791f; }
 .tile.blank { background: radial-gradient(circle at 50% 40%, #1d2638, #0a0f19); box-shadow: inset 0 0 0 2px #253049; }
-.sv { position: absolute; left: 4%; right: 4%; top: 50%; z-index: 4; text-align: center; font: 800 23cqw/1 var(--font-display); letter-spacing: 0.02em; color: #3a1e08; mix-blend-mode: multiply; opacity: 0.96; text-shadow: 0 0 1px rgba(74, 42, 16, 0.5); pointer-events: none; }
+.sv { position: absolute; left: 4%; right: 4%; top: 50%; z-index: 4; text-align: center; font: 900 21cqw/1 'Cinzel', Georgia, 'Times New Roman', serif; letter-spacing: 0; white-space: nowrap; color: #3a1e08; mix-blend-mode: multiply; opacity: 0.96; text-shadow: 0 0 1px rgba(74, 42, 16, 0.5); pointer-events: none; }
 .sv.jp-mini { color: #0f6a3a; } .sv.jp-minor { color: #1d4f9a; } .sv.jp-major { color: #a3400b; }
 .cell.hsspin .tile { animation: hsflick 0.14s steps(2, jump-none) infinite; }
 .hsreel { position: absolute; inset: 0; overflow: hidden; border-radius: 10px; z-index: 3; pointer-events: none; background: radial-gradient(circle at 50% 40%, #1d2638, #0a0f19); }
@@ -344,7 +345,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Buck Wild</h1>
-    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 11:46 AM ET</div>
+    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 12:59 PM ET</div>
   </header>
 
   <div class="layout">
