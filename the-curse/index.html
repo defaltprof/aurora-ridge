@@ -372,7 +372,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 .fx-wisp::after { bottom: auto; top: -10%; height: 40%; opacity: 0.6; animation-duration: 7s; animation-direction: alternate-reverse; }
 @keyframes drift { from { transform: translateX(-14%); } to { transform: translateX(14%); } }
 /* rolling bone pile and the Bone Wheel */
-.t-PILE .pic { inset: -18%; border-radius: 50%; animation: roll 2.6s linear infinite; }
+.tile.photo.t-PILE { border-radius: 50%; overflow: hidden; }
+.tile.photo.t-PILE .pic { inset: 3px; border-radius: 50%; background-size: 135%; animation: roll 2.6s linear infinite; }
+.tile.photo.t-PILE .shine, .tile.photo.t-PILE .fx { border-radius: 50%; inset: 3px; }
 .cell.rolling-pile .t-PILE .pic { animation-duration: 0.5s; }
 @keyframes roll { to { transform: rotate(360deg); } }
 .wheelov { position: fixed; inset: 0; z-index: 50; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; padding: 16px; border-radius: 16px; background: radial-gradient(70% 55% at 50% 45%, rgba(60, 20, 80, 0.88), rgba(5, 3, 10, 0.95)); }
@@ -405,7 +407,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">The Curse</h1>
-    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 2:44 PM ET</div>
+    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 3:21 PM ET</div>
   </header>
 
   <div class="layout">
