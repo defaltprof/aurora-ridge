@@ -389,7 +389,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">The Curse</h1>
-    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 1:55 PM ET</div>
+    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 2:26 PM ET</div>
   </header>
 
   <div class="layout">
@@ -881,7 +881,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     if (sym === 'X') return '<div class="tile blank"></div>';
     var d = SYM[sym] || { t: sym, s: '' };
     if (PHOTO[sym]) {
-      return '<div class="tile photo t-' + sym + (FX[sym] ? ' skull' : '') + '" style="--pf:' + PHOTO[sym] + '"><div class="pic pic-' + sym + '"></div>' + (FX[sym] ? '<div class="fx fx-' + FX[sym] + '"></div>' : '') + '<div class="shine"></div>' + (sym === 'W2' || sym === 'W3' ? '<span class="mult m' + sym.charAt(1) + '">' + sym.charAt(1) + 'x</span>' : '') + (sym.indexOf('JP') === 0 ? '<div class="glint"></div><span class="tier">' + CAP[sym] + '</span>' : '') + (MOON[sym] ? '<span class="cap wildword">Wild</span>' : '') + (sym === 'SC' ? '<span class="cap scatword">Scatter</span>' : '') + (sym === 'BN' ? '<span class="cap bonusword">Bonus</span>' : '') + '</div>';
+      return '<div class="tile photo t-' + sym + (FX[sym] ? ' skull' : '') + '" style="--pf:' + PHOTO[sym] + '"><div class="pic pic-' + sym + '"></div>' + (FX[sym] ? '<div class="fx fx-' + FX[sym] + '"></div>' : '') + '<div class="shine"></div>' + (sym === 'W2' || sym === 'W3' ? '<span class="mult m' + sym.charAt(1) + '">' + sym.charAt(1) + 'x</span>' : '') + (sym.indexOf('JP') === 0 ? '<div class="glint"></div><span class="tier">' + CAP[sym] + '</span>' : '') + (MOON[sym] ? '<span class="cap wildword">Wild</span>' : '') + (sym === 'SC' ? '<span class="cap scatword">Scatter</span>' : '') + '' + '</div>';
     }
     if (ART[sym]) {
       return '<div class="tile arty t-' + sym + (d.dark ? ' dark' : '') + '"><svg class="art" viewBox="0 0 100 100" aria-hidden="true">' + ART[sym] + '</svg>' + (CAP[sym] ? '<span class="cap' + ({ W: 1, G: 1, W2: 1, W3: 1 }[sym] ? ' wildword' : '') + '">' + CAP[sym] + '</span>' : '') + '</div>';
