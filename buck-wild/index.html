@@ -321,8 +321,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 .jps { grid-template-columns: repeat(4, minmax(0, 1fr)); }
 .t-J { --c: #8a5cf6; } .t-T { --c: #f2791f; }
 .tile.blank { background: radial-gradient(circle at 50% 40%, #1d2638, #0a0f19); box-shadow: inset 0 0 0 2px #253049; }
-.sv { position: absolute; left: 5%; right: 5%; bottom: 6%; z-index: 4; text-align: center; font: 800 19cqw/1.1 var(--font-display); letter-spacing: 0.02em; color: #fff; background: rgba(8, 12, 22, 0.82); border-radius: 6px; padding: 1px 0; text-shadow: 0 1px 0 #000; box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.28); pointer-events: none; }
-.sv.jp-mini { color: #7dffb5; } .sv.jp-minor { color: #8fc1ff; } .sv.jp-major { color: #ffb35c; }
+.sv { position: absolute; left: 4%; right: 4%; top: 50%; z-index: 4; text-align: center; font: 800 23cqw/1 var(--font-display); letter-spacing: 0.02em; color: #3a1e08; mix-blend-mode: multiply; opacity: 0.96; text-shadow: 0 0 1px rgba(74, 42, 16, 0.5); pointer-events: none; }
+.sv.jp-mini { color: #0f6a3a; } .sv.jp-minor { color: #1d4f9a; } .sv.jp-major { color: #a3400b; }
 .cell.hsspin .tile { animation: hsflick 0.14s steps(2, jump-none) infinite; }
 @keyframes hsflick { 0% { filter: brightness(1); } 100% { filter: brightness(1.9); } }
 .cell.pop .tile { animation: pop 0.45s cubic-bezier(0.2, 1.6, 0.4, 1); }
@@ -339,7 +339,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Buck Wild</h1>
-    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 10:51 AM ET</div>
+    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 11:07 AM ET</div>
   </header>
 
   <div class="layout">
@@ -1667,7 +1667,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   var hsRunning = 0;
   function saltText(v) { return typeof v === 'number' ? money(v * bet()) : v; }
   function addSaltLabel(r, c, v) {
-    var el = cells[r][c], old = el.querySelector('.sv');
+    var cell = cells[r][c], el = cell.querySelector('.tile') || cell, old = cell.querySelector('.sv');
     if (old) old.parentNode.removeChild(old);
     if (v === null || v === undefined) return;
     var sp = document.createElement('span');
