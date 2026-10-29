@@ -339,7 +339,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Buck Wild</h1>
-    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 11:07 AM ET</div>
+    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 11:17 AM ET</div>
   </header>
 
   <div class="layout">
@@ -885,9 +885,9 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     return cfg.hs.values[0][0];
   }
   function saltLabelHTML(v) { return '<span class="sv' + (typeof v === 'number' ? '' : ' jp-' + String(v).toLowerCase()) + '">' + (typeof v === 'number' ? money(v * (BETS ? bet() : 1.5)) : v) + '</span>'; }
-  function tileHTML(sym) {
+  function tileHTML(sym, sv) {
     if (sym === 'X') return '<div class="tile blank"></div>';
-    if (sym === 'SA') return '<div class="tile photo t-SA" style="--pf:' + PHOTO.SA + '"><div class="pic pic-SA"></div><div class="shine"></div>' + saltLabelHTML(randomSaltVal()) + '</div>';
+    if (sym === 'SA') return '<div class="tile photo t-SA" style="--pf:' + PHOTO.SA + '"><div class="pic pic-SA"></div><div class="shine"></div>' + saltLabelHTML(sv === undefined || sv === null ? randomSaltVal() : sv) + '</div>';
     var d = SYM[sym] || { t: sym, s: '' };
     if (PHOTO[sym]) {
       return '<div class="tile photo t-' + sym + '" style="--pf:' + PHOTO[sym] + '"><div class="pic pic-' + (sym === 'W' ? 'W' : MOON[sym] ? 'SUN' : sym) + '"></div><div class="shine"></div>' + (sym === 'W2' || sym === 'W3' ? '<span class="mult m' + sym.charAt(1) + '">' + sym.charAt(1) + 'x</span>' : '') + (sym.indexOf('JP') === 0 ? '<div class="glint"></div><span class="tier">' + CAP[sym] + '</span>' : '') + (MOON[sym] ? '<span class="cap wildword">Wild</span>' : '') + (sym === 'SC' ? '<span class="cap scatword">Scatter</span>' : '') + (sym === 'SH' ? '<span class="cap bonusword">Bonus</span>' : '') + '</div>';
@@ -1215,7 +1215,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     f.classList.toggle(cls, on);
     if (on && ms) { clearTimeout(frameTimer); frameTimer = setTimeout(function () { f.classList.remove(cls); }, ms); }
   }
-  function paint(r, c, sym) { cells[r][c].innerHTML = tileHTML(sym); cells[r][c].dataset.sym = sym; }
+  function paint(r, c, sym, sv) {
+    if (sym === 'SA' && (sv === undefined || sv === null)) sv = randomSaltVal();
+    cells[r][c].innerHTML = tileHTML(sym, sv); cells[r][c].dataset.sym = sym;
+    if (sym === 'SA') cells[r][c].dataset.sv = JSON.stringify(sv); else delete cells[r][c].dataset.sv;
+  }
+  function cellSalt(r, c) { var d = cells[r][c].dataset.sv; return d ? JSON.parse(d) : undefined; }
 
   (function initialGrid() {
     var stops = [4, 19, 33, 12, 27];
@@ -1371,7 +1376,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           if (level) SFX.ding(Math.min(level, 3));
         }
         for (var r = 0; r < ROWS; r++) {
-          paint(r, c, res.grid[r][c]);
+          paint(r, c, res.grid[r][c], res.saltVals ? res.saltVals[r][c] : undefined);
           cells[r][c].classList.remove('held', 'hide');
           if (still[c].indexOf(r) === -1) cells[r][c].classList.add('landed');
           if (res.saltVals && res.saltVals[r][c] !== null) addSaltLabel(r, c, res.saltVals[r][c]);
@@ -1404,9 +1409,10 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         // no crowns ever spin past on the first or last reel
         var pc = (c === 0 || c === REELS - 1) ? pool.filter(function (x) { return !/^JP/.test(x); }) : pool;
         var syms = [pc[Math.floor(Math.random() * pc.length)]];
-        for (r = 0; r < ROWS; r++) syms.push(res.grid[r][c]);
-        for (i = 0; i < L; i++) syms.push(pc[Math.floor(Math.random() * pc.length)]);
-        for (r = 0; r < ROWS; r++) { var cur = cells[r][c].dataset.sym || 'A'; syms.push(res.mode === 'base' && /^JP[345]$/.test(cur) ? 'K' : (hasB(res.bonus, 'fox') && (cur === 'K' || cur === 'Q')) ? 'NECK' : cur); }
+        var svs = [undefined];
+        for (r = 0; r < ROWS; r++) { syms.push(res.grid[r][c]); svs.push(res.saltVals ? res.saltVals[r][c] : undefined); }
+        for (i = 0; i < L; i++) { syms.push(pc[Math.floor(Math.random() * pc.length)]); svs.push(undefined); }
+        for (r = 0; r < ROWS; r++) { svs.push(cellSalt(r, c)); var cur = cells[r][c].dataset.sym || 'A'; syms.push(res.mode === 'base' && /^JP[345]$/.test(cur) ? 'K' : (hasB(res.bonus, 'fox') && (cur === 'K' || cur === 'Q')) ? 'NECK' : cur); }
         var spn = document.createElement('div');
         spn.className = 'spinner';
         var strip = document.createElement('div');
@@ -1415,7 +1421,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         var tail = syms.length - ROWS;
         for (i = 0; i < syms.length; i++) {
           var blank = (i >= 1 && i <= ROWS && still[c].indexOf(i - 1) !== -1) || (i >= tail && h.indexOf(i - tail) !== -1);
-          html += '<div class="scell" style="top:' + ((i - 1) * m.p) + 'px;height:' + m.h + 'px">' + (blank ? '' : tileHTML(syms[i])) + '</div>';
+          html += '<div class="scell" style="top:' + ((i - 1) * m.p) + 'px;height:' + m.h + 'px">' + (blank ? '' : tileHTML(syms[i], svs[i])) + '</div>';
         }
         strip.innerHTML = html;
         spn.appendChild(strip);
@@ -1668,6 +1674,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   function saltText(v) { return typeof v === 'number' ? money(v * bet()) : v; }
   function addSaltLabel(r, c, v) {
     var cell = cells[r][c], el = cell.querySelector('.tile') || cell, old = cell.querySelector('.sv');
+    if (v !== null && v !== undefined) cell.dataset.sv = JSON.stringify(v);
     if (old) old.parentNode.removeChild(old);
     if (v === null || v === undefined) return;
     var sp = document.createElement('span');
@@ -1679,7 +1686,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) {
       var v = vals[r][c];
       cells[r][c].classList.remove('win', 'dim', 'landed', 'pop', 'hsspin');
-      if (v !== null) { paint(r, c, 'SA'); addSaltLabel(r, c, v); cells[r][c].classList.add('lock'); }
+      if (v !== null) { paint(r, c, 'SA', v); addSaltLabel(r, c, v); cells[r][c].classList.add('lock'); }
       else { paint(r, c, 'X'); cells[r][c].classList.remove('lock'); }
     }
   }
@@ -1706,7 +1713,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     await sleep(fastMode ? 380 : 900);
     empties.forEach(function (el) { el.classList.remove('hsspin'); });
     res.hsAdded.forEach(function (p, i) {
-      paint(p[0], p[1], 'SA');
+      paint(p[0], p[1], 'SA', res.hsVals[p[0]][p[1]]);
       addSaltLabel(p[0], p[1], res.hsVals[p[0]][p[1]]);
       cells[p[0]][p[1]].classList.add('lock', 'pop');
     });
