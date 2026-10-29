@@ -330,6 +330,14 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 .hsreel .hstrip.blur { filter: blur(1.4px); }
 .hsreel .hsc { position: absolute; left: 0; right: 0; container-type: inline-size; }
 .cell.hsgo > .tile { visibility: hidden; }
+/* salt licks are round, like a coin */
+.tile.t-SA { border-radius: 50%; overflow: hidden; }
+.tile.t-SA .pic, .tile.t-SA .shine { border-radius: 50%; }
+.tile.photo.t-SA { box-shadow: inset 0 0 0 3px var(--pf), 0 2px 8px rgba(0, 0, 0, 0.55); }
+.cell.lock .tile.photo.t-SA { box-shadow: inset 0 0 0 3px var(--pf), 0 0 0 2px rgba(255, 255, 255, 0.35), 0 0 16px var(--pf); }
+.cell.win .tile.photo.t-SA { box-shadow: inset 0 0 0 3px var(--pf), 0 0 0 3px #ffffff, 0 0 18px 4px #ffe9a8, 0 0 28px var(--pf); }
+.tile.t-SA .sv { top: 52%; }
+.tile.t-SA .sv:not(.jp-mini):not(.jp-minor):not(.jp-major) { font-size: 28cqw; top: 48%; }
 /* free spins: every symbol wears a small multiplier badge */
 .frame.fs .tile:not(.blank)::after { content: var(--fsm, '3x'); position: absolute; top: 4cqw; right: 4cqw; z-index: 5; min-width: 24cqw; height: 24cqw; padding: 0 3cqw; box-sizing: border-box; border-radius: 12cqw; display: flex; align-items: center; justify-content: center; font: 900 14cqw/1 'Cinzel', Georgia, serif; letter-spacing: -0.02em; text-transform: none; color: #3a1d00; background: linear-gradient(180deg, #fff6c8, #ffc23d 55%, #e07a12); box-shadow: 0 0 0 1px rgba(58, 29, 0, 0.6), 0 1px 4px rgba(0, 0, 0, 0.6); text-shadow: none; pointer-events: none; animation: fsmIn 0.35s ease-out; }
 @keyframes fsmIn { from { transform: scale(0.3); opacity: 0; } to { transform: none; opacity: 1; } }
@@ -348,7 +356,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Buck Wild</h1>
-    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 1:08 PM ET</div>
+    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 1:19 PM ET</div>
   </header>
 
   <div class="layout">
@@ -466,7 +474,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
           <li><strong>Wild.</strong> The golden antler rack lands on reels 2, 3 and 4 and stands in for every symbol except shells and salt.</li>
           <li><strong>Free spins.</strong> Three or more shotgun shells anywhere award 8 free spins, and every win in them pays triple. Three more shells during the feature add 8 more. The free spin reels carry more wilds and more deer.</li>
           <li><strong>Salt Lick bonus.</strong> Six or more salt licks anywhere start it. Every salt shows a cash prize, mostly small, sometimes a Mini, Minor or Major jackpot. The salts lock in place and you get 6 respins where only salt can land. Each new salt locks too, and the respins reset back to 6 whenever one drops in. At the end you collect every salt on the board, and filling all 15 spots wins the Grand.</li>
-          <li><strong>The numbers.</strong> Symbol weights, the paytable and the salt prizes were tuned in the simulator until the return settled near 96.5%. Free spins and the Salt Lick bonus each come about once every 115 to 120 spins.</li>
+          <li><strong>The numbers.</strong> Symbol weights, the paytable and the salt prizes were tuned in the simulator until the return settled near 97.5%. Bets are whole numbers and every salt is a whole multiple of the bet, so salt prizes are always whole credits. Free spins and the Salt Lick bonus each come about once every 115 to 120 spins.</li>
           <li><strong>Art and sound.</strong> The deer, antlers, shells and salt lick pictures are original images made for this game with Higgsfield and embedded in the page. Every sound is synthesized in your browser. Credits and session stats are saved on this device. Play credits only, no real money.</li>
         </ul>
       </div>
@@ -536,7 +544,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       respins: 6,
       pLand: 0.03,
       // cash values in multiples of the total bet, with weights
-      values: [[0.5, 30], [1, 30], [2, 18], [3, 10], [5, 6], [10, 3], ['MINI', 2], ['MINOR', 0.6], ['MAJOR', 0.15]],
+      values: [[1, 62], [2, 18], [3, 10], [5, 5], [10, 2.5], ['MINI', 2], ['MINOR', 0.6], ['MAJOR', 0.15]],
       jackpots: { MINI: 10, MINOR: 25, MAJOR: 100, GRAND: 1000 }
     },
     base: [mk(B, {}), mk(B, { W: 6 }), mk(B, { W: 6 }), mk(B, { W: 6 }), mk(B, {})],
@@ -893,7 +901,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     for (var i = 0; i < cfg.hs.values.length; i++) { x -= cfg.hs.values[i][1]; if (x < 0) return cfg.hs.values[i][0]; }
     return cfg.hs.values[0][0];
   }
-  function saltLabelHTML(v) { return '<span class="sv' + (typeof v === 'number' ? '' : ' jp-' + String(v).toLowerCase()) + '">' + (typeof v === 'number' ? money(v * (BETS ? bet() : 1.5)) : v) + '</span>'; }
+  function saltLabelHTML(v) { return '<span class="sv' + (typeof v === 'number' ? '' : ' jp-' + String(v).toLowerCase()) + '">' + (typeof v === 'number' ? saltAmt(v * (BETS ? bet() : 2)) : v) + '</span>'; }
   function tileHTML(sym, sv) {
     if (sym === 'X') return '<div class="tile blank"></div>';
     if (sym === 'SA') return '<div class="tile photo t-SA" style="--pf:' + PHOTO.SA + '"><div class="pic pic-SA"></div><div class="shine"></div>' + saltLabelHTML(sv === undefined || sv === null ? randomSaltVal() : sv) + '</div>';
@@ -910,6 +918,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     return '<div class="' + cls + '"><span class="lab ' + lc + '">' + d.t + '</span>' + (d.s ? '<span class="sub">' + d.s + '</span>' : '') + '</div>';
   }
   function money(x) { return x.toFixed(2); }
+  function saltAmt(x) { return String(Math.round(x)); }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
 
@@ -1240,7 +1249,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   })();
 
   /* ---------- state ---------- */
-  var BETS = [0.75, 1.5, 3, 7.5, 15, 30];
+  var BETS = [1, 2, 3, 5, 10, 20, 50];
   var interrupt = null, interruptLabel = '';
   var betIdx = 1, balance = 500, busy = false, auto = false, fast = false, lastWin = 0;
   // credits and sessions are kept on this device between visits
@@ -1252,7 +1261,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     try { d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch (e) {}
     if (d) {
       if (typeof d.balance === 'number' && d.balance >= 0) balance = Math.round(d.balance * 100) / 100;
-      if (typeof d.betIdx === 'number') betIdx = d.betIdx;
+      if (typeof d.betIdx === 'number') betIdx = Math.max(0, Math.min(BETS.length - 1, d.betIdx));
       if (Array.isArray(d.history)) history = d.history.slice(0, 30);
       // the session from the last visit goes into history, and a fresh one starts now
       if (d.sess && d.sess.spins > 0) history.unshift(d.sess);
@@ -1681,7 +1690,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 
   /* ---------- Salt Lick hold and spin ---------- */
   var hsRunning = 0;
-  function saltText(v) { return typeof v === 'number' ? money(v * bet()) : v; }
+  function saltText(v) { return typeof v === 'number' ? saltAmt(v * bet()) : v; }
   function addSaltLabel(r, c, v) {
     var cell = cells[r][c], el = cell.querySelector('.tile') || cell, old = cell.querySelector('.sv');
     if (v !== null && v !== undefined) cell.dataset.sv = JSON.stringify(v);
