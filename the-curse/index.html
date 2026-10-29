@@ -389,7 +389,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">The Curse</h1>
-    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 1:48 PM ET</div>
+    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 29, 1:55 PM ET</div>
   </header>
 
   <div class="layout">
@@ -901,8 +901,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     var ctx = null, master = null, sfxGain = null, musGain = null;
     var soundOn = true, musicOn = false, musicTimer = null, drone = null, inFS = false;
     try {
-      if (localStorage.getItem('ar_sound') === 'off') soundOn = false;
-      if (localStorage.getItem('ar_music') === 'on') musicOn = true;
+      if (localStorage.getItem('curse_sound') === 'off') soundOn = false;
+      if (localStorage.getItem('curse_music') === 'on') musicOn = true;
     } catch (e) {}
     function ensure() {
       if (!soundOn && !musicOn) return null;
@@ -1023,123 +1023,203 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       list.forEach(function (f, i) { sweet(f, t + i * step, vol * 0.75, 0.9); });
       return t + list.length * step;
     }
+    // dark palette: D harmonic minor, low bells, bone knocks, wind, moans and thunder
+    var D = { D2: 73.42, A2: 110, D3: 146.83, F3: 174.61, A3: 220, Bb3: 233.08, Cs4: 277.18, D4: 293.66, E4: 329.63, F4: 349.23, G4: 392, Gs4: 415.3, A4: 440, Bb4: 466.16, Cs5: 554.37, D5: 587.33, E5: 659.25, F5: 698.46, A5: 880, D6: 1174.66 };
+    function lowNoise(t, dur, vol, f0, f1, type, dest) {
+      var n = Math.floor(ctx.sampleRate * dur), buf = ctx.createBuffer(1, n, ctx.sampleRate), d = buf.getChannelData(0);
+      for (var i = 0; i < n; i++) d[i] = Math.random() * 2 - 1;
+      var src = ctx.createBufferSource(); src.buffer = buf;
+      var fl = ctx.createBiquadFilter(); fl.type = type || 'lowpass';
+      fl.frequency.setValueAtTime(f0, t); fl.frequency.exponentialRampToValueAtTime(f1, t + dur);
+      var g = ctx.createGain();
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + Math.min(0.08, dur * 0.2));
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      src.connect(fl); fl.connect(g); g.connect(dest || sfxGain);
+      src.start(t); src.stop(t + dur + 0.05);
+    }
+    // bone knock: a hollow, dry clack
+    function bone(t, vol, f) {
+      tone(f, t, 0.06, 'triangle', vol, f * 0.7);
+      tone(f * 2.3, t, 0.03, 'sine', vol * 0.4);
+      noise(t, 0.02, vol * 0.6, f * 3, f * 2);
+    }
+    // a distant church bell toll
+    function toll(f, t, vol, dur, dest) { bell(f, t, vol, dur || 4, dest); tone(f * 0.5, t, (dur || 4) * 0.6, 'sine', vol * 0.5, null, dest); }
+    // ghostly moan: a wavering voice-like tone that sags as it fades
+    function moan(t, f, dur, vol, dest) {
+      var o = ctx.createOscillator(), g = ctx.createGain(), bp = ctx.createBiquadFilter(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+      o.type = 'sawtooth';
+      o.frequency.setValueAtTime(f, t);
+      o.frequency.linearRampToValueAtTime(f * 1.12, t + dur * 0.35);
+      o.frequency.exponentialRampToValueAtTime(f * 0.7, t + dur);
+      lfo.frequency.value = 5.2; lg.gain.value = f * 0.03; lfo.connect(lg); lg.connect(o.frequency);
+      bp.type = 'bandpass'; bp.Q.value = 6;
+      bp.frequency.setValueAtTime(500, t); bp.frequency.linearRampToValueAtTime(900, t + dur * 0.4); bp.frequency.linearRampToValueAtTime(420, t + dur);
+      g.gain.setValueAtTime(0.0001, t);
+      g.gain.exponentialRampToValueAtTime(vol, t + dur * 0.3);
+      g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(bp); bp.connect(g); g.connect(dest || sfxGain);
+      o.start(t); lfo.start(t); o.stop(t + dur + 0.05); lfo.stop(t + dur + 0.05);
+    }
+    function thunder(t, vol) {
+      lowNoise(t, 2.8, vol, 380, 60);
+      lowNoise(t + 0.05, 0.4, vol * 0.8, 1800, 300, 'bandpass');
+      lowNoise(t + 0.5, 1.6, vol * 0.5, 240, 50);
+    }
+    // church organ chord with a slow swell
+    function organ(freqs, t, dur, vol, dest) {
+      freqs.forEach(function (f) {
+        [1, 2, 3].forEach(function (h, k) {
+          var o = ctx.createOscillator(), g = ctx.createGain();
+          o.type = k === 0 ? 'triangle' : 'sine'; o.frequency.value = f * h;
+          var v = vol * [1, 0.45, 0.2][k];
+          g.gain.setValueAtTime(0.0001, t);
+          g.gain.linearRampToValueAtTime(v, t + Math.min(0.5, dur * 0.3));
+          g.gain.setValueAtTime(v, t + dur * 0.7);
+          g.gain.linearRampToValueAtTime(0.0001, t + dur);
+          o.connect(g); g.connect(dest || sfxGain);
+          o.start(t); o.stop(t + dur + 0.05);
+        });
+      });
+    }
+    // music box: thin, glassy notes that sound slightly out of place
+    function mbox(f, t, vol, dest) {
+      tone(f, t, 1.4, 'sine', vol, null, dest);
+      tone(f * 4.02, t, 0.25, 'sine', vol * 0.25, null, dest);
+      tone(f * 2.01, t, 0.6, 'sine', vol * 0.18, null, dest);
+    }
+    function heart(t, vol) {
+      tone(62, t, 0.16, 'sine', vol, 40); tone(62, t + 0.17, 0.2, 'sine', vol * 0.75, 38);
+    }
     var api = {
       get sound() { return soundOn; }, get music() { return musicOn; },
-      click: function () { if (!soundOn || !ensure()) return; wood(ctx.currentTime, 0.14, 950); },
+      click: function () { if (!soundOn || !ensure()) return; bone(ctx.currentTime, 0.12, 620); },
       spin: function () {
         if (!soundOn || !ensure()) return;
-        noise(ctx.currentTime, 0.45, 0.12, 300, 2400);
+        var t = ctx.currentTime;
+        // a cold gust of wind
+        lowNoise(t, 0.7, 0.1, 1400, 260, 'bandpass');
+        tone(D.D2, t, 0.5, 'sine', 0.05, 55);
       },
       stop: function (i) {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime;
-        tone(150 - i * 4, t, 0.16, 'sine', 0.26, 50);
-        noise(t, 0.04, 0.09, 3200, 1800);
-        noise(t + 0.03, 0.05, 0.04, 1200, 700);
+        // a heavy thud, like a coffin lid
+        tone(88 - i * 3, t, 0.22, 'sine', 0.3, 38);
+        lowNoise(t, 0.12, 0.12, 900, 200);
+        bone(t + 0.01, 0.05, 420 - i * 20);
       },
       coin: function () {
         if (!soundOn || !ensure()) return;
-        var t = ctx.currentTime, f = 2400 + Math.random() * 900;
-        tone(f, t, 0.2, 'sine', 0.045); tone(f * 2.71, t, 0.09, 'sine', 0.02); tone(f * 5.15, t, 0.04, 'sine', 0.01);
-        noise(t, 0.012, 0.03, 6000, 5000);
+        var t = ctx.currentTime, pick = [D.D5, D.F5, D.A5, D.Cs5, D.E5][Math.floor(Math.random() * 5)];
+        bell(pick, t, 0.07, 1.1);
+        bone(t, 0.04, 900);
       },
       ding: function (n) {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime;
         if (n >= 3) {
-          // the big one: louder, brighter, with a low hit and a chord under it
-          bell(NOTES.C6, t, 0.2, 2.4);
-          bell(NOTES.G5, t, 0.08, 2);
-          bell(NOTES.E5, t + 0.02, 0.06, 1.8);
-          tone(NOTES.C4, t, 0.5, 'sine', 0.12);
-          noise(t, 0.6, 0.04, 6000, 2500);
+          toll(D.D3, t, 0.2, 4);
+          bone(t, 0.16, 520); bone(t + 0.07, 0.14, 700); bone(t + 0.14, 0.14, 880);
+          moan(t + 0.1, D.A3, 1.8, 0.05);
           return;
         }
-        bell(n === 2 ? NOTES.G5 : NOTES.E5, t, n === 2 ? 0.11 : 0.09, 1.6);
+        bone(t, 0.14, n === 2 ? 700 : 520);
+        bone(t + 0.06, 0.1, n === 2 ? 880 : 660);
       },
       wild: function () {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime;
-        noise(t, 1.2, 0.06, 280, 950);
-        bell(110, t, 0.13, 2.4);
-        bell(164.8, t + 0.06, 0.05, 1.8);
+        toll(D.D3, t, 0.14, 3.5);
+        lowNoise(t, 1.2, 0.05, 2400, 500, 'bandpass');
       },
       grow: function () {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime;
-        marimba(NOTES.G4, t, 0.12); marimba(NOTES.D5, t + 0.08, 0.1);
+        // a shovel bites into dirt, then stone settles
+        lowNoise(t, 0.18, 0.14, 2600, 600, 'bandpass');
+        tone(70, t + 0.05, 0.3, 'sine', 0.2, 42);
+        lowNoise(t + 0.08, 0.35, 0.05, 500, 180);
       },
       win: function (x) {
         if (!soundOn || !ensure()) return;
-        var t = ctx.currentTime, end;
-        tone(NOTES.C4, t, 0.35, 'sine', 0.06);
-        if (x < 1) end = harp([NOTES.C5, NOTES.E5], 0.09, 0.16);
-        else if (x < 5) end = harp([NOTES.C5, NOTES.E5, NOTES.G5], 0.09, 0.17);
-        else end = harp([NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6, NOTES.E6], 0.08, 0.17);
-        if (x >= 1) [NOTES.C5, NOTES.E5, NOTES.G5].forEach(function (f) { bell(f, end, 0.025, 1.4); });
+        var t = ctx.currentTime;
+        var run = x < 5 ? [D.D5, D.F5, D.A5] : x < 15 ? [D.D5, D.F5, D.A5, D.Cs5 * 2, D.D6] : [D.A4, D.D5, D.F5, D.A5, D.Cs5 * 2, D.D6, D.A5, D.D6];
+        run.forEach(function (f, k) { mbox(f, t + k * 0.12, 0.07); });
+        tone(D.D3, t, 0.9, 'triangle', 0.06);
+        if (x >= 5) toll(D.D4, t + run.length * 0.12, 0.06, 2.4);
       },
-      bonus: function (retrigger) {
+      bonus: function (extra) {
         if (!soundOn || !ensure()) return;
         var t = ctx.currentTime;
-        var run = retrigger ? [NOTES.G4, NOTES.C5, NOTES.E5, NOTES.G5] : [NOTES.C4, NOTES.D4, NOTES.E4, NOTES.G4, NOTES.A4, NOTES.C5, NOTES.D5, NOTES.E5, NOTES.G5, NOTES.A5, NOTES.C6];
-        var end = harp(run, 0.065, 0.15);
-        tone(NOTES.C4, t, 0.6, 'sine', 0.07);
-        [NOTES.C5, NOTES.G5, NOTES.C6].forEach(function (f) { bell(f, end, 0.05, 2); });
+        if (extra) { toll(D.A3, t, 0.14, 3); bone(t, 0.14, 700); bone(t + 0.08, 0.14, 900); return; }
+        thunder(t, 0.28);
+        organ([D.D3, D.F3, D.A3, D.D4], t + 0.15, 2.6, 0.035);
+        organ([D.Cs4, D.E4, D.G4, D.Bb4], t + 2.2, 1.6, 0.03);
+        toll(D.D3, t + 0.15, 0.18, 4.5);
+        moan(t + 0.6, D.D4, 2.2, 0.06);
+        moan(t + 0.9, D.A3, 2.4, 0.05);
       },
       jackpot: function (tier) {
         if (!soundOn || !ensure()) return;
-        var t = ctx.currentTime, scale = [NOTES.C4, NOTES.D4, NOTES.E4, NOTES.G4, NOTES.A4, NOTES.C5, NOTES.D5, NOTES.E5, NOTES.G5, NOTES.A5, NOTES.C6, NOTES.E6];
-        var run = scale.slice(0, Math.min(scale.length, 5 + tier * 2));
-        var end = harp(run, 0.06, 0.16);
-        tone(NOTES.C4, t, 0.8, 'sine', 0.08);
-        [NOTES.C5, NOTES.E5, NOTES.G5, NOTES.C6].forEach(function (f, i) { bell(f, end + i * 0.05, 0.06, 2.6); });
-        noise(end, 1.4, 0.05, 5000, 1500);
+        var t = ctx.currentTime, scale = [D.D4, D.F4, D.A4, D.D5, D.F5, D.A5, D.D6];
+        var run = scale.slice(0, Math.min(scale.length, 3 + tier));
+        run.forEach(function (f, k) { mbox(f, t + k * 0.1, 0.08); });
+        var end = t + run.length * 0.1;
+        organ([D.D3, D.F3, D.A3, D.D4], end, 2.2, 0.03);
+        for (var k = 0; k < Math.min(4, tier); k++) toll(D.D3, end + k * 0.9, 0.16, 3.2);
+        if (tier >= 4) thunder(end, 0.25);
       },
       end: function (x) {
         if (!soundOn || !ensure()) return;
-        var end = harp(x >= 20 ? [NOTES.G5, NOTES.E5, NOTES.C5, NOTES.G4, NOTES.C5] : [NOTES.G5, NOTES.E5, NOTES.C5], 0.13, 0.15);
-        bell(NOTES.C5, end, 0.05, 2);
+        var t = ctx.currentTime;
+        [D.A5, D.F5, D.D5, D.A4].forEach(function (f, k) { mbox(f, t + k * 0.18, 0.06); });
+        toll(D.D3, t + 0.72, 0.1, 3);
       },
-      tick: function () { if (!soundOn || !ensure()) return; wood(ctx.currentTime, 0.05, 1700 + Math.random() * 200); },
+      tick: function () { if (!soundOn || !ensure()) return; bone(ctx.currentTime, 0.04, 1300 + Math.random() * 200); },
       tease: function () {
         if (!soundOn || !ensure()) return;
-        var t = ctx.currentTime, at = 0, gap = 0.16;
-        // soft tom roll that speeds up and swells
-        for (var i = 0; i < 12; i++) {
-          var v = 0.06 + i * 0.012;
-          tone(92, t + at, 0.22, 'sine', v, 52);
-          tone(140, t + at, 0.08, 'triangle', v * 0.25, 90);
-          noise(t + at, 0.05, v * 0.25, 700, 400);
-          at += gap; gap = Math.max(0.055, gap * 0.86);
-        }
-        // a rush of air rising underneath
-        noise(t, at + 0.25, 0.05, 350, 1800);
+        var t = ctx.currentTime, at = 0, gap = 0.62;
+        // a heartbeat that speeds up, with wind rising underneath
+        for (var i = 0; i < 7; i++) { heart(t + at, 0.16 + i * 0.03); at += gap; gap = Math.max(0.3, gap * 0.85); }
+        lowNoise(t, at + 0.3, 0.06, 300, 1600, 'bandpass');
+      },
+      reap: function () {
+        if (!soundOn || !ensure()) return;
+        var t = ctx.currentTime;
+        // the scythe swings: a rising swish and a cold, ringing blade
+        lowNoise(t, 0.55, 0.16, 600, 6000, 'bandpass');
+        tone(D.Cs5 * 2, t + 0.35, 1.2, 'sine', 0.03, D.D6);
+        moan(t, D.D3, 1.6, 0.05);
       },
       setFS: function (on) { inFS = on; },
       setSound: function (on) {
         soundOn = on;
-        try { localStorage.setItem('ar_sound', on ? 'on' : 'off'); } catch (e) {}
+        try { localStorage.setItem('curse_sound', on ? 'on' : 'off'); } catch (e) {}
         if (on) { ensure(); api.click(); }
       },
       setMusic: function (on) {
         musicOn = on;
-        try { localStorage.setItem('ar_music', on ? 'on' : 'off'); } catch (e) {}
+        try { localStorage.setItem('curse_music', on ? 'on' : 'off'); } catch (e) {}
         if (on) startMusic(); else stopMusic();
       },
       resume: function () { if (musicOn) startMusic(); }
     };
-    // Am  F  C  G, pads + bass + bell arpeggio. Faster and brighter in free spins.
-    var PROG = [[220, 261.63, 329.63], [174.61, 220, 261.63], [196, 261.63, 329.63], [196, 246.94, 293.66]];
-    var BASS = [110, 87.31, 65.41, 98];
+    // Dm  Bb  Gm  A : a low drone, dark pads, a lonely music box and a far off bell.
+    // In the Graveyard bonus a heartbeat joins and everything tightens up.
+    var PROG = [[D.D3, D.F3, D.A3], [D.Bb3 / 2 * 2, D.D4, D.F4], [D.G4 / 2, D.Bb3, D.D4], [D.A3, D.Cs4, D.E4]];
+    var BASS = [D.D2, 58.27, 49, 55];
+    var MEL = [[D.A5, 0, D.F5, 0, D.E5, 0, D.D5, 0], [0, D.F5, 0, D.D5, 0, 0, D.A4 * 2, 0], [D.G4 * 2, 0, D.Bb4 * 2, 0, D.A5, 0, 0, 0], [D.Gs4 * 2, 0, D.A5, 0, D.Cs5, 0, D.E5, 0]];
     var bar = 0, nextBarT = 0;
     function pad(freqs, t, dur) {
       freqs.forEach(function (f) {
-        [-7, 7].forEach(function (det) {
+        [-9, 9].forEach(function (det) {
           var o = ctx.createOscillator(), g = ctx.createGain(), fl = ctx.createBiquadFilter();
           o.type = 'sawtooth'; o.frequency.value = f; o.detune.value = det;
-          fl.type = 'lowpass'; fl.frequency.value = inFS ? 1500 : 850;
+          fl.type = 'lowpass'; fl.frequency.value = inFS ? 900 : 520;
           g.gain.setValueAtTime(0.0001, t);
-          g.gain.linearRampToValueAtTime(0.014, t + dur * 0.3);
+          g.gain.linearRampToValueAtTime(0.013, t + dur * 0.4);
           g.gain.linearRampToValueAtTime(0.0001, t + dur * 1.05);
           o.connect(fl); fl.connect(g); g.connect(musGain);
           o.start(t); o.stop(t + dur * 1.1);
@@ -1148,17 +1228,21 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     }
     function scheduleBar() {
       if (!musicOn || !ctx) { musicTimer = null; return; }
-      var len = inFS ? 1.6 : 2.6;
+      var len = inFS ? 2.4 : 3.6;
       var t = Math.max(nextBarT, ctx.currentTime + 0.05);
-      var chd = PROG[bar % 4], stepT = len / 8, pat = [0, 1, 2, 1, 2, 0, 2, 1];
-      pad(chd, t, len);
-      tone(BASS[bar % 4], t, len * 0.9, 'triangle', 0.08, null, musGain);
-      for (var i = 0; i < 8; i++) {
-        if (!inFS && i % 2) continue;
-        var f = chd[pat[i]] * (inFS ? 4 : 2);
-        tone(f, t + i * stepT, stepT * 2.5, 'sine', 0.032, null, musGain);
-        tone(f * 2, t + i * stepT, stepT, 'triangle', 0.007, null, musGain);
-      }
+      var k = bar % 4, stepT = len / 8;
+      pad(PROG[k], t, len);
+      // drone with a slow tremolo
+      var o = ctx.createOscillator(), g = ctx.createGain(), lfo = ctx.createOscillator(), lg = ctx.createGain();
+      o.type = 'triangle'; o.frequency.value = BASS[k];
+      lfo.frequency.value = inFS ? 3 : 0.7; lg.gain.value = 0.025; lfo.connect(lg); lg.connect(g.gain);
+      g.gain.setValueAtTime(0.0001, t); g.gain.linearRampToValueAtTime(0.06, t + 0.4); g.gain.setValueAtTime(0.06, t + len * 0.8); g.gain.linearRampToValueAtTime(0.0001, t + len);
+      o.connect(g); g.connect(musGain); o.start(t); lfo.start(t); o.stop(t + len + 0.05); lfo.stop(t + len + 0.05);
+      MEL[k].forEach(function (f, i) { if (f) mbox(f, t + i * stepT, 0.03, musGain); });
+      if (k === 0) toll(D.D3, t, 0.05, 4, musGain);
+      if (bar % 8 === 6) moan(t + len * 0.3, D.A3, len * 0.8, 0.018, musGain);
+      if (Math.random() < 0.35) lowNoise(t, len, 0.02, 300, 900, 'bandpass', musGain);
+      if (inFS) for (var b = 0; b < 4; b++) { tone(62, t + b * len / 4, 0.16, 'sine', 0.12, 40, musGain); tone(62, t + b * len / 4 + 0.17, 0.2, 'sine', 0.09, 38, musGain); }
       bar++;
       nextBarT = t + len;
       musicTimer = setTimeout(scheduleBar, Math.max(50, (nextBarT - ctx.currentTime - 0.3) * 1000));
@@ -1682,6 +1766,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     $('bwV').textContent = cfg.gy.spins + ' BONUS SPINS';
     await celebrate('GRAVEYARD BONUS', 'Every bone builds the graveyard: grave, tombstone, mausoleum. ' + cfg.gy.plusAt + ' bones in one spin add a spin', null, 0, null, fastMode ? 1100 : 2800, 20, 'BN', '#9dff7a');
     gyLv = res.gyLv;
+    SFX.setFS(true);
     paintGraves(gyLv);
     SFX.grow();
     updateHud();
@@ -1806,7 +1891,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         { opacity: 1, offset: 0.88 },
         { transform: 'translateX(' + W + 'px)', opacity: 0 }
       ], { duration: dur, easing: 'linear' });
-      SFX.tease();
+      SFX.reap();
       var t0 = Date.now();
       for (var i = 0; i < list.length; i++) {
         var p = list[i];
@@ -1834,6 +1919,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     balance = balBefore + credit;
     lastWin = credit;
     gyLv = null;
+    SFX.setFS(false);
     updateHud();
   }
 
@@ -1851,7 +1937,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     clearFx();
     updateHud();
     SFX.spin();
-    SFX.setFS(st.mode === 'fs');
+    SFX.setFS(!!gyLv);
     frameState('win', false);
     frameState('rolling', true);
 
