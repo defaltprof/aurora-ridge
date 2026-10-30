@@ -166,6 +166,11 @@ h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); lette
 .stepper { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
 .stepper button { width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--edge); background: var(--panel-2); font-size: 18px; line-height: 1; }
 .stepper button:disabled { opacity: 0.4; cursor: default; }
+.cash { display: block; margin-top: 2px; font: 500 11px/1.2 var(--font-mono); color: var(--mute); }
+.betx { display: flex; gap: 6px; margin-top: 6px; }
+.betx button { flex: 1; min-width: 0; height: 26px; padding: 0 4px; border-radius: 8px; border: 1px solid var(--edge); background: var(--panel-2); color: var(--text); font: 800 13px/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; white-space: nowrap; }
+.betx #denom { color: var(--amber); border-color: color-mix(in srgb, var(--amber) 45%, var(--edge)); }
+.betx button:disabled { opacity: 0.4; cursor: default; }
 .controls { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 8px; }
 .controls .spin { grid-column: 1 / -1; }
 .controls .toggle { min-height: 40px; min-width: 0; padding: 0 6px; }
@@ -410,7 +415,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">The Curse</h1>
-    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 30, 1:29 PM ET</div>
+    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 30, 1:50 PM ET</div>
   </header>
 
   <div class="layout">
@@ -455,12 +460,13 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         <div class="bw-in"><div class="bw-pics" id="bwPics" hidden></div><div class="bw-t" id="bwT">BIG WIN</div><div class="bw-v" id="bwV">0.00</div><div class="bw-s" id="bwS"></div><div class="bw-tap">Tap to continue</div></div>
       </div>
       <div class="hud">
-        <div class="stat"><span class="k">Balance</span><span class="v" id="bal">0.00</span></div>
+        <div class="stat"><span class="k">Credits</span><span class="v" id="bal">0</span><span class="cash" id="balCash">$0.00</span></div>
         <div class="stat">
-          <span class="k">Total bet</span>
+          <span class="k">Bet</span>
           <div class="stepper"><button id="betDn" aria-label="Lower bet">-</button><span class="v" id="betV">0.00</span><button id="betUp" aria-label="Raise bet">+</button></div>
+          <div class="betx"><button id="denom" aria-label="Change denomination">1¢</button><button id="betMax">Bet max</button></div>
         </div>
-        <div class="stat"><span class="k">Last win</span><span class="v win" id="winV">0.00</span></div>
+        <div class="stat"><span class="k">Win</span><span class="v win" id="winV">0.00</span></div>
       </div>
       <div class="controls">
         <button class="spin" id="spin">Spin</button>
@@ -471,7 +477,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       </div>
       <div class="msg" id="msg" aria-live="polite">Press Spin or hit the space bar. Wins pay on any of the 5 lines, left to right. Six bones start the Graveyard bonus.</div>
       <div class="foot">
-        <span id="lineBet">Line bet 0.00</span>
+        <span id="lineBet">Denom 1¢</span>
         <button id="reset">Reset credits</button>
       </div>
       <div class="sess" aria-label="Session tracker">
@@ -1000,8 +1006,17 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     var lc = l === 1 ? 'l1' : (l === 2 ? 'l2' : (l === 4 ? 'l4' : ''));
     return '<div class="' + cls + '"><span class="lab ' + lc + '">' + d.t + '</span>' + (d.s ? '<span class="sub">' + d.s + '</span>' : '') + '</div>';
   }
-  function money(x) { return x.toFixed(2); }
-  function saltAmt(x) { return String(Math.round(x)); }
+  // amounts are kept in dollars inside the game and shown in credits, like a real cabinet
+  var DENOMS = [0.01, 0.02, 0.05, 0.1, 0.25, 1], denIdx = 0;
+  var BETS = [25,  50,  75,  100,  150,  250], betIdx = 3;
+  function denom() { return DENOMS[denIdx]; }
+  function denLabel(d) { return d < 1 ? Math.round(d * 100) + '¢' : '$' + d; }
+  function money(x) {
+    var c = Math.round(x / denom() * 100) / 100;
+    return Math.abs(c - Math.round(c)) < 1e-9 ? Math.round(c).toLocaleString('en-US') : c.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function cash(x) { return (x < -0.004 ? '-' : '') + '$' + Math.abs(x).toFixed(2); }
+  function saltAmt(x) { return money(x); }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
 
@@ -1440,9 +1455,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   })();
 
   /* ---------- state ---------- */
-  var BETS = [1, 2, 3, 5, 10, 20, 50];
   var interrupt = null, interruptLabel = '';
-  var betIdx = 1, balance = 500, busy = false, auto = false, fast = false, lastWin = 0;
+  var balance = 500, busy = false, auto = false, fast = false, lastWin = 0;
   // credits and sessions are kept on this device between visits
   var SAVE_KEY = 'the-curse-save-v1';
   var sess = null, history = [];
@@ -1452,7 +1466,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     try { d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch (e) {}
     if (d) {
       if (typeof d.balance === 'number' && d.balance >= 0) balance = Math.round(d.balance * 100) / 100;
-      if (typeof d.betIdx === 'number') betIdx = Math.max(0, Math.min(BETS.length - 1, d.betIdx));
+      if (typeof d.denIdx === 'number') { denIdx = Math.max(0, Math.min(DENOMS.length - 1, d.denIdx)); if (typeof d.betIdx === 'number') betIdx = Math.max(0, Math.min(BETS.length - 1, d.betIdx)); }
       if (Array.isArray(d.history)) history = d.history.slice(0, 30);
       // the session from the last visit goes into history, and a fresh one starts now
       if (d.sess && d.sess.spins > 0) history.unshift(d.sess);
@@ -1461,33 +1475,38 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     sess = newSession();
   })();
   function saveAll() {
-    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ balance: balance, betIdx: betIdx, sess: sess, history: history })); } catch (e) {}
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ balance: balance, betIdx: betIdx, denIdx: denIdx, sess: sess, history: history })); } catch (e) {}
   }
   function renderSession() {
     var profit = sess.paid - sess.bet;
     $('ssSpins').textContent = sess.spins;
     $('ssWL').textContent = sess.won + ' / ' + sess.lost;
-    $('ssProfit').textContent = (profit > 0 ? '+' : '') + money(profit);
+    $('ssProfit').textContent = (profit > 0 ? '+' : '') + cash(profit);
     $('ssProfit').className = 'v' + (profit > 0.004 ? ' up' : profit < -0.004 ? ' down' : '');
-    $('ssBet').textContent = money(sess.bet);
-    $('ssWon').textContent = money(sess.paid);
-    $('ssBest').textContent = money(sess.best);
+    $('ssBet').textContent = cash(sess.bet);
+    $('ssWon').textContent = cash(sess.paid);
+    $('ssBest').textContent = cash(sess.best);
     if (!history.length) { $('ssHist').innerHTML = '<p style="margin:6px 0 0">No past sessions yet.</p>'; return; }
     var h = '<table><tr><th>Date</th><th>Spins</th><th>W / L</th><th>Profit</th></tr>';
     history.slice(0, 10).forEach(function (x) {
       var pr = x.paid - x.bet, dt = new Date(x.start);
-      h += '<tr><td>' + (dt.getMonth() + 1) + '/' + dt.getDate() + ' ' + dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</td><td>' + x.spins + '</td><td>' + x.won + ' / ' + x.lost + '</td><td class="' + (pr > 0.004 ? 'up' : pr < -0.004 ? 'down' : '') + '">' + (pr > 0 ? '+' : '') + money(pr) + '</td></tr>';
+      h += '<tr><td>' + (dt.getMonth() + 1) + '/' + dt.getDate() + ' ' + dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</td><td>' + x.spins + '</td><td>' + x.won + ' / ' + x.lost + '</td><td class="' + (pr > 0.004 ? 'up' : pr < -0.004 ? 'down' : '') + '">' + (pr > 0 ? '+' : '') + cash(pr) + '</td></tr>';
     });
     $('ssHist').innerHTML = h + '</table>';
   }
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-  function bet() { return BETS[betIdx]; }
+  function bet() { return BETS[betIdx] * denom(); }
 
   function updateHud() {
     $('bal').textContent = money(balance);
     $('betV').textContent = money(bet());
     $('winV').textContent = money(lastWin);
-    $('lineBet').textContent = 'Line bet ' + (bet() / NL).toFixed(3);
+    var perLine = BETS[betIdx] / NL;
+    $('lineBet').textContent = 'Denom ' + denLabel(denom()) + ' · ' + perLine + (perLine === 1 ? ' credit' : ' credits') + ' per line';
+    $('balCash').textContent = cash(balance);
+    $('denom').textContent = denLabel(denom());
+    $('denom').disabled = busy;
+    $('betMax').disabled = busy;
     $('betDn').disabled = busy || betIdx === 0;
     $('betUp').disabled = busy || betIdx === BETS.length - 1;
     $('spin').disabled = busy && !interrupt;
@@ -1890,7 +1909,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   var LV_NAME = ['empty plot', 'grave', 'tombstone', 'mausoleum'];
   var gyLv = null;
   function gyCounts(lv) { var n = [0, 0, 0, 0]; for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) n[lv[r][c]]++; return n; }
-  function prizeText(v) { return typeof v === 'number' ? String(Math.round(v * bet())) : v; }
+  function prizeText(v) { return typeof v === 'number' ? money(v * bet()) : v; }
   function paintGraves(lv) {
     for (var r = 0; r < ROWS; r++) for (var c = 0; c < REELS; c++) {
       cells[r][c].classList.remove('win', 'dim', 'landed', 'pop', 'lock', 'build', 'reap');
@@ -2341,9 +2360,23 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   $('betUp').addEventListener('click', function () { SFX.click(); });
   $('betDn').addEventListener('click', function () { if (!busy && betIdx > 0) { betIdx--; updateHud(); } });
   $('betUp').addEventListener('click', function () { if (!busy && betIdx < BETS.length - 1) { betIdx++; updateHud(); } });
+  $('denom').addEventListener('click', function () {
+    if (busy) return;
+    SFX.click();
+    denIdx = (denIdx + 1) % DENOMS.length;
+    updateHud(); if (typeof refreshLabels === 'function') refreshLabels(); saveAll();
+    say('Each credit is now worth ' + denLabel(denom()) + '. Bet ' + money(bet()) + ' credits (' + cash(bet()) + ').');
+  });
+  // like the button on a real cabinet: jump to the top bet and spin
+  $('betMax').addEventListener('click', function () {
+    if (busy) return;
+    betIdx = BETS.length - 1;
+    updateHud(); if (typeof refreshLabels === 'function') refreshLabels(); saveAll();
+    pressSpin();
+  });
   $('reset').addEventListener('click', function () {
     if (busy) return;
-    balance = 500; lastWin = 0; updateHud(); saveAll(); say('Credits reset to 500.00.');
+    balance = 500; lastWin = 0; updateHud(); saveAll(); say('Credits reset to ' + money(500) + ' (' + cash(500) + ').');
   });
   renderMeters();
   renderSession();
