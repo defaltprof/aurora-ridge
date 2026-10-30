@@ -356,7 +356,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Buck Wild</h1>
-    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 29, 1:19 PM ET</div>
+    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 30, 1:29 PM ET</div>
   </header>
 
   <div class="layout">
@@ -1372,16 +1372,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         still[c] = hk;
       }
       res._grown = {};
-      function land(c, quiet) {
-        if (done[c]) return;
-        done[c] = true;
-        if (anims[c]) { try { anims[c].onfinish = null; anims[c].cancel(); } catch (e) {} }
-        if (spinners[c] && spinners[c].parentNode) spinners[c].parentNode.removeChild(spinners[c]);
-        (growEls[c] || []).forEach(function (g) { if (g.parentNode) g.parentNode.removeChild(g); });
-        reelEls[c].classList.remove('tease');
-        if (!quiet) SFX.stop(c);
-        // bells climb only for matching symbols: ding, ding (higher), DING on the third
-        if (!quiet) {
+      var heard = [];
+      // the stop thud and matching-symbol bells play the instant a reel hits, not after its bounce settles
+      function impact(c) {
+        if (heard[c]) return;
+        heard[c] = true;
+        SFX.stop(c);
           var here = {};
           for (var r0 = 0; r0 < ROWS; r0++) { var g0 = res.grid[r0][c]; if (g0 === 'SH') here[g0] = (here[g0] || 0) + 1; }
           // a crown only counts toward a run if the reel before it had the same crown
@@ -1393,7 +1389,15 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
             level = Math.max(level, matchCount[k]);
           });
           if (level) SFX.ding(Math.min(level, 3));
-        }
+              }
+      function land(c, quiet) {
+        if (done[c]) return;
+        done[c] = true;
+        if (anims[c]) { try { anims[c].onfinish = null; anims[c].cancel(); } catch (e) {} }
+        if (spinners[c] && spinners[c].parentNode) spinners[c].parentNode.removeChild(spinners[c]);
+        (growEls[c] || []).forEach(function (g) { if (g.parentNode) g.parentNode.removeChild(g); });
+        reelEls[c].classList.remove('tease');
+        if (!quiet) impact(c);
         for (var r = 0; r < ROWS; r++) {
           paint(r, c, res.grid[r][c], res.saltVals ? res.saltVals[r][c] : undefined);
           cells[r][c].classList.remove('held', 'hide');
@@ -1481,6 +1485,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         }
         (function (cc, st2) {
           anim.onfinish = function () { land(cc); };
+          timers.push(setTimeout(function () { if (!done[cc]) impact(cc); }, Math.max(0, D - settle)));
           timers.push(setTimeout(function () { st2.classList.add('blur'); }, wind + 60));
           timers.push(setTimeout(function () { st2.classList.remove('blur'); }, Math.max(wind + 90, D - settle - 260)));
         })(c, strip);
@@ -1754,9 +1759,11 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         cell.appendChild(box);
         cell.classList.add('hsgo');
         var S = N * h, settle = fastMode ? 150 : 300;
+        var heardS = false, hitSound = function () { if (heardS) return; heardS = true; if (hit) SFX.ding(Math.min(3, ++lands)); else SFX.stop(cc); };
+        setTimeout(hitSound, Math.max(0, stopAt - settle));
         var finish = function () {
-          if (hit) { paint(rr, cc, 'SA', res.hsVals[rr][cc]); addSaltLabel(rr, cc, res.hsVals[rr][cc]); cell.classList.add('lock', 'pop'); SFX.ding(Math.min(3, ++lands)); }
-          else SFX.stop(cc);
+          hitSound();
+          if (hit) { paint(rr, cc, 'SA', res.hsVals[rr][cc]); addSaltLabel(rr, cc, res.hsVals[rr][cc]); cell.classList.add('lock', 'pop'); }
           if (box.parentNode) box.parentNode.removeChild(box);
           cell.classList.remove('hsgo');
           if (++n === spots.length) done();
