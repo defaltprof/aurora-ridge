@@ -134,6 +134,9 @@ h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); lette
 .jps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
 .jp { border-radius: 8px; padding: 5px 4px; text-align: center; background: var(--ink); border: 1px solid color-mix(in srgb, var(--c) 70%, transparent); min-width: 0; }
 .jp .n { display: block; font: 700 10px/1.2 var(--font-mono); letter-spacing: 0.08em; color: var(--c); }
+.jp.progj .v::after { content: 'PROGRESSIVE'; display: block; margin-top: 1px; font: 700 7px/1.1 var(--font-mono); letter-spacing: 0.12em; color: var(--c); opacity: 0.85; }
+.jp.progj.hot { box-shadow: 0 0 10px color-mix(in srgb, var(--c) 70%, transparent); animation: jpHot 1.2s ease-in-out infinite alternate; }
+@keyframes jpHot { from { box-shadow: 0 0 4px color-mix(in srgb, var(--c) 40%, transparent); } to { box-shadow: 0 0 16px var(--c); } }
 .jp .v { display: block; font: 800 15px/1.2 var(--font-display); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 .jp.hit { background: color-mix(in srgb, var(--c) 45%, var(--ink)); animation: pulse 0.5s ease-in-out infinite alternate; }
 .t-W, .t-G, .t-W2, .t-W3 { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 40%, white), 0 0 16px color-mix(in srgb, var(--c) 55%, transparent); }
@@ -361,7 +364,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Buck Wild</h1>
-    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 30, 1:50 PM ET</div>
+    <div class="meta">5 x 3 reels / 15 lines / play credits only / build Oct 31, 10:00 AM ET</div>
   </header>
 
   <div class="layout">
@@ -548,7 +551,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     hs: {
       trigger: 6,
       respins: 6,
-      pLand: 0.03,
+      pLand: 0.028,
       // cash values in multiples of the total bet, with weights
       values: [[1, 62], [2, 18], [3, 10], [5, 5], [10, 2.5], ['MINI', 2], ['MINOR', 0.6], ['MAJOR', 0.15]],
       jackpots: { MINI: 10, MINOR: 25, MAJOR: 100, GRAND: 1000 }
@@ -1306,7 +1309,43 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function bet() { return BETS[betIdx] * denom(); }
 
+  /* ---------- progressive jackpots ---------- */
+  // the top two jackpots climb with every paid spin and reset to their starting value when hit.
+  // growth is kept in multiples of the bet, and rounded down to whole credits at the current bet.
+  var PROG = { key: 'buck-wild-prog-v1', tiers: [{ k: 'MAJOR', el: 'jp3', rate: 0.004 }, { k: 'GRAND', el: 'jp4', rate: 0.006 }] };
+  PROG.tiers.forEach(function (t) { t.base = cfg.hs.jackpots[t.k]; });
+  var progX = {};
+  try { var psv = JSON.parse(localStorage.getItem(PROG.key) || 'null'); if (psv) PROG.tiers.forEach(function (t) { if (typeof psv[t.k] === 'number' && psv[t.k] >= 0) progX[t.k] = psv[t.k]; }); } catch (e) {}
+  function setJP(t, v) { cfg.hs.jackpots[t.k] = v; }
+  function progSave() { try { localStorage.setItem(PROG.key, JSON.stringify(progX)); } catch (e) {} }
+  function progVal(t) { var cr = BETS[betIdx]; return t.base + Math.floor((progX[t.k] || 0) * cr) / cr; }
+  function progApply() { PROG.tiers.forEach(function (t) { setJP(t, progVal(t)); }); }
+  function progAdd() { PROG.tiers.forEach(function (t) { progX[t.k] = (progX[t.k] || 0) + t.rate; }); progSave(); progApply(); }
+  function progHit(k) { PROG.tiers.forEach(function (t) { if (t.k === k) { progX[k] = 0; jpShown[k] = undefined; } }); progSave(); progApply(); }
+  function progCheck(res) { if (!res) return; if (res.hsEnded) { var hasMajor = false; (res.hsVals || []).forEach(function (row) { row.forEach(function (v) { if (v === 'MAJOR') hasMajor = true; }); }); if (hasMajor) progHit('MAJOR'); if (res.hsGrand) progHit('GRAND'); } }
+  var jpShown = {}, jpAnim = {};
+  function progShow() {
+    PROG.tiers.forEach(function (t) {
+      var el = $(t.el); if (!el) return;
+      var v = el.querySelector('.v');
+      el.classList.add('progj');
+      el.classList.toggle('hot', (progX[t.k] || 0) > t.base * 0.15);
+      var target = progVal(t) * bet(), from = jpShown[t.k];
+      if (from === target) return;
+      jpShown[t.k] = target;
+      if (jpAnim[t.k]) cancelAnimationFrame(jpAnim[t.k]);
+      if (from === undefined || reduceMotion || target < from) { v.textContent = money(target); return; }
+      var t0 = performance.now(), d = denom();
+      (function step(now) {
+        var q = Math.min(1, (now - t0) / 900);
+        v.textContent = money(Math.floor((from + (target - from) * q) / d + 1e-9) * d);
+        if (q < 1) jpAnim[t.k] = requestAnimationFrame(step);
+      })(t0);
+    });
+  }
+
   function updateHud() {
+    progApply();
     $('bal').textContent = money(balance);
     $('betV').textContent = money(bet());
     $('winV').textContent = money(lastWin);
@@ -1326,7 +1365,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       for (var ji = 0; ji < 4; ji++) jh += '<div class="jp" id="jp' + (ji + 1) + '" style="--c:' + ['#2aa876', '#3b82f6', '#f2791f', '#e0304f'][ji] + '"><span class="n">' + JN[ji] + '</span><span class="v"></span></div>';
       $('jps').innerHTML = jh;
     }
-    ['MINI', 'MINOR', 'MAJOR', 'GRAND'].forEach(function (k, jj) { $('jp' + (jj + 1)).lastChild.textContent = money(cfg.hs.jackpots[k] * bet()); });
+    ['MINI', 'MINOR'].forEach(function (k, jj) { $('jp' + (jj + 1)).lastChild.textContent = money(cfg.hs.jackpots[k] * bet()); });
+    progShow();
     var fs = st.mode === 'fs';
     $('frame').classList.toggle('fs', fs);
     $('frame').style.setProperty('--fsm', '"' + (cfg.fsMult || 3) + 'x"');
@@ -1836,7 +1876,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   async function spinOnce() {
     if (st.mode === 'hs') return await hsStep(fast || reduceMotion);
     var b = bet();
-    if (st.mode === 'base') balance -= b;
+    if (st.mode === 'base') { balance -= b; progAdd(); }
     // reels that already hold a locked wild keep those rows still while spinning
     var held = {};
     st.exp.forEach(function (e) { held[e.reel] = held[e.reel] || []; for (var q = e.lo; q <= e.hi; q++) held[e.reel].push(q); });
@@ -1964,8 +2004,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     busy = true; updateHud();
     var roundBet = st.mode === 'base' ? bet() : 0, roundStart = balance;
     try {
-      await spinOnce();
-      while (st.mode !== 'base') { await sleep(fast ? 120 : 380); await spinOnce(); }
+      progCheck(await spinOnce());
+      while (st.mode !== 'base') { await sleep(fast ? 120 : 380); progCheck(await spinOnce()); }
     } finally {
       busy = false; updateHud();
       if (roundBet) {

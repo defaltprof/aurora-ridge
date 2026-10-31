@@ -133,6 +133,9 @@ h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); lette
 .jps { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-bottom: 10px; }
 .jp { border-radius: 8px; padding: 5px 4px; text-align: center; background: var(--ink); border: 1px solid color-mix(in srgb, var(--c) 70%, transparent); min-width: 0; }
 .jp .n { display: block; font: 700 10px/1.2 var(--font-mono); letter-spacing: 0.08em; color: var(--c); }
+.jp.progj .v::after { content: 'PROGRESSIVE'; display: block; margin-top: 1px; font: 700 7px/1.1 var(--font-mono); letter-spacing: 0.12em; color: var(--c); opacity: 0.85; }
+.jp.progj.hot { box-shadow: 0 0 10px color-mix(in srgb, var(--c) 70%, transparent); animation: jpHot 1.2s ease-in-out infinite alternate; }
+@keyframes jpHot { from { box-shadow: 0 0 4px color-mix(in srgb, var(--c) 40%, transparent); } to { box-shadow: 0 0 16px var(--c); } }
 .jp .v { display: block; font: 800 15px/1.2 var(--font-display); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 .jp.hit { background: color-mix(in srgb, var(--c) 45%, var(--ink)); animation: pulse 0.5s ease-in-out infinite alternate; }
 .t-W, .t-G, .t-W2, .t-W3 { box-shadow: inset 0 0 0 2px color-mix(in srgb, var(--c) 40%, white), 0 0 16px color-mix(in srgb, var(--c) 55%, transparent); }
@@ -342,7 +345,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">Aurora Ridge</h1>
-    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 30, 1:50 PM ET</div>
+    <div class="meta">5 x 4 reels / 40 lines / play credits only / build Oct 31, 10:00 AM ET</div>
   </header>
 
   <div class="layout">
@@ -516,13 +519,13 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       W: [24, 72, 500],
       ELK: [12, 36, 200],
       OWL: [10, 24, 150],
-      HARE: [7.2, 20, 100],
-      LAN: [4.8, 12, 50],
-      PINE: [2.5, 10, 36],
-      NECK: [2.5, 10, 36],
-      A: [2.5, 7.2, 24],
-      K: [2.5, 7.2, 24],
-      Q: [2.5, 7.2, 24]
+      HARE: [7, 20, 100],
+      LAN: [5, 12, 50],
+      PINE: [3, 10, 36],
+      NECK: [2, 10, 36],
+      A: [2, 7, 24],
+      K: [2, 7, 24],
+      Q: [3, 7, 24]
     },
     // scatter pays are multiples of the TOTAL bet
     scatter: { 3: 5, 4: 10, 5: 25 },
@@ -1503,7 +1506,43 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   function bet() { return BETS[betIdx] * denom(); }
 
+  /* ---------- progressive jackpots ---------- */
+  // the top two jackpots climb with every paid spin and reset to their starting value when hit.
+  // growth is kept in multiples of the bet, and rounded down to whole credits at the current bet.
+  var PROG = { key: 'aurora-ridge-prog-v1', tiers: [{ k: 'MAXI', i: 3, el: 'jp4', rate: 0.004 }, { k: 'GRAND', i: 4, el: 'jp5', rate: 0.006 }] };
+  PROG.tiers.forEach(function (t) { t.base = cfg.jackpots[t.i]; });
+  var progX = {};
+  try { var psv = JSON.parse(localStorage.getItem(PROG.key) || 'null'); if (psv) PROG.tiers.forEach(function (t) { if (typeof psv[t.k] === 'number' && psv[t.k] >= 0) progX[t.k] = psv[t.k]; }); } catch (e) {}
+  function setJP(t, v) { cfg.jackpots[t.i] = v; }
+  function progSave() { try { localStorage.setItem(PROG.key, JSON.stringify(progX)); } catch (e) {} }
+  function progVal(t) { var cr = BETS[betIdx]; return t.base + Math.floor((progX[t.k] || 0) * cr) / cr; }
+  function progApply() { PROG.tiers.forEach(function (t) { setJP(t, progVal(t)); }); }
+  function progAdd() { PROG.tiers.forEach(function (t) { progX[t.k] = (progX[t.k] || 0) + t.rate; }); progSave(); progApply(); }
+  function progHit(k) { PROG.tiers.forEach(function (t) { if (t.k === k) { progX[k] = 0; jpShown[k] = undefined; } }); progSave(); progApply(); }
+  function progCheck(res) { if (!res) return; (res.jackpots || []).forEach(function (j) { if (j.tier === 4) progHit('MAXI'); if (j.tier === 5) progHit('GRAND'); }); }
+  var jpShown = {}, jpAnim = {};
+  function progShow() {
+    PROG.tiers.forEach(function (t) {
+      var el = $(t.el); if (!el) return;
+      var v = el.querySelector('.v');
+      el.classList.add('progj');
+      el.classList.toggle('hot', (progX[t.k] || 0) > t.base * 0.15);
+      var target = progVal(t) * bet(), from = jpShown[t.k];
+      if (from === target) return;
+      jpShown[t.k] = target;
+      if (jpAnim[t.k]) cancelAnimationFrame(jpAnim[t.k]);
+      if (from === undefined || reduceMotion || target < from) { v.textContent = money(target); return; }
+      var t0 = performance.now(), d = denom();
+      (function step(now) {
+        var q = Math.min(1, (now - t0) / 900);
+        v.textContent = money(Math.floor((from + (target - from) * q) / d + 1e-9) * d);
+        if (q < 1) jpAnim[t.k] = requestAnimationFrame(step);
+      })(t0);
+    });
+  }
+
   function updateHud() {
+    progApply();
     $('bal').textContent = money(balance);
     $('betV').textContent = money(bet());
     $('winV').textContent = money(lastWin);
@@ -1523,7 +1562,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       for (var ji = 0; ji < 5; ji++) jh += '<div class="jp" id="jp' + (ji + 1) + '" style="--c:' + ['#2aa876', '#3b82f6', '#9b5de5', '#f2791f', '#e0304f'][ji] + '"><span class="n">' + JN[ji] + '</span><span class="v"></span></div>';
       $('jps').innerHTML = jh;
     }
-    for (var jj = 0; jj < 5; jj++) $('jp' + (jj + 1)).lastChild.textContent = money(cfg.jackpots[jj] * bet());
+    for (var jj = 0; jj < 3; jj++) $('jp' + (jj + 1)).lastChild.textContent = money(cfg.jackpots[jj] * bet());
+    progShow();
     var fs = st.mode === 'fs';
     $('frame').classList.toggle('fs', fs);
     ['fox', 'hare', 'bear'].forEach(function (k) { $('frame').classList.toggle('b-' + k, fs && hasB(st.bonus, k)); });
@@ -1904,7 +1944,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   /* ---------- one spin ---------- */
   async function spinOnce() {
     var b = bet();
-    if (st.mode === 'base') balance -= b;
+    if (st.mode === 'base') { balance -= b; progAdd(); }
     // reels that already hold a locked wild keep those rows still while spinning
     var held = {};
     st.exp.forEach(function (e) { held[e.reel] = held[e.reel] || []; for (var q = e.lo; q <= e.hi; q++) held[e.reel].push(q); });
@@ -2031,8 +2071,8 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     busy = true; updateHud();
     var roundBet = st.mode === 'base' ? bet() : 0, roundStart = balance;
     try {
-      await spinOnce();
-      while (st.mode === 'fs') { await sleep(fast ? 120 : 380); await spinOnce(); }
+      progCheck(await spinOnce());
+      while (st.mode === 'fs') { await sleep(fast ? 120 : 380); progCheck(await spinOnce()); }
     } finally {
       busy = false; updateHud();
       if (roundBet) {
