@@ -137,6 +137,26 @@ h1 { margin: 0; font: 800 clamp(34px, 7vw, 52px)/0.95 var(--font-display); lette
 .jp .n { display: block; font: 700 10px/1.2 var(--font-mono); letter-spacing: 0.08em; color: var(--c); }
 .jp.progj .v::after { content: 'PROGRESSIVE'; display: block; margin-top: 1px; font: 700 7px/1.1 var(--font-mono); letter-spacing: 0.12em; color: var(--c); opacity: 0.85; }
 .jp.progj.hot { box-shadow: 0 0 10px color-mix(in srgb, var(--c) 70%, transparent); animation: jpHot 1.2s ease-in-out infinite alternate; }
+/* tower light and hand pay lockup */
+.tower { position: absolute; top: -2px; right: 18px; z-index: 6; width: 18px; height: 30px; display: flex; flex-direction: column; border-radius: 5px 5px 2px 2px; overflow: hidden; box-shadow: 0 0 0 2px #1a1a22, 0 2px 4px rgba(0, 0, 0, 0.6); pointer-events: none; }
+.tower i { flex: 1; background: #5a1420; opacity: 0.55; }
+.tower i + i { background: #d8d8e0; opacity: 0.35; }
+.tower.hp-tower { position: relative; top: auto; right: auto; width: 30px; height: 50px; margin: 0 auto 16px; }
+.tower.on i { animation: towerRed 0.4s steps(2, jump-none) infinite; }
+.tower.on i + i { animation: towerWhite 0.4s steps(2, jump-none) infinite; animation-delay: 0.2s; }
+@keyframes towerRed { 0% { background: #ff2a3c; opacity: 1; box-shadow: 0 0 12px #ff2a3c; } 100% { background: #5a1420; opacity: 0.55; } }
+@keyframes towerWhite { 0% { background: #ffffff; opacity: 1; } 100% { background: #d8d8e0; opacity: 0.35; } }
+.handpay { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px; background: radial-gradient(70% 55% at 50% 45%, rgba(120, 10, 20, 0.92), rgba(4, 2, 6, 0.97)); animation: hpFlash 0.8s steps(2, jump-none) infinite; }
+@keyframes hpFlash { 0% { background-color: rgba(255, 30, 50, 0.08); } 100% { background-color: transparent; } }
+.hp-in { text-align: center; max-width: 420px; }
+.hp-t { font: 900 clamp(46px, 15vw, 80px)/1 'Cinzel', Georgia, serif; letter-spacing: 0.04em; background: linear-gradient(180deg, #fff7cf, #ffc23d 55%, #d9690c); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 3px 0 #2a0408); animation: pulse 0.5s ease-in-out infinite alternate; }
+.hp-s { margin-top: 6px; font: 800 clamp(22px, 7vw, 32px)/1 var(--font-display); letter-spacing: 0.3em; color: #fff; }
+.hp-v { margin-top: 18px; font: 800 clamp(40px, 13vw, 64px)/1 var(--font-display); color: #ffe07a; font-variant-numeric: tabular-nums; }
+.hp-c { margin-top: 4px; font: 600 16px/1.2 var(--font-mono); color: #ffd0d6; }
+.hp-call { margin-top: 18px; font: 600 15px/1.4 var(--font-body); color: #ffb3bd; }
+.hp-btn { position: relative; overflow: hidden; margin-top: 18px; width: 100%; max-width: 320px; min-height: 52px; border-radius: 12px; border: 2px solid #ffd75e; background: #2a0a10; color: #fff; font: 800 18px/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; touch-action: none; user-select: none; -webkit-user-select: none; }
+.hp-btn i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, #ffc23d, #ff7a1a); }
+.hp-btn span { position: relative; }
 @keyframes jpHot { from { box-shadow: 0 0 4px color-mix(in srgb, var(--c) 40%, transparent); } to { box-shadow: 0 0 16px var(--c); } }
 .jp .v { display: block; font: 800 15px/1.2 var(--font-display); letter-spacing: 0.02em; font-variant-numeric: tabular-nums; }
 .jp.hit { background: color-mix(in srgb, var(--c) 45%, var(--ink)); animation: pulse 0.5s ease-in-out infinite alternate; }
@@ -418,11 +438,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
 <div class="wrap">
   <header class="top">
     <h1 class="sr">The Curse</h1>
-    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 31, 10:00 AM ET</div>
+    <div class="meta">5 x 3 reels / 5 lines / play credits only / build Oct 31, 10:48 AM ET</div>
   </header>
 
   <div class="layout">
     <section class="cab" aria-label="Slot machine">
+      <div class="tower" id="tower" aria-hidden="true"><i></i><i></i></div>
       <div class="topper" aria-hidden="true">
         <svg viewBox="0 0 400 118">
           <defs>
@@ -457,6 +478,17 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
       <div class="jps" id="jps" aria-label="Jackpots"></div>
       <div class="frame" id="frame"><div class="bulbs" id="bulbs" aria-hidden="true"></div>
         <div class="reels" id="reels"><svg class="lines-ov" id="lineSvg" aria-hidden="true"></svg></div>
+      </div>
+      <div class="handpay" id="handpay" hidden role="alertdialog" aria-labelledby="hpT">
+        <div class="hp-in">
+          <div class="tower on hp-tower" aria-hidden="true"><i></i><i></i></div>
+          <div class="hp-t" id="hpT">JACKPOT</div>
+          <div class="hp-s">HAND PAY</div>
+          <div class="hp-v" id="hpV">0</div>
+          <div class="hp-c" id="hpC">$0.00</div>
+          <div class="hp-call">Machine locked. Call attendant.</div>
+          <button class="hp-btn" id="hpBtn"><i id="hpFill"></i><span>Hold for attendant reset</span></button>
+        </div>
       </div>
       <div class="bigwin" id="bigwin" hidden>
         <div class="coins" id="coins"></div>
@@ -1018,7 +1050,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     var c = Math.round(x / denom() * 100) / 100;
     return Math.abs(c - Math.round(c)) < 1e-9 ? Math.round(c).toLocaleString('en-US') : c.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
   }
-  function cash(x) { return (x < -0.004 ? '-' : '') + '$' + Math.abs(x).toFixed(2); }
+  function cash(x) { return (x < -0.004 ? '-' : '') + '$' + Math.abs(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
   function saltAmt(x) { return money(x); }
   function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
 
@@ -1349,6 +1381,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
         else bell(D.A5, t + 0.05, 0.1, 1.5);
       },
       setFS: function (on) { inFS = on; },
+      alarm: function () {
+        if (!soundOn || !ensure()) return;
+        // an old-school jackpot bell: a fast clapper hammering a bright bell
+        var t = ctx.currentTime;
+        for (var k = 0; k < 9; k++) bell(k % 2 ? 1480 : 1395, t + k * 0.055, 0.05, 0.3);
+      },
       setSound: function (on) {
         soundOn = on;
         try { localStorage.setItem('curse_sound', on ? 'on' : 'off'); } catch (e) {}
@@ -1512,7 +1550,7 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
   function progVal(t) { var cr = BETS[betIdx]; return t.base + Math.floor((progX[t.k] || 0) * cr) / cr; }
   function progApply() { PROG.tiers.forEach(function (t) { setJP(t, progVal(t)); }); }
   function progAdd() { PROG.tiers.forEach(function (t) { progX[t.k] = (progX[t.k] || 0) + t.rate; }); progSave(); progApply(); }
-  function progHit(k) { PROG.tiers.forEach(function (t) { if (t.k === k) { progX[k] = 0; jpShown[k] = undefined; } }); progSave(); progApply(); }
+  function progHit(k) { PROG.tiers.forEach(function (t) { if (t.k === k) { progX[k] = 0; jpShown[k] = undefined; if (k === 'GRAND') grandHit = true; } }); progSave(); progApply(); }
   function progCheck(res) { if (!res) return; if (res.gyEnded) (res.gyPrizes || []).forEach(function (pz) { if (pz.prize === 'MAJOR' || pz.prize === 'GRAND') progHit(pz.prize); }); if (res.wheelTrigger && res.wheelPrize > 0) { var sg = cfg.wheel.segs[res.wheelSeg]; if (sg.k === 'J' && (sg.v === 'MAJOR' || sg.v === 'GRAND')) progHit(sg.v); } }
   var jpShown = {}, jpAnim = {};
   function progShow() {
@@ -2339,6 +2377,43 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     return res;
   }
 
+  /* ---------- hand pay ---------- */
+  // like a real machine: a round worth $1,200 or more in cash, or any Grand, locks the machine until an attendant resets it.
+  // the amount is already on the credit meter; the lockup is the drama and the paperwork.
+  var HANDPAY_CASH = 1200, grandHit = false;
+  function handPay(amount) {
+    return new Promise(function (resolve) {
+      setAuto(false);
+      var ov = $('handpay'), btn = $('hpBtn'), fill = $('hpFill');
+      $('hpT').textContent = grandHit ? 'GRAND JACKPOT' : 'JACKPOT';
+      $('hpV').textContent = money(amount) + ' credits';
+      $('hpC').textContent = cash(amount);
+      ov.hidden = false;
+      $('tower').classList.add('on');
+      SFX.alarm();
+      var ring = setInterval(function () { SFX.alarm(); }, 700), hold = null, t0 = 0, raf = 0;
+      function tick() {
+        var q = Math.min(1, (performance.now() - t0) / 2000);
+        fill.style.width = (q * 100) + '%';
+        if (q >= 1) return finish();
+        raf = requestAnimationFrame(tick);
+      }
+      function down(e) { if (e) e.preventDefault(); if (hold) return; hold = true; t0 = performance.now(); raf = requestAnimationFrame(tick); }
+      function up() { hold = null; cancelAnimationFrame(raf); fill.style.width = '0'; }
+      function key(e) { if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); e.stopPropagation(); if (e.type === 'keydown') { if (!e.repeat) down(); } else up(); } }
+      function finish() {
+        cancelAnimationFrame(raf); clearInterval(ring);
+        btn.removeEventListener('pointerdown', down); btn.removeEventListener('pointerup', up); btn.removeEventListener('pointerleave', up); btn.removeEventListener('pointercancel', up);
+        document.removeEventListener('keydown', key, true); document.removeEventListener('keyup', key, true);
+        fill.style.width = '0'; ov.hidden = true; $('tower').classList.remove('on');
+        say('<strong>Hand pay complete.</strong> ' + money(amount) + ' credits (' + cash(amount) + ') are on your credit meter.');
+        resolve();
+      }
+      btn.addEventListener('pointerdown', down); btn.addEventListener('pointerup', up); btn.addEventListener('pointerleave', up); btn.addEventListener('pointercancel', up);
+      document.addEventListener('keydown', key, true); document.addEventListener('keyup', key, true);
+      btn.focus();
+    });
+  }
   async function round() {
     if (busy) return;
     if (st.mode === 'base' && balance < bet() - 1e-9) {
@@ -2348,9 +2423,12 @@ select { background: var(--panel-2); color: var(--text); border: 1px solid var(-
     }
     busy = true; updateHud();
     var roundBet = st.mode === 'base' ? bet() : 0, roundStart = balance;
+    grandHit = false;
     try {
       progCheck(await spinOnce());
       while (st.mode !== 'base') { await sleep(fast ? 120 : 380); progCheck(await spinOnce()); }
+      var roundWon = balance - roundStart + roundBet;
+      if (roundBet && (roundWon >= HANDPAY_CASH - 1e-9 || grandHit)) await handPay(roundWon);
     } finally {
       busy = false; updateHud();
       if (roundBet) {
