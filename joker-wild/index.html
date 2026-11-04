@@ -1,0 +1,760 @@
+<!doctype html>
+<html lang="en">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#04061a">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Joker Wild">
+<style>@media (display-mode: standalone) { body { padding-top: max(20px, env(safe-area-inset-top)); padding-bottom: max(40px, env(safe-area-inset-bottom)); } }</style>
+<script>if ('serviceWorker' in navigator && /github\.io$/.test(location.hostname)) window.addEventListener('load', function () { navigator.serviceWorker.register('sw.js').catch(function () {}); });</script>
+<meta charset="utf-8">
+<title>Joker Wild</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=Hanken+Grotesk:wght@400;500;600&display=swap">
+<style>
+/* Classic video poker cabinet: royal blue screen, yellow pay table, big white cards. Single dark look on purpose. */
+:root {
+  --ink: #04061a;
+  --scr: #0b1fa0;
+  --scr-2: #06125e;
+  --edge: #22307a;
+  --yel: #ffe14d;
+  --red: #e3202c;
+  --text: #f3f6ff;
+  --mute: #9aa6d6;
+  --held: #ffe14d;
+  --font-display: 'Big Shoulders Display', 'Arial Narrow', Impact, sans-serif;
+  --font-body: 'Hanken Grotesk', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --font-mono: ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
+  --font-card: Georgia, 'Times New Roman', serif;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+html, body { background: var(--ink); }
+body { margin: 0; color: var(--text); font: 15px/1.5 var(--font-body); padding: 16px max(16px, env(safe-area-inset-right, 0px)) 40px max(16px, env(safe-area-inset-left, 0px)); background: radial-gradient(900px 420px at 50% -10%, rgba(40, 70, 220, 0.35), transparent 70%), var(--ink); }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, [role=tab]:focus-visible, .card:focus-visible { outline: 2px solid var(--yel); outline-offset: 2px; }
+[hidden] { display: none !important; }
+.wrap { max-width: 1120px; margin: 0 auto; }
+.top { display: flex; justify-content: space-between; align-items: baseline; gap: 8px; margin-bottom: 10px; }
+.top .meta { font: 500 12px/1.4 var(--font-mono); color: var(--mute); }
+.sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+.layout { display: grid; gap: 18px; grid-template-columns: minmax(0, 1fr); align-items: start; }
+@media (min-width: 980px) { .layout { grid-template-columns: minmax(0, 560px) minmax(0, 1fr); } }
+
+/* cabinet */
+.cab { position: relative; border-radius: 18px; padding: 12px; background: linear-gradient(180deg, #1b1f33, #0b0d18); border: 1px solid #2a2f4a; box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5); }
+.title { text-align: center; margin: 2px 0 10px; font: 900 clamp(30px, 9vw, 44px)/1 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; background: linear-gradient(180deg, #fff7c8, #ffd23a 50%, #e07a12); -webkit-background-clip: text; background-clip: text; color: transparent; filter: drop-shadow(0 2px 0 #3a0a0a); }
+.title small { display: block; margin-top: 4px; font: 700 11px/1 var(--font-mono); letter-spacing: 0.3em; color: #ff6a6a; -webkit-text-fill-color: #ff6a6a; filter: none; }
+.screen { position: relative; border-radius: 12px; padding: 10px; background: linear-gradient(180deg, var(--scr), var(--scr-2)); box-shadow: inset 0 0 0 3px #0a1250, inset 0 0 40px rgba(0, 0, 0, 0.45); }
+
+/* pay table */
+.pt { width: 100%; border-collapse: collapse; font: 800 clamp(11px, 3.2vw, 14px)/1.15 var(--font-display); letter-spacing: 0.04em; color: var(--yel); text-transform: uppercase; }
+.pt td { padding: 1px 4px; text-align: right; font-variant-numeric: tabular-nums; border-left: 1px solid rgba(255, 225, 77, 0.18); }
+.pt td:first-child { text-align: left; border-left: 0; white-space: nowrap; }
+.pt td.cur { background: var(--red); color: #fff; }
+.pt tr.hit td { background: #fff; color: var(--red); }
+.pt tr.hit td.cur { background: #ffe14d; color: #a00; }
+.pt-wrap { border: 2px solid rgba(255, 225, 77, 0.5); border-radius: 6px; padding: 3px; margin-bottom: 8px; background: rgba(0, 0, 40, 0.35); }
+
+/* hands */
+.extra { display: grid; gap: 6px 8px; margin-bottom: 8px; }
+.extra.n3 { grid-template-columns: minmax(0, 1fr); max-width: 340px; margin-left: auto; margin-right: auto; }
+.extra.n5, .extra.n10 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (min-width: 520px) { .extra.n10 { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+.mini { position: relative; display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 3px; padding: 3px; border-radius: 6px; background: rgba(0, 0, 30, 0.35); }
+.mini .res { position: absolute; left: 3px; right: 3px; bottom: 3px; z-index: 3; padding: 2px 3px; border-radius: 4px; text-align: center; font: 800 clamp(10px, 2.8vw, 12px)/1.1 var(--font-display); letter-spacing: 0.04em; text-transform: uppercase; color: var(--red); background: rgba(255, 255, 255, 0.94); box-shadow: 0 1px 4px rgba(0, 0, 0, 0.5); animation: resIn 0.25s ease-out; }
+.mini.win { box-shadow: 0 0 0 2px var(--yel); }
+@keyframes resIn { from { transform: scale(0.6); opacity: 0; } to { transform: none; opacity: 1; } }
+.main { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.slot { display: flex; flex-direction: column; align-items: stretch; gap: 4px; }
+.heldtag { height: 18px; text-align: center; font: 900 15px/18px var(--font-display); letter-spacing: 0.12em; color: var(--held); text-shadow: 0 1px 0 #000; visibility: hidden; }
+.slot.held .heldtag { visibility: visible; }
+
+/* cards */
+.card { position: relative; aspect-ratio: 5 / 7; border-radius: 7%/5%; background: #fff; color: #111; overflow: hidden; container-type: inline-size; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.45); user-select: none; -webkit-user-select: none; }
+.card.red { color: #d0121c; }
+.card .cr { position: absolute; left: 6%; top: 3%; text-align: center; font: 700 30cqw/0.95 var(--font-card); }
+.card .cr i { display: block; font-style: normal; font-size: 26cqw; }
+.card .pip { position: absolute; left: 0; right: 0; top: 34%; text-align: center; font: 400 64cqw/1 var(--font-card); }
+.card .face { position: absolute; left: 0; right: 0; top: 30%; text-align: center; font: 700 52cqw/1 var(--font-card); }
+.card .face i { display: block; font-style: normal; font-size: 30cqw; margin-top: 2cqw; }
+.card.joker { background: #fff; }
+.card.joker .jimg { position: absolute; inset: 4% 4% 4% 18%; background-size: cover; background-position: center; border-radius: 4px; }
+.card.joker .jtxt { position: absolute; left: 3%; top: 4%; bottom: 4%; width: 14%; display: flex; flex-direction: column; justify-content: center; align-items: center; font: 900 16cqw/0.92 var(--font-display); color: #d0121c; }
+.card.back { background: #fff; padding: 6%; }
+.card.back::before { content: ''; position: absolute; inset: 6%; border-radius: 4px; background: repeating-linear-gradient(45deg, #b4121c 0 6%, #e3202c 6% 12%), #e3202c; box-shadow: inset 0 0 0 2px #fff, inset 0 0 0 4px #b4121c; }
+.mini .card { border-radius: 8%/6%; box-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); }
+.mini .card .pip { top: 40%; font-size: 52cqw; }
+.mini .card .face { top: 42%; font-size: 40cqw; }
+.mini .card .face i { display: none; }
+.mini .card .cr { font-size: 34cqw; }
+.mini .card .cr i { font-size: 30cqw; }
+.mini .card.joker .jtxt { display: none; }
+.mini .card.joker .jimg { inset: 4%; }
+.main .card { cursor: pointer; }
+.card.flip { animation: flip 0.18s ease-out; }
+@keyframes flip { 0% { transform: scaleX(0.05); } 100% { transform: scaleX(1); } }
+.main .slot.wincard .card { box-shadow: 0 0 0 3px var(--yel), 0 0 14px var(--yel); }
+
+.status { min-height: 26px; margin: 8px 0 2px; text-align: center; font: 900 clamp(18px, 5.4vw, 24px)/1.1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; color: #fff; text-shadow: 0 2px 0 #000; }
+.status.win { color: var(--yel); }
+.meters { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.meter { padding: 4px 6px; border-radius: 6px; background: rgba(0, 0, 30, 0.45); text-align: center; }
+.meter .k { display: block; font: 800 12px/1.2 var(--font-display); letter-spacing: 0.14em; color: var(--yel); }
+.meter .v { display: block; font: 800 clamp(20px, 6vw, 26px)/1.1 var(--font-display); letter-spacing: 0.03em; color: #fff; font-variant-numeric: tabular-nums; }
+.meter .cash { display: block; font: 500 10px/1.2 var(--font-mono); color: #c9d2ff; }
+
+/* buttons */
+.row { display: grid; gap: 6px; margin-top: 8px; }
+.row.opts { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.row.play { grid-template-columns: 1fr 1fr 1.6fr; }
+.btn { min-height: 40px; padding: 4px 4px; border-radius: 8px; border: 1px solid #3a4170; background: linear-gradient(180deg, #2a3157, #171b33); color: #fff; font: 800 13px/1.05 var(--font-display); letter-spacing: 0.06em; text-transform: uppercase; }
+.btn small { display: block; font: 700 10px/1.1 var(--font-mono); letter-spacing: 0.04em; color: var(--yel); text-transform: none; }
+.btn:disabled { opacity: 0.4; cursor: default; }
+.btn.big { min-height: 56px; font-size: 24px; letter-spacing: 0.12em; color: #1a0a00; border-color: #c98a00; background: linear-gradient(180deg, #ffe066, #f5b400 55%, #c98a00); }
+.btn.hold { min-height: 34px; font-size: 14px; letter-spacing: 0.1em; }
+.btn.hold.on { background: linear-gradient(180deg, #ffe066, #f5b400); color: #1a0a00; border-color: #c98a00; }
+.holdrow { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; margin-top: 6px; }
+.msg { margin-top: 8px; min-height: 22px; font-size: 14px; color: var(--mute); }
+.msg strong { color: var(--text); }
+.foot { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 6px 12px; margin-top: 6px; font: 500 11px/1.4 var(--font-mono); color: var(--mute); }
+.foot button { border: 0; background: none; color: #8fb0ff; text-decoration: underline; padding: 0; font: inherit; }
+
+/* session tracker */
+.sess { margin-top: 12px; padding: 12px; border-radius: 12px; background: #0b0f22; border: 1px solid #22284a; }
+.sess-h { display: flex; justify-content: space-between; align-items: center; font: 800 13px/1 var(--font-display); letter-spacing: 0.14em; text-transform: uppercase; color: var(--mute); }
+.sess-h button { padding: 6px 10px; border-radius: 8px; border: 1px solid #2c3460; background: #151a33; font: 800 12px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.sess-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; margin-top: 10px; }
+.sess-g .k { display: block; font: 500 10px/1.2 var(--font-mono); letter-spacing: 0.08em; text-transform: uppercase; color: var(--mute); }
+.sess-g .v { display: block; font: 800 20px/1.15 var(--font-display); font-variant-numeric: tabular-nums; }
+.up { color: #6fe08a; } .down { color: #ff7a7a; }
+details summary { cursor: pointer; margin-top: 10px; font: 700 12px/1.4 var(--font-mono); color: var(--mute); }
+details table { width: 100%; margin-top: 6px; border-collapse: collapse; font: 500 12px/1.5 var(--font-mono); }
+details th, details td { padding: 2px 4px; text-align: right; } details th:first-child, details td:first-child { text-align: left; }
+
+/* side panel */
+.panel { border-radius: 16px; padding: 14px; background: #0b0f22; border: 1px solid #22284a; }
+.tabs { display: flex; gap: 6px; margin-bottom: 12px; }
+.tabs [role=tab] { flex: 1; padding: 8px; border-radius: 8px; border: 1px solid #2c3460; background: #151a33; font: 800 13px/1 var(--font-display); letter-spacing: 0.1em; text-transform: uppercase; }
+.tabs [role=tab][aria-selected=true] { background: #2a3157; border-color: var(--yel); color: var(--yel); }
+.pane h2 { margin: 0 0 6px; font: 800 22px/1.1 var(--font-display); letter-spacing: 0.05em; text-transform: uppercase; }
+.pane p, .list { color: var(--mute); }
+.list { padding-left: 18px; margin: 0; } .list li { margin: 5px 0; } .list strong { color: var(--text); }
+.odds { width: 100%; border-collapse: collapse; font: 500 13px/1.4 var(--font-body); }
+.odds th { text-align: right; font: 700 11px/1.2 var(--font-mono); color: var(--mute); padding: 4px; border-bottom: 1px solid #22284a; }
+.odds td { text-align: right; padding: 4px; border-bottom: 1px solid #161b36; font-variant-numeric: tabular-nums; }
+.odds th:first-child, .odds td:first-child { text-align: left; }
+.odds td:first-child { color: var(--text); font-weight: 600; }
+.ret { margin: 10px 0 12px; padding: 10px 12px; border-radius: 10px; background: #151a33; border: 1px solid #2c3460; }
+.ret b { font: 800 28px/1 var(--font-display); color: var(--yel); }
+
+/* overlays: big win and hand pay */
+.bigwin { position: absolute; inset: 0; z-index: 20; display: grid; place-items: center; border-radius: 18px; background: radial-gradient(70% 55% at 50% 45%, rgba(20, 40, 160, 0.9), rgba(4, 6, 26, 0.95)); cursor: pointer; }
+.bw-t { text-align: center; font: 900 clamp(38px, 12vw, 60px)/1 var(--font-display); letter-spacing: 0.06em; background: linear-gradient(180deg, #fff7c8, #ffd23a 50%, #e07a12); -webkit-background-clip: text; background-clip: text; color: transparent; animation: pulse 0.5s ease-in-out infinite alternate; }
+.bw-v { margin-top: 10px; text-align: center; font: 800 clamp(30px, 10vw, 48px)/1 var(--font-display); color: #fff; font-variant-numeric: tabular-nums; }
+.bw-s { margin-top: 8px; text-align: center; color: #c9d2ff; }
+@keyframes pulse { from { transform: scale(1); } to { transform: scale(1.04); } }
+.tower { position: absolute; top: -2px; right: 18px; z-index: 6; width: 18px; height: 30px; display: flex; flex-direction: column; border-radius: 5px 5px 2px 2px; overflow: hidden; box-shadow: 0 0 0 2px #1a1a22, 0 2px 4px rgba(0, 0, 0, 0.6); pointer-events: none; }
+.tower i { flex: 1; background: #5a1420; opacity: 0.55; }
+.tower i + i { background: #d8d8e0; opacity: 0.35; }
+.tower.on i { animation: towerRed 0.4s steps(2, jump-none) infinite; }
+.tower.on i + i { animation: towerWhite 0.4s steps(2, jump-none) infinite; animation-delay: 0.2s; }
+.tower.hp-tower { position: relative; top: auto; right: auto; width: 30px; height: 50px; margin: 0 auto 16px; }
+@keyframes towerRed { 0% { background: #ff2a3c; opacity: 1; box-shadow: 0 0 12px #ff2a3c; } 100% { background: #5a1420; opacity: 0.55; } }
+@keyframes towerWhite { 0% { background: #ffffff; opacity: 1; } 100% { background: #d8d8e0; opacity: 0.35; } }
+.handpay { position: fixed; inset: 0; z-index: 70; display: grid; place-items: center; padding: 16px; background: radial-gradient(70% 55% at 50% 45%, rgba(120, 10, 20, 0.92), rgba(4, 2, 6, 0.97)); }
+.hp-in { text-align: center; max-width: 420px; }
+.hp-t { font: 900 clamp(46px, 15vw, 80px)/1 var(--font-display); letter-spacing: 0.06em; background: linear-gradient(180deg, #fff7cf, #ffc23d 55%, #d9690c); -webkit-background-clip: text; background-clip: text; color: transparent; animation: pulse 0.5s ease-in-out infinite alternate; }
+.hp-s { margin-top: 6px; font: 800 clamp(22px, 7vw, 32px)/1 var(--font-display); letter-spacing: 0.3em; color: #fff; }
+.hp-v { margin-top: 18px; font: 800 clamp(36px, 12vw, 60px)/1 var(--font-display); color: #ffe07a; font-variant-numeric: tabular-nums; }
+.hp-c { margin-top: 4px; font: 600 16px/1.2 var(--font-mono); color: #ffd0d6; }
+.hp-call { margin-top: 18px; font: 600 15px/1.4 var(--font-body); color: #ffb3bd; }
+.hp-btn { position: relative; overflow: hidden; margin-top: 18px; width: 100%; max-width: 320px; min-height: 52px; border-radius: 12px; border: 2px solid #ffd75e; background: #2a0a10; color: #fff; font: 800 18px/1 var(--font-display); letter-spacing: 0.08em; text-transform: uppercase; touch-action: none; user-select: none; -webkit-user-select: none; }
+.hp-btn i { position: absolute; left: 0; top: 0; bottom: 0; width: 0; background: linear-gradient(90deg, #ffc23d, #ff7a1a); }
+.hp-btn span { position: relative; }
+@media (prefers-reduced-motion: reduce) { * { animation: none !important; transition: none !important; } }
+@media (max-width: 400px) { .row.opts .btn { font-size: 11px; } .btn small { font-size: 9px; } }
+.pic-JOKER{background-image:url(data:image/jpeg;base64,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)}
+
+</style>
+
+<div class="wrap">
+  <header class="top">
+    <h1 class="sr">Joker Wild</h1>
+    <div class="meta">video poker / 53 card deck / play credits only / build Nov 4, 1:45 PM ET</div>
+  </header>
+  <div class="layout">
+    <section class="cab" aria-label="Video poker machine">
+      <div class="tower" id="tower" aria-hidden="true"><i></i><i></i></div>
+      <div class="title">Joker Wild<small id="sub">KINGS OR BETTER · TRIPLE PLAY</small></div>
+      <div class="screen">
+        <div class="pt-wrap"><table class="pt" id="pt" aria-label="Pay table"></table></div>
+        <div class="extra" id="extra" aria-label="Extra hands"></div>
+        <div class="main" id="main" aria-label="Your hand"></div>
+        <div class="status" id="status" aria-live="polite">Press Deal</div>
+        <div class="meters">
+          <div class="meter"><span class="k">Win</span><span class="v" id="winV">0</span></div>
+          <div class="meter"><span class="k">Bet</span><span class="v" id="betV">0</span><span class="cash" id="betSub">0 hands x 0</span></div>
+          <div class="meter"><span class="k">Credits</span><span class="v" id="bal">0</span><span class="cash" id="balCash">$0.00</span></div>
+        </div>
+      </div>
+      <div class="holdrow" id="holdrow"></div>
+      <div class="row opts">
+        <button class="btn" id="handsBtn">Hands<small id="handsV">3</small></button>
+        <button class="btn" id="denomBtn">Denom<small id="denomV">1¢</small></button>
+        <button class="btn" id="gameBtn">Game<small id="gameV">17-7-5</small></button>
+        <button class="btn" id="speedBtn" aria-pressed="false">Speed<small id="speedV">Normal</small></button>
+        <button class="btn" id="sndBtn" aria-pressed="true">Sound<small id="sndV">On</small></button>
+      </div>
+      <div class="row play">
+        <button class="btn" id="betOne">Bet one<small id="coinsV">5 coins</small></button>
+        <button class="btn" id="betMax">Bet max</button>
+        <button class="btn big" id="deal">Deal</button>
+      </div>
+      <div class="msg" id="msg">Tap a card (or its HOLD button) to keep it, then Draw. The joker is wild. Space bar deals and draws, keys 1 to 5 hold.</div>
+      <div class="foot"><span id="info">Denom 1¢</span><button id="reset">Reset credits</button></div>
+      <div class="sess" aria-label="Session tracker">
+        <div class="sess-h"><span>This session</span><button id="newSess">New session</button></div>
+        <div class="sess-g">
+          <div><span class="k">Games</span><span class="v" id="ssGames">0</span></div>
+          <div><span class="k">Hands</span><span class="v" id="ssHands">0</span></div>
+          <div><span class="k">Profit</span><span class="v" id="ssProfit">$0.00</span></div>
+          <div><span class="k">Total bet</span><span class="v" id="ssBet">$0.00</span></div>
+          <div><span class="k">Total won</span><span class="v" id="ssWon">$0.00</span></div>
+          <div><span class="k">Best game</span><span class="v" id="ssBest">$0.00</span></div>
+        </div>
+        <details><summary>Past sessions</summary><div id="ssHist"></div></details>
+      </div>
+      <div class="bigwin" id="bigwin" hidden><div><div class="bw-t" id="bwT">BIG WIN</div><div class="bw-v" id="bwV">0</div><div class="bw-s" id="bwS"></div></div></div>
+      <div class="handpay" id="handpay" hidden role="alertdialog" aria-labelledby="hpT">
+        <div class="hp-in">
+          <div class="tower on hp-tower" aria-hidden="true"><i></i><i></i></div>
+          <div class="hp-t" id="hpT">JACKPOT</div>
+          <div class="hp-s">HAND PAY</div>
+          <div class="hp-v" id="hpV">0</div>
+          <div class="hp-c" id="hpC">$0.00</div>
+          <div class="hp-call">Machine locked. Call attendant.</div>
+          <button class="hp-btn" id="hpBtn"><i id="hpFill"></i><span>Hold for attendant reset</span></button>
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" aria-label="Game details">
+      <div class="tabs" role="tablist">
+        <button role="tab" id="tab-odds" aria-selected="true" aria-controls="pane-odds">Odds</button>
+        <button role="tab" id="tab-how" aria-selected="false" aria-controls="pane-how">How it works</button>
+      </div>
+      <div class="pane" id="pane-odds" role="tabpanel" aria-labelledby="tab-odds">
+        <h2 id="oddsH">Odds</h2>
+        <div class="ret" id="ret"></div>
+        <table class="odds" id="oddsT"></table>
+        <p style="margin-top:12px">The chance of each hand is for one hand played with perfect strategy at 5 coins. It is the same for every hand in multi-play, because each one draws from its own deck. "Yours" counts every hand you have finished on this device, so you can watch real results drift toward the math over time.</p>
+      </div>
+      <div class="pane" id="pane-how" role="tabpanel" aria-labelledby="tab-how" hidden>
+        <h2>How it works</h2>
+        <ul class="list">
+          <li><strong>A real deck.</strong> Every game deals from a freshly shuffled 53-card deck: the 52 regular cards plus one joker. The shuffle uses your browser's cryptographic random number generator, the same kind of source a certified machine uses. Nothing is weighted, and no outcome is decided ahead of time except by the shuffle.</li>
+          <li><strong>The joker is wild.</strong> It becomes whatever card makes your best hand, so four aces plus the joker is five of a kind, and the joker can fill a straight, a flush or a royal (a "wild royal").</li>
+          <li><strong>Kings or Better.</strong> The smallest paying hand is a pair of kings or aces. The joker with a king or an ace counts.</li>
+          <li><strong>Multi-play.</strong> Pick 1, 3, 5 or 10 hands. You see one hand and choose your holds. Every other hand starts with the same held cards, and each one draws its replacements from its own separate deck (with your 5 dealt cards removed), exactly like Triple Play style machines. So every hand has the same odds as a single-hand machine, and the results are independent.</li>
+          <li><strong>Coins and the royal.</strong> You bet 1 to 5 coins on each hand. A natural royal flush pays 250 per coin, or 4,000 at 5 coins, so max bet pays back more.</li>
+          <li><strong>Pick your machine.</strong> The Game button switches between four real Joker Poker pay tables. They differ only in what four of a kind pays (20, 18, 17 or 15 per coin), but that changes the payback by more than 4%.</li>
+          <li><strong>The numbers are exact.</strong> The payback figures were computed by checking every one of the 2,869,685 possible deals and all 32 ways to hold each one, picking the best hold every time. Real players usually give back 1 to 3% more than that through imperfect holds.</li>
+          <li><strong>Hand pay.</strong> Like a real machine, a game that wins $1,200 or more locks up for an attendant. Hold the reset button for 2 seconds. The win stays on your credit meter.</li>
+          <li>Play credits only, no real money. Credits, settings and session stats are saved on this device.</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</div>
+
+<script>/* Joker Wild video poker engine (Kings or Better)
+ * A real 53-card deck: 52 cards plus one joker, which is wild.
+ * Every deal is a fair shuffle using the browser's cryptographic random numbers.
+ * In multi-play, every extra hand draws from its own fresh deck that is missing only the 5 dealt cards,
+ * exactly like Triple Play style machines, so every hand has the same odds as a single-hand machine.
+ */
+(function (root) {
+  'use strict';
+  // card 0..51: rank = c >> 2 (0 = deuce ... 12 = ace), suit = c & 3; 52 = joker
+  var JOKER = 52;
+  var CAT = { NOTHING: 0, KOB: 1, TWOP: 2, TRIPS: 3, STR: 4, FLUSH: 5, FULL: 6, QUADS: 7, SF: 8, WROYAL: 9, FIVEK: 10, NROYAL: 11 };
+  var NAMES = ['Nothing', 'Kings or Better', 'Two Pair', 'Three of a Kind', 'Straight', 'Flush', 'Full House', 'Four of a Kind', 'Straight Flush', 'Wild Royal Flush', 'Five of a Kind', 'Royal Flush'];
+  // pay per coin by category; the natural royal pays 250 per coin, or 4,000 for a 5 coin bet
+  function table(id, name, quads, ret5, ret1) {
+    return { id: id, name: name, pays: [0, 1, 1, 2, 3, 5, 7, quads, 50, 100, 200, 250], royalMax: 4000, ret5: ret5, ret1: ret1 };
+  }
+  // returns with perfect play, computed exactly over every possible deal and hold
+  var TABLES = [
+    table('17-7-5', '17-7-5', 17, 98.0854, 96.9447),
+    table('20-7-5', '20-7-5 Full Pay', 20, 100.6463, 99.5166),
+    table('18-7-5', '18-7-5', 18, 98.9372, 97.8003),
+    table('15-7-5', '15-7-5', 15, 96.3848, 95.2364)
+  ];
+  function evalNat(r, s, n, hasJoker) {
+    var rc = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], flush = true, i;
+    for (i = 0; i < n; i++) { rc[r[i]]++; if (s[i] !== s[0]) flush = false; }
+    var mx = 0, pairs = 0, trips = 0, uniq = 0, hiPair = false, lo = 13, hi = -1;
+    for (i = 0; i < 13; i++) {
+      if (rc[i]) { uniq++; if (i < lo) lo = i; if (i > hi) hi = i; }
+      if (rc[i] > mx) mx = rc[i];
+      if (rc[i] === 2) { pairs++; if (i >= 11) hiPair = true; }
+      if (rc[i] === 3) trips++;
+    }
+    var straight = false, royal = false;
+    if (uniq === 5) {
+      if (hi - lo === 4) { straight = true; if (hi === 12) royal = true; }
+      if (rc[12] && rc[0] && rc[1] && rc[2] && rc[3]) straight = true;
+    }
+    if (mx === 5) return CAT.FIVEK;
+    if (straight && flush) return royal ? (hasJoker ? CAT.WROYAL : CAT.NROYAL) : CAT.SF;
+    if (mx === 4) return CAT.QUADS;
+    if (trips && pairs) return CAT.FULL;
+    if (flush) return CAT.FLUSH;
+    if (straight) return CAT.STR;
+    if (trips) return CAT.TRIPS;
+    if (pairs === 2) return CAT.TWOP;
+    if (pairs === 1 && hiPair) return CAT.KOB;
+    return CAT.NOTHING;
+  }
+  // best hand for 5 cards; the joker becomes whatever card makes the best hand
+  function evaluate(cards) {
+    var r = [], s = [], j = false;
+    for (var i = 0; i < 5; i++) { if (cards[i] === JOKER) j = true; else { r.push(cards[i] >> 2); s.push(cards[i] & 3); } }
+    if (!j) return evalNat(r, s, 5, false);
+    var best = 0;
+    for (var x = 0; x < 52; x++) { r[4] = x >> 2; s[4] = x & 3; var v = evalNat(r, s, 5, true); if (v > best) best = v; }
+    return best;
+  }
+  // uniform random integer in [0, n) from the crypto source, without modulo bias
+  var buf = new Uint32Array(64), bi = 64;
+  var cryptoObj = (typeof crypto !== 'undefined' && crypto.getRandomValues) ? crypto : null;
+  function u32() {
+    if (!cryptoObj) return Math.floor(Math.random() * 4294967296);
+    if (bi >= buf.length) { cryptoObj.getRandomValues(buf); bi = 0; }
+    return buf[bi++];
+  }
+  function randInt(n) {
+    var lim = 4294967296 - (4294967296 % n), x;
+    do { x = u32(); } while (x >= lim);
+    return x % n;
+  }
+  function shuffled(exclude) {
+    var d = [], ex = {};
+    (exclude || []).forEach(function (c) { ex[c] = true; });
+    for (var c = 0; c <= JOKER; c++) if (!ex[c]) d.push(c);
+    for (var i = d.length - 1; i > 0; i--) { var j = randInt(i + 1), t = d[i]; d[i] = d[j]; d[j] = t; }
+    return d;
+  }
+  function payFor(tbl, cat, coins) {
+    if (cat === CAT.NROYAL && coins === 5) return tbl.royalMax;
+    return tbl.pays[cat] * coins;
+  }
+  // one game: deal 5 from a fresh deck; after holds, the main hand draws from the rest of that deck
+  // and every extra hand draws from its own fresh deck minus the 5 dealt cards
+  function deal() { var d = shuffled(); return { deck: d, hand: d.slice(0, 5), next: 5 }; }
+  function draw(game, held, hands) {
+    var out = [], i, h;
+    var main = game.hand.slice(), p = game.next;
+    for (i = 0; i < 5; i++) if (!held[i]) main[i] = game.deck[p++];
+    out.push(main);
+    for (h = 1; h < hands; h++) {
+      var d = shuffled(game.hand), q = 0, hand = game.hand.slice();
+      for (i = 0; i < 5; i++) if (!held[i]) hand[i] = d[q++];
+      out.push(hand);
+    }
+    return out;
+  }
+  var api = { JOKER: JOKER, CAT: CAT, NAMES: NAMES, TABLES: TABLES, evaluate: evaluate, payFor: payFor, deal: deal, draw: draw, shuffled: shuffled, randInt: randInt };
+  if (typeof module !== 'undefined' && module.exports) module.exports = api;
+  else root.VP = api;
+})(this);
+</script>
+<script>
+(function () {
+  'use strict';
+  var V = window.VP, CAT = V.CAT, NAMES = V.NAMES, TABLES = V.TABLES;
+  var ODDS = {"0,1,1,2,3,5,7,20,50,100,200,250":{"ret":99.5166,"probs":{"Natural royal":0.00001721,"Five of a kind":0.0000936,"Wild royal":0.00008724,"Straight flush":0.0005644,"Four of a kind":0.00858892,"Full house":0.01572138,"Flush":0.01581925,"Straight":0.01621708,"Three of a kind":0.13454821,"Two pair":0.11102178,"Kings or better":0.14550416,"Nothing":0.55181677}},"0,1,1,2,3,5,7,18,50,100,200,250":{"ret":97.8003,"probs":{"Natural royal":0.00001722,"Five of a kind":0.00009351,"Wild royal":0.0000866,"Straight flush":0.00057013,"Four of a kind":0.00857451,"Full house":0.01570294,"Flush":0.01588498,"Straight":0.01642054,"Three of a kind":0.13433615,"Two pair":0.11093589,"Kings or better":0.14527347,"Nothing":0.55210406}},"0,1,1,2,3,5,7,17,50,100,200,250":{"ret":96.9447,"probs":{"Natural royal":0.00001735,"Five of a kind":0.00009322,"Wild royal":0.00008648,"Straight flush":0.00058414,"Four of a kind":0.00854322,"Full house":0.01567345,"Flush":0.01606957,"Straight":0.01648115,"Three of a kind":0.13398421,"Two pair":0.11085625,"Kings or better":0.14504565,"Nothing":0.55256531}},"0,1,1,2,3,5,7,15,50,100,200,250":{"ret":95.2364,"probs":{"Natural royal":0.00001737,"Five of a kind":0.00009318,"Wild royal":0.00008645,"Straight flush":0.00058717,"Four of a kind":0.00853946,"Full house":0.01567031,"Flush":0.01609598,"Straight":0.01651336,"Three of a kind":0.13394274,"Two pair":0.11084826,"Kings or better":0.14484542,"Nothing":0.55276031}},"0,1,1,2,3,5,7,18,50,100,200,800":{"ret":98.9372,"probs":{"Natural royal":0.0000246,"Five of a kind":0.00009322,"Wild royal":0.00010418,"Straight flush":0.00058056,"Four of a kind":0.00853754,"Full house":0.01565551,"Flush":0.01566302,"Straight":0.01680457,"Three of a kind":0.13365873,"Two pair":0.1107449,"Kings or better":0.14154396,"Nothing":0.5565892}},"0,1,1,2,3,5,7,17,50,100,200,800":{"ret":98.0854,"probs":{"Natural royal":0.00002471,"Five of a kind":0.00009293,"Wild royal":0.00010399,"Straight flush":0.00059413,"Four of a kind":0.00850657,"Full house":0.01562642,"Flush":0.01583894,"Straight":0.01685321,"Three of a kind":0.13331316,"Two pair":0.11066732,"Kings or better":0.14134785,"Nothing":0.55703077}},"0,1,1,2,3,5,7,15,50,100,200,800":{"ret":96.3848,"probs":{"Natural royal":0.00002505,"Five of a kind":0.00009287,"Wild royal":0.00010474,"Straight flush":0.00059712,"Four of a kind":0.00849947,"Full house":0.01561838,"Flush":0.01589276,"Straight":0.01689356,"Three of a kind":0.13320679,"Two pair":0.11062085,"Kings or better":0.14090123,"Nothing":0.55754717}},"0,1,1,2,3,5,7,20,50,100,200,800":{"ret":100.6463,"probs":{"Natural royal":0.00002426,"Five of a kind":0.00009334,"Wild royal":0.00010405,"Straight flush":0.00057488,"Four of a kind":0.00855538,"Full house":0.01567909,"Flush":0.01557662,"Straight":0.01659493,"Three of a kind":0.1339371,"Two pair":0.1108732,"Kings or better":0.14195799,"Nothing":0.55602915}}};
+  function $(id) { return document.getElementById(id); }
+  var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ---------- money: dollars inside, credits on screen ---------- */
+  var DENOMS = [0.01, 0.05, 0.25, 1, 5], denIdx = 2;
+  var HANDS = [1, 3, 5, 10], handsIdx = 1;
+  var coins = 5, tableIdx = 0, fast = false, balance = 500, lastWin = 0;
+  function denom() { return DENOMS[denIdx]; }
+  function denLabel(d) { return d < 1 ? Math.round(d * 100) + '¢' : '$' + d; }
+  function hands() { return HANDS[handsIdx]; }
+  function tbl() { return TABLES[tableIdx]; }
+  function betCredits() { return coins * hands(); }
+  function bet() { return betCredits() * denom(); }
+  function money(x) {
+    var c = Math.round(x / denom() * 100) / 100;
+    return Math.abs(c - Math.round(c)) < 1e-9 ? Math.round(c).toLocaleString('en-US') : c.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  }
+  function cash(x) { return (x < -0.004 ? '-' : '') + '$' + Math.abs(x).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function sleep(ms) { return new Promise(function (r) { setTimeout(r, ms); }); }
+
+  /* ---------- saving ---------- */
+  var SAVE_KEY = 'joker-wild-save-v1';
+  var sess = null, history = [], stats = { hands: 0, cats: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0] };
+  function newSession() { return { start: Date.now(), games: 0, hands: 0, bet: 0, paid: 0, best: 0 }; }
+  (function load() {
+    var d = null;
+    try { d = JSON.parse(localStorage.getItem(SAVE_KEY) || 'null'); } catch (e) {}
+    if (d) {
+      if (typeof d.balance === 'number' && d.balance >= 0) balance = Math.round(d.balance * 100) / 100;
+      if (typeof d.denIdx === 'number') denIdx = Math.max(0, Math.min(DENOMS.length - 1, d.denIdx));
+      if (typeof d.handsIdx === 'number') handsIdx = Math.max(0, Math.min(HANDS.length - 1, d.handsIdx));
+      if (typeof d.coins === 'number') coins = Math.max(1, Math.min(5, d.coins));
+      if (typeof d.tableIdx === 'number') tableIdx = Math.max(0, Math.min(TABLES.length - 1, d.tableIdx));
+      if (typeof d.fast === 'boolean') fast = d.fast;
+      if (d.stats && Array.isArray(d.stats.cats) && d.stats.cats.length === 12) stats = d.stats;
+      if (Array.isArray(d.history)) history = d.history.slice(0, 30);
+      if (d.sess && d.sess.games > 0) history.unshift(d.sess);
+    }
+    history = history.slice(0, 30);
+    sess = newSession();
+  })();
+  function saveAll() {
+    try { localStorage.setItem(SAVE_KEY, JSON.stringify({ balance: balance, denIdx: denIdx, handsIdx: handsIdx, coins: coins, tableIdx: tableIdx, fast: fast, stats: stats, sess: sess, history: history })); } catch (e) {}
+  }
+
+  /* ---------- sound (synthesized, classic machine beeps and bells) ---------- */
+  var SFX = (function () {
+    var ctx = null, out = null, on = true;
+    try { if (localStorage.getItem('joker_sound') === 'off') on = false; } catch (e) {}
+    function ensure() {
+      if (!on) return null;
+      if (!ctx) {
+        var AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return null;
+        try { ctx = new AC(); out = ctx.createGain(); out.gain.value = 0.6; out.connect(ctx.destination); } catch (e) { ctx = null; return null; }
+      }
+      if (ctx.state === 'suspended') { try { ctx.resume(); } catch (e) {} }
+      return ctx;
+    }
+    function tone(f, t, dur, type, vol, to) {
+      var o = ctx.createOscillator(), g = ctx.createGain();
+      o.type = type || 'square'; o.frequency.setValueAtTime(f, t);
+      if (to) o.frequency.exponentialRampToValueAtTime(to, t + dur);
+      g.gain.setValueAtTime(0.0001, t); g.gain.exponentialRampToValueAtTime(vol, t + 0.004); g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+      o.connect(g); g.connect(out); o.start(t); o.stop(t + dur + 0.03);
+    }
+    function bell(f, t, vol, dur) { [[1, 1], [2.76, 0.4], [5.4, 0.15]].forEach(function (p) { tone(f * p[0], t, dur * (p[0] === 1 ? 1 : 0.5), 'sine', vol * p[1]); }); }
+    return {
+      get on() { return on; },
+      set: function (v) { on = v; try { localStorage.setItem('joker_sound', v ? 'on' : 'off'); } catch (e) {} if (v && ensure()) tone(880, ctx.currentTime, 0.06, 'square', 0.05); },
+      resume: function () { ensure(); },
+      card: function () { if (!ensure()) return; tone(1300, ctx.currentTime, 0.035, 'square', 0.035, 900); },
+      hold: function (v) { if (!ensure()) return; tone(v ? 990 : 660, ctx.currentTime, 0.07, 'square', 0.05); },
+      coin: function () { if (!ensure()) return; tone(1500, ctx.currentTime, 0.05, 'square', 0.04); },
+      tick: function () { if (!ensure()) return; bell(1760, ctx.currentTime, 0.05, 0.18); },
+      win: function (big) { if (!ensure()) return; var t = ctx.currentTime; (big ? [784, 988, 1175, 1568, 1976] : [988, 1319]).forEach(function (f, i) { bell(f, t + i * 0.09, 0.08, 0.6); }); },
+      lose: function () { if (!ensure()) return; tone(330, ctx.currentTime, 0.12, 'triangle', 0.03, 260); },
+      alarm: function () { if (!ensure()) return; var t = ctx.currentTime; for (var k = 0; k < 9; k++) bell(k % 2 ? 1480 : 1395, t + k * 0.055, 0.05, 0.3); }
+    };
+  })();
+
+  /* ---------- cards ---------- */
+  var RANKS = ['2', '3', '4', '5', '6', '7', '8', '9', '10', 'J', 'Q', 'K', 'A'];
+  var SUITS = ['♣', '♦', '♥', '♠'];
+  function cardName(c) { if (c === V.JOKER) return 'Joker'; return RANKS[c >> 2] + ' of ' + ['clubs', 'diamonds', 'hearts', 'spades'][c & 3]; }
+  function cardHTML(c, extra) {
+    if (c === null || c === undefined) return '<div class="card back' + (extra || '') + '" aria-label="Face down card"></div>';
+    if (c === V.JOKER) return '<div class="card joker' + (extra || '') + '" aria-label="Joker"><div class="jtxt">J<br>O<br>K<br>E<br>R</div><div class="jimg pic-JOKER"></div></div>';
+    var r = c >> 2, s = c & 3, red = s === 1 || s === 2;
+    var mid = r >= 9 ? '<div class="face">' + RANKS[r] + '<i>' + SUITS[s] + '</i></div>' : '<div class="pip">' + SUITS[s] + '</div>';
+    return '<div class="card' + (red ? ' red' : '') + (extra || '') + '" aria-label="' + cardName(c) + '"><div class="cr">' + RANKS[r] + '<i>' + SUITS[s] + '</i></div>' + mid + '</div>';
+  }
+
+  /* ---------- layout ---------- */
+  var mainSlots = [], holdBtns = [], miniEls = [];
+  function buildMain() {
+    var h = '', b = '';
+    for (var i = 0; i < 5; i++) {
+      h += '<div class="slot" id="slot' + i + '"><div class="heldtag">HELD</div><div class="cwrap" id="cw' + i + '" tabindex="0" role="button" aria-label="Card ' + (i + 1) + '">' + cardHTML(null) + '</div></div>';
+      b += '<button class="btn hold" id="hold' + i + '">Hold</button>';
+    }
+    $('main').innerHTML = h; $('holdrow').innerHTML = b;
+    for (i = 0; i < 5; i++) {
+      mainSlots[i] = $('slot' + i); holdBtns[i] = $('hold' + i);
+      (function (k) {
+        $('cw' + k).addEventListener('click', function () { toggleHold(k); });
+        $('cw' + k).addEventListener('keydown', function (e) { if (e.key === 'Enter') { e.preventDefault(); toggleHold(k); } });
+        holdBtns[k].addEventListener('click', function () { toggleHold(k); });
+      })(i);
+    }
+  }
+  function buildExtra() {
+    var n = hands(), h = '';
+    $('extra').className = 'extra n' + n;
+    for (var k = n - 1; k >= 1; k--) {
+      h += '<div class="mini" id="mini' + k + '" aria-label="Hand ' + (k + 1) + '">';
+      for (var i = 0; i < 5; i++) h += '<div id="m' + k + '_' + i + '">' + cardHTML(null) + '</div>';
+      h += '</div>';
+    }
+    $('extra').innerHTML = h;
+    miniEls = [];
+    for (k = 1; k < n; k++) miniEls[k] = $('mini' + k);
+  }
+  function buildPaytable() {
+    var t = tbl(), rows = [CAT.NROYAL, CAT.FIVEK, CAT.WROYAL, CAT.SF, CAT.QUADS, CAT.FULL, CAT.FLUSH, CAT.STR, CAT.TRIPS, CAT.TWOP, CAT.KOB], h = '';
+    rows.forEach(function (cat) {
+      h += '<tr id="pr' + cat + '"><td>' + NAMES[cat] + '</td>';
+      for (var c = 1; c <= 5; c++) h += '<td class="' + (c === coins ? 'cur' : '') + '">' + V.payFor(t, cat, c).toLocaleString('en-US') + '</td>';
+      h += '</tr>';
+    });
+    $('pt').innerHTML = h;
+  }
+
+  /* ---------- state ---------- */
+  var phase = 'idle', game = null, held = [false, false, false, false, false], busy = false;
+  function updateHud() {
+    $('bal').textContent = money(balance);
+    $('balCash').textContent = cash(balance);
+    $('betV').textContent = betCredits().toLocaleString('en-US');
+    $('betSub').textContent = hands() + (hands() === 1 ? ' hand' : ' hands') + ' x ' + coins;
+    $('winV').textContent = money(lastWin);
+    $('handsV').textContent = hands() === 1 ? 'Single' : hands() === 3 ? 'Triple' : hands() === 5 ? 'Five' : 'Ten';
+    $('denomV').textContent = denLabel(denom());
+    $('gameV').textContent = tbl().id;
+    $('speedV').textContent = fast ? 'Fast' : 'Normal';
+    $('sndV').textContent = SFX.on ? 'On' : 'Off';
+    $('coinsV').textContent = coins + (coins === 1 ? ' coin' : ' coins');
+    $('sub').textContent = 'KINGS OR BETTER · ' + (hands() === 1 ? 'SINGLE HAND' : hands() === 3 ? 'TRIPLE PLAY' : hands() === 5 ? 'FIVE PLAY' : 'TEN PLAY');
+    $('info').textContent = 'Denom ' + denLabel(denom()) + ' · ' + tbl().name + ' · ' + (coins === 5 ? tbl().ret5 : tbl().ret1).toFixed(2) + '% with perfect play';
+    var idle = phase === 'idle' && !busy;
+    ['handsBtn', 'denomBtn', 'gameBtn', 'betOne', 'betMax'].forEach(function (id) { $(id).disabled = !idle; });
+    $('deal').textContent = phase === 'dealt' ? 'Draw' : 'Deal';
+    $('deal').disabled = busy;
+    for (var i = 0; i < 5; i++) { holdBtns[i].disabled = phase !== 'dealt' || busy; holdBtns[i].classList.toggle('on', held[i]); mainSlots[i].classList.toggle('held', held[i]); }
+    document.documentElement.dataset.busy = busy || phase === 'dealt' ? '1' : '0';
+    document.documentElement.dataset.phase = phase;
+  }
+  function say(h) { $('msg').innerHTML = h; }
+  function status(t, win) { $('status').textContent = t; $('status').classList.toggle('win', !!win); }
+  function clearWins() {
+    var rows = document.querySelectorAll('.pt tr.hit'); for (var i = 0; i < rows.length; i++) rows[i].classList.remove('hit');
+    for (i = 0; i < 5; i++) mainSlots[i].classList.remove('wincard');
+  }
+  function setMain(i, c, animate) {
+    var w = $('cw' + i); w.innerHTML = cardHTML(c, animate && !reduceMotion ? ' flip' : '');
+  }
+  function setMini(k, i, c, animate) { var el = $('m' + k + '_' + i); if (el) el.innerHTML = cardHTML(c, animate && !reduceMotion ? ' flip' : ''); }
+  // upper hands show the held cards in place and face down cards everywhere else, like the real machine
+  function mirrorHolds() {
+    for (var k = 1; k < hands(); k++) {
+      var m = miniEls[k]; if (!m) continue;
+      var r = m.querySelector('.res'); if (r) r.remove();
+      m.classList.remove('win');
+      for (var i = 0; i < 5; i++) setMini(k, i, held[i] ? game.hand[i] : null, false);
+    }
+  }
+  function toggleHold(i) {
+    if (phase !== 'dealt' || busy) return;
+    held[i] = !held[i];
+    SFX.hold(held[i]);
+    mirrorHolds();
+    updateHud();
+  }
+
+  /* ---------- play ---------- */
+  async function dealOrDraw() {
+    SFX.resume();
+    if (busy) return;
+    if (phase === 'idle') return deal();
+    if (phase === 'dealt') return drawCards();
+  }
+  async function deal() {
+    if (balance < bet() - 1e-9) { say('Not enough credits for that bet. Lower the coins, hands or denomination, or reset credits.'); return; }
+    busy = true;
+    balance -= bet();
+    lastWin = 0;
+    sess.games++; sess.bet += bet();
+    clearWins();
+    status('Good luck');
+    buildExtra();
+    game = V.deal();
+    held = [false, false, false, false, false];
+    updateHud();
+    for (var i = 0; i < 5; i++) setMain(i, null, false);
+    var gap = fast ? 25 : 70;
+    for (i = 0; i < 5; i++) { await sleep(gap); setMain(i, game.hand[i], true); SFX.card(); }
+    phase = 'dealt';
+    busy = false;
+    var now = V.evaluate(game.hand);
+    status(now ? NAMES[now] : 'Hold cards, then draw', !!now);
+    say('Tap the cards you want to keep, then <strong>Draw</strong>.' + (game.hand.indexOf(V.JOKER) >= 0 ? ' You have the joker. It is wild, so you will almost always want to hold it.' : ''));
+    updateHud();
+    saveAll();
+  }
+  async function drawCards() {
+    busy = true; updateHud();
+    var b = bet(), coinPay = denom();
+    var results = V.draw(game, held, hands());
+    var gap = fast ? 25 : 70, i, k;
+    // the main hand draws first
+    for (i = 0; i < 5; i++) if (!held[i]) { await sleep(gap); setMain(i, results[0][i], true); SFX.card(); }
+    var total = 0, best = 0, bestCat = 0, catsHit = {};
+    var mainCat = V.evaluate(results[0]), mainPay = V.payFor(tbl(), mainCat, coins);
+    total += mainPay; catsHit[mainCat] = true; stats.cats[mainCat]++; stats.hands++;
+    if (mainCat > bestCat) bestCat = mainCat;
+    // then the upper hands fill in from the bottom up
+    var handGap = fast ? 40 : (hands() >= 10 ? 90 : 160);
+    for (k = 1; k < hands(); k++) {
+      await sleep(handGap);
+      for (i = 0; i < 5; i++) setMini(k, i, results[k][i], !held[i]);
+      SFX.card();
+      var cat = V.evaluate(results[k]), pay = V.payFor(tbl(), cat, coins);
+      stats.cats[cat]++; stats.hands++;
+      if (pay > 0) {
+        total += pay; catsHit[cat] = true; if (cat > bestCat) bestCat = cat;
+        var r = document.createElement('div'); r.className = 'res'; r.textContent = NAMES[cat] + ' ' + pay.toLocaleString('en-US');
+        miniEls[k].appendChild(r); miniEls[k].classList.add('win');
+      }
+    }
+    sess.hands += hands();
+    Object.keys(catsHit).forEach(function (c) { if (+c > 0) { var row = $('pr' + c); if (row) row.classList.add('hit'); } });
+    if (mainPay > 0) { status(NAMES[mainCat] + ' · ' + mainPay.toLocaleString('en-US'), true); } else status(hands() > 1 && total > 0 ? 'Bottom hand: no win' : 'Game over', false);
+    phase = 'idle';
+    var credit = total * coinPay, balBefore = balance;
+    if (total > 0) {
+      var xBet = credit / b;
+      if (xBet >= 25 || bestCat >= CAT.SF) await bigWin(bestCat, credit, balBefore);
+      else await rollUp(credit, balBefore, total);
+      say('<strong>Won ' + total.toLocaleString('en-US') + ' credits</strong> (' + cash(credit) + ') on ' + hands() + (hands() === 1 ? ' hand.' : ' hands.'));
+    } else { SFX.lose(); say('No win. Press <strong>Deal</strong> to play again.'); }
+    balance = balBefore + credit;
+    lastWin = credit;
+    sess.paid += credit; if (credit > sess.best) sess.best = credit;
+    if (credit >= 1200 - 1e-9) await handPay(credit, bestCat);
+    busy = false;
+    updateHud(); renderSession(); renderOdds(); saveAll();
+  }
+  async function rollUp(credit, balBefore, credits) {
+    SFX.win(false);
+    var steps = Math.min(40, Math.max(4, Math.round(credits / Math.max(1, coins)))), ms = fast ? 250 : Math.min(1800, 300 + steps * 45);
+    var t0 = performance.now(), last = -1;
+    await new Promise(function (res) {
+      (function frame(now) {
+        var q = Math.min(1, (now - t0) / ms), x = credit * q;
+        $('winV').textContent = money(Math.floor(x / denom() + 1e-9) * denom());
+        $('bal').textContent = money(balBefore + Math.floor(x / denom() + 1e-9) * denom());
+        var s = Math.floor(q * steps); if (s !== last) { last = s; SFX.tick(); }
+        if (q < 1) requestAnimationFrame(frame); else res();
+      })(t0);
+    });
+  }
+  function bigWin(cat, credit, balBefore) {
+    return new Promise(function (resolve) {
+      var ov = $('bigwin');
+      $('bwT').textContent = cat >= CAT.QUADS ? NAMES[cat] : 'BIG WIN';
+      $('bwS').textContent = cash(credit);
+      $('bwV').textContent = '0';
+      ov.hidden = false;
+      SFX.win(true);
+      var ms = fast ? 900 : 2600, t0 = performance.now(), last = -1, done = false;
+      function finish() { if (done) return; done = true; ov.removeEventListener('click', skip); setTimeout(function () { ov.hidden = true; resolve(); }, fast ? 300 : 900); }
+      function skip() { ms = 1; }
+      ov.addEventListener('click', skip);
+      (function frame(now) {
+        var q = Math.min(1, (now - t0) / ms), x = Math.floor(credit * q / denom() + 1e-9) * denom();
+        $('bwV').textContent = money(x); $('winV').textContent = money(x); $('bal').textContent = money(balBefore + x);
+        var s = Math.floor(q * 30); if (s !== last) { last = s; SFX.tick(); }
+        if (q < 1) requestAnimationFrame(frame); else finish();
+      })(t0);
+    });
+  }
+  function handPay(amount, cat) {
+    return new Promise(function (resolve) {
+      var ov = $('handpay'), btn = $('hpBtn'), fill = $('hpFill');
+      $('hpT').textContent = cat === CAT.NROYAL ? 'ROYAL FLUSH' : 'JACKPOT';
+      $('hpV').textContent = money(amount) + ' credits';
+      $('hpC').textContent = cash(amount);
+      ov.hidden = false; $('tower').classList.add('on');
+      SFX.alarm();
+      var ring = setInterval(function () { SFX.alarm(); }, 700), hold = null, t0 = 0, raf = 0;
+      function tick() { var q = Math.min(1, (performance.now() - t0) / 2000); fill.style.width = (q * 100) + '%'; if (q >= 1) return finish(); raf = requestAnimationFrame(tick); }
+      function down(e) { if (e) e.preventDefault(); if (hold) return; hold = true; t0 = performance.now(); raf = requestAnimationFrame(tick); }
+      function up() { hold = null; cancelAnimationFrame(raf); fill.style.width = '0'; }
+      function key(e) { if (e.code === 'Space' || e.code === 'Enter') { e.preventDefault(); e.stopPropagation(); if (e.type === 'keydown') { if (!e.repeat) down(); } else up(); } }
+      function finish() {
+        cancelAnimationFrame(raf); clearInterval(ring);
+        btn.removeEventListener('pointerdown', down); btn.removeEventListener('pointerup', up); btn.removeEventListener('pointerleave', up); btn.removeEventListener('pointercancel', up);
+        document.removeEventListener('keydown', key, true); document.removeEventListener('keyup', key, true);
+        fill.style.width = '0'; ov.hidden = true; $('tower').classList.remove('on');
+        resolve();
+      }
+      btn.addEventListener('pointerdown', down); btn.addEventListener('pointerup', up); btn.addEventListener('pointerleave', up); btn.addEventListener('pointercancel', up);
+      document.addEventListener('keydown', key, true); document.addEventListener('keyup', key, true);
+      btn.focus();
+    });
+  }
+
+  /* ---------- session and odds panels ---------- */
+  function renderSession() {
+    var p = sess.paid - sess.bet;
+    $('ssGames').textContent = sess.games.toLocaleString('en-US');
+    $('ssHands').textContent = sess.hands.toLocaleString('en-US');
+    $('ssProfit').textContent = (p > 0 ? '+' : '') + cash(p);
+    $('ssProfit').className = 'v' + (p > 0.004 ? ' up' : p < -0.004 ? ' down' : '');
+    $('ssBet').textContent = cash(sess.bet); $('ssWon').textContent = cash(sess.paid); $('ssBest').textContent = cash(sess.best);
+    if (!history.length) { $('ssHist').innerHTML = '<p style="margin:6px 0 0">No past sessions yet.</p>'; return; }
+    var h = '<table><tr><th>Date</th><th>Games</th><th>Profit</th></tr>';
+    history.slice(0, 10).forEach(function (x) {
+      var pr = x.paid - x.bet, dt = new Date(x.start);
+      h += '<tr><td>' + (dt.getMonth() + 1) + '/' + dt.getDate() + ' ' + dt.toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' }) + '</td><td>' + x.games + '</td><td class="' + (pr > 0.004 ? 'up' : pr < -0.004 ? 'down' : '') + '">' + (pr > 0 ? '+' : '') + cash(pr) + '</td></tr>';
+    });
+    $('ssHist').innerHTML = h + '</table>';
+  }
+  function renderOdds() {
+    var t = tbl(), key = t.pays.slice(0, 11).concat([800]).join(','), o = ODDS[key];
+    $('oddsH').textContent = 'Odds: ' + t.name;
+    $('ret').innerHTML = '<b>' + t.ret5.toFixed(2) + '%</b> payback with perfect play at 5 coins<br><span style="color:var(--mute)">' + t.ret1.toFixed(2) + '% at 1 to 4 coins, because the royal only pays 250 per coin below max bet.</span>';
+    var rows = [CAT.NROYAL, CAT.FIVEK, CAT.WROYAL, CAT.SF, CAT.QUADS, CAT.FULL, CAT.FLUSH, CAT.STR, CAT.TRIPS, CAT.TWOP, CAT.KOB, CAT.NOTHING];
+    var h = '<tr><th>Hand</th><th>Pays (5 coins)</th><th>Chance</th><th>Yours</th></tr>';
+    rows.forEach(function (cat) {
+      var p = o ? o.probs[cat === CAT.NROYAL ? 'Natural royal' : cat === CAT.WROYAL ? 'Wild royal' : cat === CAT.KOB ? 'Kings or better' : NAMES[cat].charAt(0) + NAMES[cat].slice(1).toLowerCase()] : 0;
+      var mine = stats.cats[cat];
+      h += '<tr><td>' + NAMES[cat] + '</td><td>' + (cat ? V.payFor(t, cat, 5).toLocaleString('en-US') : '-') + '</td><td>' + (p ? (1 / p >= 10 ? '1 in ' + Math.round(1 / p).toLocaleString('en-US') : (p * 100).toFixed(1) + '%') : '-') + '</td><td>' + mine.toLocaleString('en-US') + (stats.hands ? ' <span style="color:var(--mute)">(' + (mine / stats.hands * 100).toFixed(mine / stats.hands < 0.01 ? 2 : 1) + '%)</span>' : '') + '</td></tr>';
+    });
+    h += '<tr><td>Hands played</td><td></td><td></td><td>' + stats.hands.toLocaleString('en-US') + '</td></tr>';
+    $('oddsT').innerHTML = h;
+  }
+
+  /* ---------- controls ---------- */
+  function idle() { return phase === 'idle' && !busy; }
+  $('deal').addEventListener('click', dealOrDraw);
+  $('betOne').addEventListener('click', function () { if (!idle()) return; coins = coins % 5 + 1; SFX.coin(); buildPaytable(); updateHud(); renderOdds(); saveAll(); });
+  $('betMax').addEventListener('click', function () { if (!idle()) return; coins = 5; buildPaytable(); updateHud(); saveAll(); dealOrDraw(); });
+  $('handsBtn').addEventListener('click', function () { if (!idle()) return; handsIdx = (handsIdx + 1) % HANDS.length; SFX.coin(); buildExtra(); updateHud(); saveAll(); say(hands() === 1 ? 'Single hand.' : hands() + ' hands: every hand gets your holds and draws from its own deck. Bet is ' + betCredits() + ' credits.'); });
+  $('denomBtn').addEventListener('click', function () { if (!idle()) return; denIdx = (denIdx + 1) % DENOMS.length; SFX.coin(); updateHud(); saveAll(); say('Each credit is now worth ' + denLabel(denom()) + '. Bet ' + betCredits() + ' credits (' + cash(bet()) + ').'); });
+  $('gameBtn').addEventListener('click', function () { if (!idle()) return; tableIdx = (tableIdx + 1) % TABLES.length; SFX.coin(); buildPaytable(); updateHud(); renderOdds(); saveAll(); say('Now playing the <strong>' + tbl().name + '</strong> machine: four of a kind pays ' + tbl().pays[CAT.QUADS] + ' per coin, ' + tbl().ret5.toFixed(2) + '% payback with perfect play.'); });
+  $('speedBtn').addEventListener('click', function () { fast = !fast; $('speedBtn').setAttribute('aria-pressed', fast ? 'true' : 'false'); updateHud(); saveAll(); });
+  $('sndBtn').addEventListener('click', function () { SFX.set(!SFX.on); $('sndBtn').setAttribute('aria-pressed', SFX.on ? 'true' : 'false'); updateHud(); });
+  $('reset').addEventListener('click', function () { if (!idle()) return; balance = 500; lastWin = 0; updateHud(); saveAll(); say('Credits reset to ' + money(500) + ' (' + cash(500) + ').'); });
+  $('newSess').addEventListener('click', function () { if (!idle()) return; if (sess.games > 0) history.unshift(sess); history = history.slice(0, 30); sess = newSession(); renderSession(); saveAll(); say('New session started. Your credits carry over.'); });
+  document.addEventListener('keydown', function (e) {
+    if (e.target && e.target.tagName === 'INPUT') return;
+    if (!$('handpay').hidden) return;
+    if (e.code === 'Space' && (e.target === document.body || e.target === document.documentElement || (e.target.classList && e.target.classList.contains('cwrap')))) { e.preventDefault(); dealOrDraw(); }
+    var n = '12345'.indexOf(e.key); if (n >= 0) toggleHold(n);
+  });
+  var tabs = ['odds', 'how'];
+  tabs.forEach(function (k) { $('tab-' + k).addEventListener('click', function () { tabs.forEach(function (j) { $('tab-' + j).setAttribute('aria-selected', j === k ? 'true' : 'false'); $('pane-' + j).hidden = j !== k; }); }); });
+
+  buildMain(); buildExtra(); buildPaytable(); updateHud(); renderSession(); renderOdds();
+  $('speedBtn').setAttribute('aria-pressed', fast ? 'true' : 'false');
+  $('sndBtn').setAttribute('aria-pressed', SFX.on ? 'true' : 'false');
+})();
+</script>
+
+</html>
